@@ -1,4 +1,4 @@
-package com.eisoo.telemetry.utils;
+package com.eisoo.telemetry.log.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

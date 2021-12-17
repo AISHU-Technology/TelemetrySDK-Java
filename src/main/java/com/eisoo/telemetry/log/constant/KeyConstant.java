@@ -1,4 +1,4 @@
-package com.eisoo.telemetry.constant;
+package com.eisoo.telemetry.log.constant;
 
 public enum KeyConstant {
     MESSAGE("Message"),

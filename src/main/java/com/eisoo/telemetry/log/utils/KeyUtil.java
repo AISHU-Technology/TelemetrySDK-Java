@@ -1,4 +1,4 @@
-package com.eisoo.telemetry.utils;
+package com.eisoo.telemetry.log.utils;
 
 import java.security.SecureRandom;
 

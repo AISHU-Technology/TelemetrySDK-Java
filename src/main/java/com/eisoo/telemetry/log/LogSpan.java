@@ -1,8 +1,8 @@
-package com.eisoo.telemetry;
+package com.eisoo.telemetry.log;
 
 
-import com.eisoo.telemetry.constant.KeyConstant;
-import com.eisoo.telemetry.utils.KeyUtil;
+import com.eisoo.telemetry.log.constant.KeyConstant;
+import com.eisoo.telemetry.log.utils.KeyUtil;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

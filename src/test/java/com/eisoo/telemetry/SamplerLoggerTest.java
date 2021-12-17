@@ -1,5 +1,9 @@
 package com.eisoo.telemetry;
 
+import com.eisoo.telemetry.log.Attributes;
+import com.eisoo.telemetry.log.Body;
+import com.eisoo.telemetry.log.Level;
+import com.eisoo.telemetry.log.SamplerLogger;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.trace.Span;

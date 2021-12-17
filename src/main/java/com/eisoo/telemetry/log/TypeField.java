@@ -1,4 +1,4 @@
-package com.eisoo.telemetry;
+package com.eisoo.telemetry.log;
 
 public class TypeField {
     private String type;

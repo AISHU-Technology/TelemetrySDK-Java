@@ -1,4 +1,4 @@
-package com.eisoo.telemetry;
+package com.eisoo.telemetry.log;
 
 //日志等级
 public enum Level {
