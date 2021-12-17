@@ -1,2 +1,2 @@
-telemetry-java/target/*
-telemetry-java/.idea/*
+target/*
+.idea/*
