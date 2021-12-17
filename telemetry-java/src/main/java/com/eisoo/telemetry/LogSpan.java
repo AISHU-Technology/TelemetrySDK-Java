@@ -45,7 +45,7 @@ public class LogSpan {
         try {
             resource.put("HostName", InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
     }
 

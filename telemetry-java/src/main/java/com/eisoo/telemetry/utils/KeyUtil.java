@@ -1,6 +1,6 @@
 package com.eisoo.telemetry.utils;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 public class KeyUtil {
 
@@ -25,7 +25,7 @@ public class KeyUtil {
     private static String getRandomValue(int numSize) {
         StringBuilder result = new StringBuilder(numSize);
         for (int i = 0; i < numSize; i++) {
-            result.append(Integer.toHexString(new Random().nextInt(16)));
+            result.append(Integer.toHexString(new SecureRandom().nextInt(16)));
         }
         return result.toString();
     }
