@@ -9,6 +9,7 @@ import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.jaeger.JaegerGrpcSpanExporter;
+import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
@@ -101,25 +102,14 @@ public class SamplerLoggerTest {
     public void testTraceIdAndSpanId() {
         final SamplerLogger logger = new SamplerLogger();
 
-        ManagedChannel jaegerChannel =
-        //需要在localhost启一个jaeger服务，开通14250和16686端口，在http://localhost:16686/查看，但不启动jaeger服务也可以生成span完成测试
-                ManagedChannelBuilder.forAddress("localhost", 14250).usePlaintext().build();
-        // Export traces to Jaeger
-        JaegerGrpcSpanExporter jaegerExporter =
-                JaegerGrpcSpanExporter.builder()
-                        .setChannel(jaegerChannel)
-                        .setTimeout(30, TimeUnit.SECONDS)
-                        .build();
-
         Resource serviceNameResource =
                 Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example"));
-
 
         // Set to process the spans by the Jaeger Exporter
         SdkTracerProvider tracerProvider =
                 SdkTracerProvider.builder()
-                        .addSpanProcessor(SimpleSpanProcessor.create(jaegerExporter))
-//                        .addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()))
+//                        .addSpanProcessor(SimpleSpanProcessor.create(jaegerExporter))
+                        .addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()))
                         .setResource(Resource.getDefault().merge(serviceNameResource))
                         .build();
         OpenTelemetrySdk openTelemetry =
