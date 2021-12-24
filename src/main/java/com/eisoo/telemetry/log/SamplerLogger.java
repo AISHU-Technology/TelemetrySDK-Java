@@ -1,18 +1,20 @@
 package com.eisoo.telemetry.log;
 
 import com.eisoo.telemetry.log.constant.KeyConstant;
-import io.opentelemetry.api.trace.Span;
 import com.eisoo.telemetry.log.utils.JsonUtil;
+import io.opentelemetry.api.trace.SpanContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
 
-
 public class SamplerLogger {
+    static final Logger logger = LoggerFactory.getLogger(SamplerLogger.class);
 
-
+    //日志等级：默认是info
     private Level level = Level.INFO;
-
+    //最终输出的日志内容
     private String result;
 
     public Level getLevel() {
@@ -38,17 +40,17 @@ public class SamplerLogger {
             return;
         }
 
-        final LogSpan logSpan = new LogSpan();
+        Log log = new Log();
 
         //日志等级
-        logSpan.setSeverityText(l.toString());
+        log.setSeverityText(l.toString());
 
         //消息体
-        final HashMap<String, Object> bodyMap = new HashMap<>();
+        HashMap<String, Object> bodyMap = new HashMap<>();
 
 
         for (Object o : objects) {
-            //消息体只有字符串时才可以有Message
+            //消息体只有字符串时才可以有Message属性
             if (o instanceof String && bodyMap.isEmpty()) {
                 bodyMap.put(KeyConstant.MESSAGE.toString(), o);
                 //消息体是一个Body类实例
@@ -62,18 +64,19 @@ public class SamplerLogger {
                 final HashMap<String, Object> attrMap = new HashMap<>();
                 attrMap.put(KeyConstant.TYPE.toString(), attributes.getType());
                 attrMap.put(attributes.getType(), attributes.getField());
-                logSpan.setAttributes(attrMap);
+                log.setAttributes(attrMap);
                 //传入的是span类实例，把原traceId和spanId修改为span的traceId和spanId
-            } else if (o instanceof Span) {
-                final Span span = (Span) o;
-                logSpan.setTraceId(span.getSpanContext().getTraceId());
-                logSpan.setSpanId(span.getSpanContext().getSpanId());
+            } else if (o instanceof SpanContext) {
+                final SpanContext spanContext = (SpanContext) o;
+                log.setTraceId(spanContext.getTraceId());
+                log.setSpanId(spanContext.getSpanId());
             }
         }
 
-        logSpan.setBody(bodyMap);
-        setResult(JsonUtil.toJson(logSpan));
-        System.out.println(getResult());
+        log.setBody(bodyMap);
+        setResult(JsonUtil.toJson(log));
+
+        logger.info(getResult());
     }
 
     public void trace(Object... o) {

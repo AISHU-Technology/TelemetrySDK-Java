@@ -1,0 +1,45 @@
+package com.eisoo.telemetry.log.utils;
+
+
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+
+
+import io.opentelemetry.api.trace.SpanId;
+import io.opentelemetry.api.trace.TraceId;
+import javax.annotation.concurrent.ThreadSafe;
+
+/** Interface used by the {@link //SdkTracer} to generate new {@link SpanId}s and {@link TraceId}s. */
+@ThreadSafe
+public interface IdGenerator {
+
+    /**
+     * Returns a {@link IdGenerator} that generates purely random IDs, which is the default for
+     * OpenTelemetry.
+     *
+     * <p>The underlying implementation uses {@link java.util.concurrent.ThreadLocalRandom} for
+     * randomness but may change in the future.
+     */
+    static IdGenerator random() {
+        // note: uses RandomHolder's platformDefault to account for android.
+        return RandomIdGenerator.INSTANCE;
+    }
+
+    /**
+     * Generates a new valid {@code SpanId}.
+     *
+     * @return a new valid {@code SpanId}.
+     */
+    String generateSpanId();
+
+    /**
+     * Generates a new valid {@code TraceId}.
+     *
+     * @return a new valid {@code TraceId}.
+     */
+    String generateTraceId();
+}
+

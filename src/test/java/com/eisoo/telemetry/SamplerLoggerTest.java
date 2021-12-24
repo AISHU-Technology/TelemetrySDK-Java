@@ -4,11 +4,8 @@ import com.eisoo.telemetry.log.Attributes;
 import com.eisoo.telemetry.log.Body;
 import com.eisoo.telemetry.log.Level;
 import com.eisoo.telemetry.log.SamplerLogger;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.exporter.jaeger.JaegerGrpcSpanExporter;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
@@ -18,16 +15,15 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
 
 public class SamplerLoggerTest {
 
     //测试消息体Body是字符串时的情况
     @Test
     public void testString() {
-        final SamplerLogger logger = new SamplerLogger();
-
-        logger.setLevel(Level.TRACE);
+        final SamplerLogger logger = new SamplerLogger();       //生成日志实例
+        logger.setLevel(Level.TRACE);                           //（可选）配置系统日志等级，默认是info
+        logger.info("test hello world");                   //生成info级别的字符串日志：test hello world
         logger.trace(logger.getLevel().toString());
         logger.debug(logger.getLevel().toString());
         logger.info(logger.getLevel().toString());
@@ -91,6 +87,7 @@ public class SamplerLoggerTest {
         final Attributes attributes = new Attributes();
         attributes.setType("animalType");
         attributes.setField(animal);
+
         logger.trace("bodyAbc", attributes);
         logger.warn("bodyAbc", attributes);
 
@@ -108,7 +105,6 @@ public class SamplerLoggerTest {
         // Set to process the spans by the Jaeger Exporter
         SdkTracerProvider tracerProvider =
                 SdkTracerProvider.builder()
-//                        .addSpanProcessor(SimpleSpanProcessor.create(jaegerExporter))
                         .addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()))
                         .setResource(Resource.getDefault().merge(serviceNameResource))
                         .build();
@@ -123,7 +119,7 @@ public class SamplerLoggerTest {
         final String message = "using existed traceId and spanId";
         System.out.println("traceId:" + span.getSpanContext().getTraceId());
         System.out.println("spanId:" + span.getSpanContext().getSpanId());
-        logger.info(message, span);
+        logger.info(message, span.getSpanContext());
         span.end();
 
         String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":(.*),\"Body\":(.*)\"Message\":(.*)" + message + "(.*),\"Attributes\":(.*),\"Resource\":(.*)\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"(.*)";

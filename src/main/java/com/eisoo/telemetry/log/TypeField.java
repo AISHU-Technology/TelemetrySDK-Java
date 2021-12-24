@@ -1,7 +1,10 @@
 package com.eisoo.telemetry.log;
 
+
 public class TypeField {
+    //类型
     private String type;
+    //内容
     private Object field;
 
     public String getType() {

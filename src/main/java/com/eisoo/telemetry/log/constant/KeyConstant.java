@@ -5,7 +5,7 @@ public enum KeyConstant {
     TYPE("Type");
 
     private String key;
-    private KeyConstant(String k){
+    KeyConstant(String k){
         this.key = k;
     }
 

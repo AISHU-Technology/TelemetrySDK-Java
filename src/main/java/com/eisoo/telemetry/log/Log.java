@@ -2,7 +2,7 @@ package com.eisoo.telemetry.log;
 
 
 import com.eisoo.telemetry.log.constant.KeyConstant;
-import com.eisoo.telemetry.log.utils.KeyUtil;
+import com.eisoo.telemetry.log.utils.IdGenerator;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -10,19 +10,20 @@ import java.util.HashMap;
 import java.util.Map;
 import com.google.gson.annotations.SerializedName;
 
-public class LogSpan {
+
+public class Log {
 
     @SerializedName("Version")
     private  String version = "v1.6.1";
 
     @SerializedName("TraceId")
-    private String traceId = KeyUtil.getTraceId();
+    private String traceId = IdGenerator.random().generateTraceId();
 
     @SerializedName("SpanId")
-    private String spanId = KeyUtil.getSpanId();
+    private String spanId = IdGenerator.random().generateSpanId();
 
     @SerializedName("Timestamp")
-    private Long timestamp = KeyUtil.getNanoSecond();
+    private Long timestamp = System.currentTimeMillis() * 1000000L + System.nanoTime() % 1000000L;
 
     @SerializedName("SeverityText")
     private String severityText = Level.INFO.toString();
@@ -36,7 +37,7 @@ public class LogSpan {
     @SerializedName("Resource")
     private Map<String, String> resource = new HashMap<>();
 
-    public LogSpan() {
+    public Log() {
         body.put(KeyConstant.MESSAGE.toString(), "");
         resource.put("Telemetry.SDK.Name", "Telemetry SDK");
         resource.put("Telemetry.SDK.Version", "2.0.0");
@@ -45,7 +46,7 @@ public class LogSpan {
         try {
             resource.put("HostName", InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException e) {
-            System.out.println(e.toString());
+            SamplerLogger.logger.info("Log get HostName failed: " , e);
         }
     }
 
