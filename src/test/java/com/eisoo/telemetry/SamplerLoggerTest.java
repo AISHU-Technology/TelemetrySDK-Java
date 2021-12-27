@@ -21,23 +21,23 @@ public class SamplerLoggerTest {
     //测试消息体Body是字符串时的情况
     @Test
     public void testString() {
-        final SamplerLogger logger = new SamplerLogger();       //生成日志实例
+        final SamplerLogger logger = SamplerLogger.getLogger();  //生成日志实例
         logger.setLevel(Level.TRACE);                           //（可选）配置系统日志等级，默认是info
         logger.info("test hello world");                   //生成info级别的字符串日志：test hello world
+        logger.trace();
         logger.trace(logger.getLevel().toString());
         logger.debug(logger.getLevel().toString());
         logger.info(logger.getLevel().toString());
         logger.warn(logger.getLevel().toString());
         logger.error(logger.getLevel().toString());
-        logger.fatal();
         logger.fatal(logger.getLevel().toString());
 
-        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":(.*),\"Body\":(.*)\"Message\":(.*),\"Attributes\":(.*),\"Resource\":(.*)\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"(.*)";
-        Assert.assertTrue(logger.getResult().matches(regLog));
+//        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"\\w+\"\\},\"Attributes\":\\{(.*)\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}";
+        Assert.assertTrue(logger.getResult().matches("\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"\\w+\"\\},\"Attributes\":\\{(.*)\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}"));
     }
 
     //测试用的自定义类
-    public class Animal {
+    private class Animal {
         private String name;
         private Integer age;
 
@@ -56,12 +56,20 @@ public class SamplerLoggerTest {
         public void setAge(Integer age) {
             this.age = age;
         }
+
+        public String getName() {
+            return name;
+        }
+
+        public Integer getAge() {
+            return age;
+        }
     }
 
     //测试给Body添加Animal类的实例
     @Test
     public void testBody() {
-        final SamplerLogger logger = new SamplerLogger();
+        final SamplerLogger logger = SamplerLogger.getLogger();;
         //Body: Animal实例
         final Animal animal = new Animal();
         animal.setName("little cat");
@@ -72,14 +80,15 @@ public class SamplerLoggerTest {
         body.setField(animal);
 
         logger.info(body);
-        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":(.*),\"Body\":\\{\"Type\":\"animal\",\"animal\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Attributes\":(.*),\"Resource\":(.*)\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"(.*)";
+
+        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Type\":\"animal\",\"animal\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Attributes\":\\{(.*)\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}";
         Assert.assertTrue(logger.getResult().matches(regLog));
     }
 
     //测试给Attributes添加Animal类的实例
     @Test
     public void testAttributes() {
-        final SamplerLogger logger = new SamplerLogger();
+        final SamplerLogger logger = SamplerLogger.getLogger();;
 
         //Attributes: Animal实例
         final Animal animal = new Animal("little cat", 2);
@@ -97,7 +106,7 @@ public class SamplerLoggerTest {
 
     @Test
     public void testTraceIdAndSpanId() {
-        final SamplerLogger logger = new SamplerLogger();
+        final SamplerLogger logger = SamplerLogger.getLogger();;
 
         Resource serviceNameResource =
                 Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example"));
@@ -117,12 +126,10 @@ public class SamplerLoggerTest {
         Span span = tracer.spanBuilder("Start my wonderful use case").startSpan();
         span.addEvent("Event 0");
         final String message = "using existed traceId and spanId";
-        System.out.println("traceId:" + span.getSpanContext().getTraceId());
-        System.out.println("spanId:" + span.getSpanContext().getSpanId());
         logger.info(message, span.getSpanContext());
         span.end();
 
-        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":(.*),\"Body\":(.*)\"Message\":(.*)" + message + "(.*),\"Attributes\":(.*),\"Resource\":(.*)\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"(.*)";
+        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"" + message + "\"\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}";
         Assert.assertTrue(logger.getResult().matches(regLog));
     }
 

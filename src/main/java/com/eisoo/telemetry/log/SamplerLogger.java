@@ -33,6 +33,13 @@ public class SamplerLogger {
         level = l;
     }
 
+    private SamplerLogger() {
+    }
+
+    public static SamplerLogger getLogger(){
+        return new SamplerLogger();
+    }
+
 
     private void common(Level l, Object... objects) {
         //日志等级低于配置，直接返回
