@@ -82,9 +82,7 @@ public class SamplerLoggerTest {
 
         logger.info(body);
 
-        String regLog = "^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Type\":\"animal\",\"animal\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
-
-        Assert.assertTrue(Pattern.matches(regLog, logger.getResult()));
+        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Type\":\"animal\",\"animal\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
         Assert.assertTrue(logger.getResult().matches(regLog));
     }
 
