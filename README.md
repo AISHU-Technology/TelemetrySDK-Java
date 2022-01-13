@@ -1,20 +1,24 @@
 ### sdk使用方式：
 ##### 命令行：
-    $ git clone https://gitlab.aishu.cn/anyrobot/observability/telemetrysdk/telemetryjava.git  
+    $ git clone https://gitlab.aishu.cn/anyrobot/observability/telemetrysdk/telemetry-java.git
     $ mvn clean install
 
 ##### 在pom.xml里添加：
     <dependency>
         <groupId>com.eisoo</groupId>
         <artifactId>SamplerLogger</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0.0</version>
     </dependency>
 
 ##### 使用代码
     //1.字符串日志：
-    SamplerLogger logger = new SamplerLogger();     //new SamplerLogger对象
-    logger.setLevel(Level.TRACE);                   //设置日志等级，默认是info
-    logger.trace("hello world");                    //可以看见打印信息
+    public void testString(){
+    //1.字符串日志：
+    Logger logger = LoggerFactory.getLogger("test");  //生成日志实例
+    SamplerLogConfig.setLevel(Level.TRACE);                 //（可选）配置系统日志等级，默认是DEBUG
+    logger.trace("hello world");
+    }
+    //可以看见打印信息
 
     //2.在body添加自定义类日志：
     //测试用的自定义类:Animal
@@ -41,7 +45,7 @@
 
     //2.1测试给Body添加Animal类的实例
     public void testBody() {
-        final SamplerLogger logger = new SamplerLogger();
+        final Logger logger = LoggerFactory.getLogger("test");  //生成日志实例
         //Body: Animal实例
         final Animal animal = new Animal();
         animal.setName("little cat");
@@ -57,7 +61,7 @@
 
     //2.2测试给Attributes添加Animal类的实例
     public void testAttributes() {
-        final SamplerLogger logger = new SamplerLogger();
+        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
 
         //Attributes: Animal实例
         final Animal animal = new Animal("little cat", 2);
@@ -69,10 +73,10 @@
         logger.info("bodyAbc", attributes);
     }
 
-    
+
     //3.当使用trace时，应当把SpanContext传入log，以便log能获得相应的TraceId和SpanId
     public void testTraceIdAndSpanId() {
-        final SamplerLogger logger = new SamplerLogger();
+        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
 
         Resource serviceNameResource =
                 Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example"));

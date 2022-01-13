@@ -1,53 +1,25 @@
 package com.eisoo.telemetry.log;
 
+
+import com.eisoo.telemetry.log.config.SamplerLogConfig;
 import com.eisoo.telemetry.log.constant.KeyConstant;
-import com.eisoo.telemetry.log.utils.JsonUtil;
 import io.opentelemetry.api.trace.SpanContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
+public class SamplerLogger implements com.eisoo.telemetry.log.Logger {
 
-public class SamplerLogger {
-    static final Logger logger = LoggerFactory.getLogger(SamplerLogger.class);
+    static final Dispatcher dispatcher = Dispatcher.getInstance();
 
-    //日志等级：默认是info
-    private Level level = Level.INFO;
-    //最终输出的日志内容
-    private String result;
-
-    public Level getLevel() {
-        return level;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public void setLevel(Level l) {
-        level = l;
-    }
-
-    private SamplerLogger() {
-    }
-
-    public static SamplerLogger getLogger(){
-        return new SamplerLogger();
-    }
-
+    private String name;
 
     private void common(Level l, Object... objects) {
         //日志等级低于配置，直接返回
-        if (l.toInt() < level.toInt()) {
+        if (l.toInt() < SamplerLogConfig.getLevel().toInt()) {
             return;
         }
 
-        Log log = new Log();
+        LogContent log = new LogContent();
 
         //日志等级
         log.setSeverityText(l.toString());
@@ -62,7 +34,7 @@ public class SamplerLogger {
                 bodyMap.put(KeyConstant.MESSAGE.toString(), o);
                 //消息体是一个Body类实例
             } else if (o instanceof Body) {
-                final Body body = (Body) o;
+                Body body = (Body) o;
                 bodyMap.put(KeyConstant.TYPE.toString(), body.getType());
                 bodyMap.put(body.getType(), body.getField());
                 //传入的是Attributes类实例
@@ -81,9 +53,8 @@ public class SamplerLogger {
         }
 
         log.setBody(bodyMap);
-        setResult(JsonUtil.toJson(log));
 
-        logger.info(getResult());
+        dispatcher.dispatchEvent(log);
     }
 
     public void trace(Object... o) {
@@ -108,6 +79,15 @@ public class SamplerLogger {
 
     public void fatal(Object... o) {
         common(Level.FATAL, o);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
 }

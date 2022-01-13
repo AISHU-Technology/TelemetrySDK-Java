@@ -1,9 +1,10 @@
 package com.eisoo.telemetry;
 
-import com.eisoo.telemetry.log.Attributes;
-import com.eisoo.telemetry.log.Body;
-import com.eisoo.telemetry.log.Level;
-import com.eisoo.telemetry.log.SamplerLogger;
+
+import com.eisoo.telemetry.log.*;
+import com.eisoo.telemetry.log.config.SamplerLogConfig;
+import com.eisoo.telemetry.log.output.BufferOut;
+import com.eisoo.telemetry.log.output.Stdout;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
@@ -15,24 +16,41 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.BlockingQueue;
 
 public class SamplerLoggerTest {
 
     //测试消息体Body是字符串时的情况
     @Test
-    public void testString() {
-        final SamplerLogger logger = SamplerLogger.getLogger();  //生成日志实例
-        logger.setLevel(Level.TRACE);                           //（可选）配置系统日志等级，默认是info
-        logger.info("test hello world");                   //生成info级别的字符串日志：test hello world
-        logger.trace();
-        logger.trace(logger.getLevel().toString());
-        logger.debug(logger.getLevel().toString());
-        logger.info(logger.getLevel().toString());
-        logger.warn(logger.getLevel().toString());
-        logger.error(logger.getLevel().toString());
-        logger.fatal(logger.getLevel().toString());
+    public void testString() throws InterruptedException {
+        BlockingQueue<String> buffer = setAndGetBufferOutput();
+        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
 
-        Assert.assertTrue(logger.getResult().matches("^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"\\w+\"\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$"));
+        logger.trace("test");
+        SamplerLogConfig.setLevel(Level.TRACE);                           //（可选）配置系统日志等级，默认是DEBUG
+        logger.trace("test");
+        logger.debug("test");
+        logger.info("test");                                        //生成info级别的字符串日志：test
+        logger.warn("test");
+        logger.error("test");
+        logger.fatal("test");
+
+        String regLog = "^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
+
+        for (int i = 0; i < 6; i++) {
+            assertAndPrint(buffer, regLog);
+        }
+    }
+
+    private BlockingQueue<String> setAndGetBufferOutput() {
+        SamplerLogConfig.setDestination(new BufferOut());
+        return BufferOut.getBuffer();
+    }
+
+    private void assertAndPrint(BlockingQueue<String> buffer, String s) throws InterruptedException {
+        final String logMsg = buffer.take();
+        Assert.assertTrue(logMsg.matches(s));
+        System.out.println(logMsg);
     }
 
     //测试用的自定义类
@@ -56,19 +74,21 @@ public class SamplerLoggerTest {
             this.age = age;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public Integer getAge() {
-            return age;
+        @Override
+        public String toString() {
+            return "Animal{" +
+                    "name='" + name + '\'' +
+                    ", age=" + age +
+                    '}';
         }
     }
 
     //测试给Body添加Animal类的实例
     @Test
-    public void testBody() {
-        final SamplerLogger logger = SamplerLogger.getLogger();
+    public void testBody() throws InterruptedException {
+        BlockingQueue<String> buffer = setAndGetBufferOutput();
+        final Logger logger = LoggerFactory.getLogger("this.getClass()");  //生成日志实例
+
         //Body: Animal实例
         final Animal animal = new Animal();
         animal.setName("little cat");
@@ -81,13 +101,16 @@ public class SamplerLoggerTest {
         logger.info(body);
 
         String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Type\":\"animal\",\"animal\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
-        Assert.assertTrue(logger.getResult().matches(regLog));
+        assertAndPrint(buffer, regLog);
+
     }
 
     //测试给Attributes添加Animal类的实例
     @Test
-    public void testAttributes() {
-        final SamplerLogger logger = SamplerLogger.getLogger();
+    public void testAttributes() throws InterruptedException {
+        BlockingQueue<String> buffer = setAndGetBufferOutput();
+        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
+
 
         //Attributes: Animal实例
         final Animal animal = new Animal("little cat", 2);
@@ -100,12 +123,17 @@ public class SamplerLoggerTest {
         logger.warn("bodyAbc", attributes);
 
         String regLog = "^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"\\w+\"\\},\"Attributes\":\\{\"Type\":\"animalType\",\"animalType\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"(.*)\\}\\}$";
-        Assert.assertTrue(logger.getResult().matches(regLog));
+
+        assertAndPrint(buffer, regLog);
+
     }
 
     @Test
-    public void testTraceIdAndSpanId() {
-        final SamplerLogger logger = SamplerLogger.getLogger();
+    public void testTraceIdAndSpanId() throws InterruptedException {
+        BlockingQueue<String> buffer = setAndGetBufferOutput();
+
+        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
+
 
         Resource serviceNameResource =
                 Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example"));
@@ -129,8 +157,16 @@ public class SamplerLoggerTest {
         span.end();
 
         String regLog = "^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"" + message + "\"\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
-        Assert.assertTrue(logger.getResult().matches(regLog));
 
+        assertAndPrint(buffer, regLog);
     }
+
+    @Test
+    public void testStdout() {
+        final Stdout stdout = new Stdout();
+        stdout.write("test");
+        Assert.assertNotNull(stdout);
+    }
+
 
 }

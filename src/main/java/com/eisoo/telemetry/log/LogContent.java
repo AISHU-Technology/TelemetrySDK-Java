@@ -11,7 +11,7 @@ import java.util.Map;
 import com.google.gson.annotations.SerializedName;
 
 
-public class Log {
+public class LogContent {
 
     @SerializedName("Version")
     private  String version = "v1.6.1";
@@ -37,7 +37,8 @@ public class Log {
     @SerializedName("Resource")
     private Map<String, String> resource = new HashMap<>();
 
-    public Log() {
+    public LogContent() {
+
         body.put(KeyConstant.MESSAGE.toString(), "");
         resource.put("Telemetry.SDK.Name", "Telemetry SDK");
         resource.put("Telemetry.SDK.Version", "2.0.0");
@@ -46,8 +47,9 @@ public class Log {
         try {
             resource.put("HostName", InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException e) {
-            SamplerLogger.logger.info("Log get HostName failed: " , e);
+            //暂时吃掉该异常
         }
+
     }
 
     public void setSeverityText(String severityText) {

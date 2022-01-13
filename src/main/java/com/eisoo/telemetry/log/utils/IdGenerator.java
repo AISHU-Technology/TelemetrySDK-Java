@@ -1,13 +1,6 @@
 package com.eisoo.telemetry.log.utils;
 
 
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
-
-
-
 import io.opentelemetry.api.trace.SpanId;
 import io.opentelemetry.api.trace.TraceId;
 import javax.annotation.concurrent.ThreadSafe;
@@ -24,7 +17,6 @@ public interface IdGenerator {
      * randomness but may change in the future.
      */
     static IdGenerator random() {
-        // note: uses RandomHolder's platformDefault to account for android.
         return RandomIdGenerator.INSTANCE;
     }
 
