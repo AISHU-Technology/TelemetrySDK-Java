@@ -1,16 +1,19 @@
 ### sdk使用方式：
-##### 命令行：
-    $ git clone https://gitlab.aishu.cn/anyrobot/observability/telemetrysdk/telemetry-java.git
-    $ mvn clean install
+##### 1. 命令行：
+    1.1 $ git clone https://devops.aishu.cn/AISHUDevOps/AnyRobot/_git/DE_TelemetryJava
+        或者：
+        $ git clone https://gitlab.aishu.cn/anyrobot/observability/telemetrysdk/telemetry-java.git
+    
+    1.2 $ mvn clean install
 
-##### 在pom.xml里添加：
+##### 2. 在pom.xml里添加：
     <dependency>
         <groupId>com.eisoo</groupId>
         <artifactId>SamplerLogger</artifactId>
         <version>2.0.0</version>
     </dependency>
 
-##### 使用代码
+##### 3. 使用代码
     //1.字符串日志：
     public void testString(){
     //1.字符串日志：

@@ -1,8 +1,10 @@
 package com.eisoo.telemetry.log;
 
+
 import com.eisoo.telemetry.log.config.SamplerLogConfig;
 import com.eisoo.telemetry.log.output.BufferOut;
 
+import com.eisoo.telemetry.log.output.Stdout;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,10 +22,14 @@ public class SamplerLoggerBenchmarkTest {
         }
         final long endTime = System.currentTimeMillis();
         final long ms = endTime - startTime;
-        final long baseline = number / 1000 * 5;
+        //基线：1百万条日志生成耗时要小于5秒
+        final long baseline = 5 * number / 1000;
+        //cps：1秒可生成多少条日志
         final long cps = 1000  * number / ms;
         Assert.assertTrue(ms < baseline);
-        System.out.println("*** Benchmark test result: generate "+ number + " log message takes "+ ms + " ms,  cps: " + cps + ". ***");
+
+        new Stdout().write("*** Benchmark test result: generate "+ number + " log message takes "+ ms + " ms,  cps: " + cps + ". ***");
+        BufferOut.getBuffer().clear();
     }
 
 

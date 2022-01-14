@@ -50,7 +50,7 @@ public class SamplerLoggerTest {
     private void assertAndPrint(BlockingQueue<String> buffer, String s) throws InterruptedException {
         final String logMsg = buffer.take();
         Assert.assertTrue(logMsg.matches(s));
-        System.out.println(logMsg);
+        new Stdout().write(logMsg);
     }
 
     //测试用的自定义类
