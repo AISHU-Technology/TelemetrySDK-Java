@@ -16,10 +16,9 @@
 ##### 3. 使用代码
     //1.字符串日志：
     public void testString(){
-    //1.字符串日志：
-    Logger logger = LoggerFactory.getLogger("test");  //生成日志实例
-    SamplerLogConfig.setLevel(Level.TRACE);                 //（可选）配置系统日志等级，默认是DEBUG
-    logger.trace("hello world");
+        Logger logger = LoggerFactory.getLogger("test");  //生成日志实例
+        SamplerLogConfig.setLevel(Level.TRACE);                 //（可选）配置系统日志等级，默认是DEBUG
+        logger.trace("hello world");
     }
     //可以看见打印信息
 
