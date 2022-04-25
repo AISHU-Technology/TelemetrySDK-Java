@@ -1,8 +1,6 @@
-### sdk使用方式：
+### sdk使用方式(拉取 2.0.0 版本)：
 ##### 1. 命令行：
-    1.1 $ git clone https://devops.aishu.cn/AISHUDevOps/AnyRobot/_git/DE_TelemetryJava
-        或者：
-        $ git clone https://gitlab.aishu.cn/anyrobot/observability/telemetrysdk/telemetry-java.git
+    1.1 $ git clone https://devops.aishu.cn/AISHUDevOps/AnyRobot/_git/DE_TelemetryJava -b 2.0.0
     
     1.2 $ mvn clean install
 
