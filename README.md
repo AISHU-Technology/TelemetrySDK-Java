@@ -1,6 +1,6 @@
 ### sdk使用方式(拉取 2.0.0 版本)：
 ##### 1. 命令行：
-    1.1 $ git clone https://devops.aishu.cn/AISHUDevOps/AnyRobot/_git/DE_TelemetryJava -b 2.0.0
+    1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java -b 2.1.0
     
     1.2 $ mvn clean install
 
@@ -8,7 +8,7 @@
     <dependency>
         <groupId>com.eisoo</groupId>
         <artifactId>SamplerLogger</artifactId>
-        <version>2.0.0</version>
+        <version>2.1.0</version>
     </dependency>
 
 ##### 3. 使用代码
