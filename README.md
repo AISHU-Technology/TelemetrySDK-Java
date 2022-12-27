@@ -1,22 +1,23 @@
-### sdk使用方式(拉取 2.0.0 版本)：
+### sdk使用方式(拉取 2.4.0 版本)：
 ##### 1. 命令行：
-    1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java -b 2.1.0
+    1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java -b 2.4.0
     
     1.2 $ mvn clean install
 
 ##### 2. 在pom.xml里添加：
     <dependency>
         <groupId>com.eisoo</groupId>
-        <artifactId>SamplerLogger</artifactId>
-        <version>2.1.0</version>
+        <artifactId>SamplerEvent</artifactId>
+        <version>2.4.0</version>
     </dependency>
 
 ##### 3. 使用代码
     //1.字符串日志：
-    public void testString(){
-        Logger logger = LoggerFactory.getLogger("test");  //生成日志实例
-        SamplerLogConfig.setLevel(Level.TRACE);                 //（可选）配置系统日志等级，默认是DEBUG
-        logger.trace("hello world");
+    public void testMapStdout() {
+        Event event = EventFactory.getEvent(this.getClass());   //生成日志实例
+        HashMap<String, String> dataContent =new HashMap<>();
+        dataContent.put("data","test123str");
+        event.info(dataContent);
     }
     //可以看见打印信息
 
@@ -43,61 +44,57 @@
         }
     }
 
-    //2.1测试给Body添加Animal类的实例
-    public void testBody() {
-        final Logger logger = LoggerFactory.getLogger("test");  //生成日志实例
-        //Body: Animal实例
-        final Animal animal = new Animal();
-        animal.setName("little cat");
-        animal.setAge(2);
+    //2.1 用http或者https方式发送event，可以设置一些自定义配置
+     public void testObjectHttpSend() throws InterruptedException {
 
-        final Body body = new Body();
-        body.setType("animal");
-        body.setField(animal);
+        //若要使用http发送event，需要以下设置，默认打印到标准输出
+         EventConfig.setDestination(new HttpOut("http://10.4.15.62/api/feed_ingester/v1/jobs/job-0e87b9ed98e52c30/events"));
 
-        logger.info(body);
+        //若要使用https发送event，需要以下设置
+        // EventConfig.setDestination(new HttpsOut("https://10.4.15.62/api/feed_ingester/v1/jobs/job-0e87b9ed98e52c30/events"));
+
+        Event event = EventFactory.getEvent(this.getClass());   //生成日志实例
+
+        //创建data：自定义类型：Animal
+        final Animal animal = new Animal("little cat4", 2);  //
+
+        //可创建自定义的：EventType
+        EventType eventType = new EventType("myEventType");
+
+        //可创建自定义的：service
+        Service service = new Service();
+        service.setName("myServiceName");
+        service.setInstance("myServiceInstance");
+        service.setVersion("myServiceVersion2.4");
+
+        //可创建自定义的：Subject
+        Subject subject = new Subject("v1.1.3");
+
+        //可创建自定义的：service
+        Link link = new Link();
+        link.setTraceId("a64dfb055e90ccab9bbce30ab31040df");
+        link.setSpanId("217400e1dbf690f9");
+
+        //把刚刚自定义的各个配置添加到event：
+        event.warn(animal,service,subject,link,eventType);      //生成warn级别的event
+    }
+
+    //2.2可设置event级别
+    public void testAllLevel() throws InterruptedException {
+        final Event event = EventFactory.getEvent("this.getClass()");  //生成日志实例
+
+        EventConfig.setLevel(Level.ERROR);                           //（可选）配置事件等级，默认是INFO，后面的等级设置会覆盖前面的设置
+        EventConfig.setLevel(Level.WARN);                           //（可选）配置事件等级，默认是INFO，后面的等级设置会覆盖前面的设置
+        EventConfig.setLevel(Level.INFO);                           //（可选）配置事件等级，默认是INFO，后面的等级设置会覆盖前面的设置
+        final Animal animal = new Animal("little cat5", 2);         //创建event自定义的data内容
+
+        event.info(animal);                                        //生成info级别的字符串日志：test
+        event.warn(animal);
+        event.error(animal);
     }
 
 
-    //2.2测试给Attributes添加Animal类的实例
-    public void testAttributes() {
-        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
-
-        //Attributes: Animal实例
-        final Animal animal = new Animal("little cat", 2);
-
-        final Attributes attributes = new Attributes();
-        attributes.setType("animalType");
-        attributes.setField(animal);
-
-        logger.info("bodyAbc", attributes);
-    }
 
 
-    //3.当使用trace时，应当把SpanContext传入log，以便log能获得相应的TraceId和SpanId
-    public void testTraceIdAndSpanId() {
-        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
 
-        Resource serviceNameResource =
-                Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example"));
-
-        // Set to process the spans by the Jaeger Exporter
-        SdkTracerProvider tracerProvider =
-                SdkTracerProvider.builder()
-                        .addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()))
-                        .setResource(Resource.getDefault().merge(serviceNameResource))
-                        .build();
-        OpenTelemetrySdk openTelemetry =
-                OpenTelemetrySdk.builder().setTracerProvider(tracerProvider).build();
-
-        // it's always a good idea to shut down the SDK cleanly at JVM exit.
-        Runtime.getRuntime().addShutdownHook(new Thread(tracerProvider::close));
-        final Tracer tracer = openTelemetry.getTracer("io.opentelemetry.example.JaegerExample");
-        Span span = tracer.spanBuilder("Start my wonderful use case").startSpan();
-        span.addEvent("Event 0");
-        final String message = "using existed traceId and spanId";
-
-        logger.info(message, span.getSpanContext());
-        span.end();
-
-    }
+ 

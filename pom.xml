@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.eisoo</groupId>
-    <artifactId>SamplerLogger</artifactId>
-    <version>2.1.0</version>
+    <artifactId>SamplerEvent</artifactId>
+    <version>2.4.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <jacocoArgLine></jacocoArgLine>
     </properties>
 
@@ -29,6 +29,12 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+        <dependency>
+            <groupId>com.github.f4b6a3</groupId>
+            <artifactId>ulid-creator</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>
@@ -85,6 +91,11 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>0.8.7</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.7.16</version>
         </dependency>
 
     </dependencies>
