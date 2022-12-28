@@ -12,16 +12,16 @@
     </dependency>
 
 ##### 3. 使用代码
-    //1.字符串日志：
+    //1.生成以map类型作为data的event：
     public void testMapStdout() {
-        Event event = EventFactory.getEvent(this.getClass());   //生成日志实例
+        Event event = EventFactory.getEvent(this.getClass());   //生成event实例
         HashMap<String, String> dataContent =new HashMap<>();
         dataContent.put("data","test123str");
         event.info(dataContent);
     }
     //可以看见打印信息
 
-    //2.在body添加自定义类日志：
+    //2.生成以Animal类型作为data的event：
     //测试用的自定义类:Animal
     public class Animal {
         private String name;
@@ -93,6 +93,15 @@
         event.error(animal);
     }
 
+    //3.1可选择在resources添加配置文件event.properties设置service和http.url或https.url,如： 
+        service.instance=myServiceInstance
+        service.name=myServiceName
+        service.version=myServiceVersion
+
+        //http或者https，填一种方式就好，默认是打印在标准输出
+        http.url=http://10.4.15.62/api/feed_ingester/v1/jobs/job-0e87b9ed98e52c30/events
+       或
+        https.url=https://10.4.15.62/api/feed_ingester/v1/jobs/job-0e87b9ed98e52c30/events
 
 
 

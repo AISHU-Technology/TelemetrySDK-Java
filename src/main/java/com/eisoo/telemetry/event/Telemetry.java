@@ -13,7 +13,7 @@ public class Telemetry {
 
         private  String language = "java";
 
-        private  String name = "elemetrySDK-Java/exporter/arevent";
+        private  String name = "TelemetrySDK-Java/exporters/arevent";
 
         private  String version = "v2.4.0";
 
