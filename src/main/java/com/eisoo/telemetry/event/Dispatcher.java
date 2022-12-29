@@ -16,10 +16,10 @@ public class Dispatcher {
     }
 
     private ExecutorService singleThread = null;
-    private static final int CAPACITY = 1024;
+    private static final int CAPACITY = 4096;
+    private static final int CAPACITY2 = 65535;
     private final BlockingQueue<EventContent> eventQueue = new ArrayBlockingQueue<>(CAPACITY);
-
-
+    private final BlockingQueue<EventContent> eventQueue2 = new LinkedBlockingQueue<>(CAPACITY2);
 
     /**
      * 事件循环逻辑
@@ -29,9 +29,12 @@ public class Dispatcher {
             while (true) {
                 EventContent content;
                 try {
-                    content = eventQueue.poll(2, TimeUnit.SECONDS);
+                    content = eventQueue.poll();
                     if (content == null) {
-                        break;
+                        content = eventQueue2.poll(2, TimeUnit.SECONDS);
+                        if (content == null) {
+                            break;
+                        }
                     }
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
@@ -54,13 +57,11 @@ public class Dispatcher {
     }
 
     protected void dispatch(EventContent eventContent) {
-
         try {
             EventConfig.getDestination().write(JsonUtil.toJson(eventContent));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void dispatchEvent(EventContent eventContent) {
@@ -72,6 +73,8 @@ public class Dispatcher {
             //超过队列容量直接丢弃日志
             if (eventQueue.size() < CAPACITY) {
                 eventQueue.put(eventContent);
+            }else if (eventQueue2.size() < CAPACITY2)  {
+                eventQueue2.put(eventContent);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
