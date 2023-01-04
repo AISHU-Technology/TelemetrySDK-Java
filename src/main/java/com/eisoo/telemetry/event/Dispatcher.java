@@ -32,9 +32,12 @@ public class Dispatcher {
                     content = eventQueue.poll();
                     if (content == null) {
                         content = eventQueue2.poll(2, TimeUnit.SECONDS);
-                        if (content == null) {
-                            break;
-                        }
+                    }
+                    if (content == null) {
+                        content = eventQueue.poll();
+                    }
+                    if (content == null) {
+                        break;
                     }
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();

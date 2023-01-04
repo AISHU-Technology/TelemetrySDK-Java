@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 public class EventEventTest {
@@ -75,6 +76,11 @@ public class EventEventTest {
         service.setInstance("myServiceInstance");
         service.setVersion("myServiceVersion2.4");
 
+        //创建Attributes
+        Map<String, Object> attr =new HashMap<>();
+        attr.put("attr","test123str");
+        Attributes attributes = new Attributes(attr);
+
         //创建Subject
         Subject subject = new Subject("v1.1.3");
 
@@ -84,9 +90,9 @@ public class EventEventTest {
         link.setSpanId("217400e1dbf690f9");
 
         //把刚刚自定义的各个配置添加到event：
-        event.warn(animal,service,subject,link,eventType);                           //生成warn级别的event
+        event.warn(animal,service,subject,link,eventType,attributes);                           //生成warn级别的event
 
-        String regEvent = "^\\{\"EventID\":\"[0-9A-Z]{26}\",\"EventType\":\"[^\"]+\",\"Time\":\"[^\"]+\",\"Level\":\"\\w+\",\"Resource\":\\{\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"\\w+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"\\w+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\},\"Subject\":\".*\",\"Link\":\\{\"TraceId\":\"\\w+\",\"SpanId\":\"\\w+\"\\},\"Data\":\\{.*\\}$";
+        String regEvent = "^\\{\"EventID\":\"[0-9A-Z]{26}\",\"EventType\":\"[^\"]+\",\"Time\":\"[^\"]+\",\"Level\":\"\\w+\",\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"\\w+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"\\w+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\},\"Subject\":\".*\",\"Link\":\\{\"TraceId\":\"\\w+\",\"SpanId\":\"\\w+\"\\},\"Data\":\\{.*\\}$";
         assertAndPrint(buffer, regEvent);
 
         //若要测试http或者https网络发生，需要睡眠等一等
@@ -113,7 +119,7 @@ public class EventEventTest {
         event.warn(animal);
         event.error(animal);
 
-        String regEvent = "^\\{\"EventID\":\"[0-9A-Z]{26}\",\"EventType\":\"[^\"]+\",\"Time\":\"[^\"]+\",\"Level\":\"\\w+\",\"Resource\":\\{\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"\\w+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"\\w+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\},\"Subject\":\".*\",\"Link\":\\{\"TraceId\":\"\\w+\",\"SpanId\":\"\\w+\"\\},\"Data\":\\{.*\\}$";
+        String regEvent = "^\\{\"EventID\":\"[0-9A-Z]{26}\",\"EventType\":\"[^\"]+\",\"Time\":\"[^\"]+\",\"Level\":\"\\w+\",\"Attributes\":\\{\\},\"Resource\":\\{\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"\\w+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"\\w+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\},\"Subject\":\".*\",\"Data\":\\{.*\\}$";
 
         for (int i = 0; i < 3; i++) {
             assertAndPrint(buffer, regEvent);

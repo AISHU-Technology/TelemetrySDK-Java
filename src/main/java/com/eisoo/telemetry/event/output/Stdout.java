@@ -7,6 +7,6 @@ public class Stdout implements Destination {
 
     @Override
     public void write(String string) {
-        out.println(string);
+        out.println("[" + string + "]");
     }
 }

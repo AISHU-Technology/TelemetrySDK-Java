@@ -9,15 +9,6 @@ public class Service {
 
     private  String version = "UnknownServiceVersion";
 
-    public Service() {
-    }
-
-    public Service(String instance, String name, String version) {
-        this.instance = instance;
-        this.name = name;
-        this.version = version;
-    }
-
     public void setInstance(String instance) {
         this.instance = instance;
     }

@@ -67,6 +67,11 @@
         service.setInstance("myServiceInstance");
         service.setVersion("myServiceVersion2.4");
 
+        //创建Attributes
+        Map<String, Object> attr =new HashMap<>();
+        attr.put("attr","test123str");
+        Attributes attributes = new Attributes(attr);
+
         //可创建自定义的：Subject
         Subject subject = new Subject("v1.1.3");
 
@@ -76,7 +81,7 @@
         link.setSpanId("217400e1dbf690f9");
 
         //把刚刚自定义的各个配置添加到event：
-        event.warn(animal,service,subject,link,eventType);      //生成warn级别的event
+        event.warn(animal,service,subject,link,eventType,attributes);      //生成warn级别的event
     }
 
     //2.2可设置event级别

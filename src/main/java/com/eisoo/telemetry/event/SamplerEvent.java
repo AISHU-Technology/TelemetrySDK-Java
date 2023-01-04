@@ -39,7 +39,10 @@ public class SamplerEvent implements Event {
             }else if(o instanceof Link){
                 Link link = (Link) o;
                 eventContent.setLink(link);
-            }else {
+            }else if(o instanceof Attributes){
+                Attributes attributes = (Attributes) o;
+                eventContent.setAttributes(attributes.getAttributes());
+            } else {
                 eventContent.setData(o);
             }
         }

@@ -31,6 +31,9 @@ public class EventContent {
     @SerializedName("Level")
     private String level = Level.INFO.toString();
 
+    @SerializedName("Attributes")
+    private Map<String, Object> attributes = new HashMap<>();
+
     @SerializedName("Resource")
     private Map<String, Object> resource = new HashMap<>();
 
@@ -46,8 +49,7 @@ public class EventContent {
     }
 
     @SerializedName("Link")
-    private Link link = new Link(IdGenerator.random().generateTraceId(), IdGenerator.random().generateSpanId());
-
+    private Link link = null;
 
     @SerializedName("Data")
     private Object data = "";
@@ -75,15 +77,6 @@ public class EventContent {
                     service.setVersion(serviceVersion);
                 }
                 resource.put("service", service);
-
-                String httpUrl = properties.getProperty("http.url");
-                if (httpUrl != null) {
-                    EventConfig.setDestination(new HttpOut(httpUrl));
-                }
-                String httpsUrl = properties.getProperty("https.url");
-                if (httpsUrl != null) {
-                    EventConfig.setDestination(new HttpsOut(httpsUrl));
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -113,5 +106,9 @@ public class EventContent {
 
     public void setLink(Link link) {
         this.link = link;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
     }
 }
