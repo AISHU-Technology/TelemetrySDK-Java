@@ -4,7 +4,6 @@ package com.eisoo.telemetry.event;
 import com.eisoo.telemetry.event.config.EventConfig;
 import com.eisoo.telemetry.event.utils.JsonUtil;
 
-import java.io.IOException;
 import java.util.concurrent.*;
 
 public class Dispatcher {
@@ -60,11 +59,7 @@ public class Dispatcher {
     }
 
     protected void dispatch(EventContent eventContent) {
-        try {
-            EventConfig.getDestination().write(JsonUtil.toJson(eventContent));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        EventConfig.getDestination().write(JsonUtil.toJson(eventContent));
     }
 
     public void dispatchEvent(EventContent eventContent) {
@@ -76,7 +71,7 @@ public class Dispatcher {
             //超过队列容量直接丢弃日志
             if (eventQueue.size() < CAPACITY) {
                 eventQueue.put(eventContent);
-            }else if (eventQueue2.size() < CAPACITY2)  {
+            } else if (eventQueue2.size() < CAPACITY2) {
                 eventQueue2.put(eventContent);
             }
         } catch (InterruptedException e) {

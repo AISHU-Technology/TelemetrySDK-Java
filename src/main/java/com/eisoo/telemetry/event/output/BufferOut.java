@@ -1,10 +1,6 @@
 package com.eisoo.telemetry.event.output;
 
-import com.eisoo.telemetry.event.EventContent;
-import com.eisoo.telemetry.event.config.EventConfig;
-import com.eisoo.telemetry.event.utils.JsonUtil;
 
-import java.io.IOException;
 import java.util.concurrent.*;
 
 public class BufferOut implements Destination {

@@ -2,10 +2,6 @@ package com.eisoo.telemetry.event;
 
 
 import cn.hutool.core.date.DateUtil;
-import com.eisoo.telemetry.event.config.EventConfig;
-import com.eisoo.telemetry.event.output.HttpOut;
-import com.eisoo.telemetry.event.output.HttpsOut;
-import com.eisoo.telemetry.event.utils.IdGenerator;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.google.gson.annotations.SerializedName;
 
@@ -26,7 +22,7 @@ public class EventContent {
     private String eventType = "Default.EventType";
 
     @SerializedName("Time")
-    private String time = DateUtil.format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSXXX");
+    private String time;
 
     @SerializedName("Level")
     private String level = Level.INFO.toString();
@@ -56,6 +52,9 @@ public class EventContent {
 
 
     public EventContent() {
+        Long nano =(System.nanoTime() % 1000000L)/100;
+        time = DateUtil.format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+",  nano + "+");
+
         Properties properties = new Properties();
         InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("event.properties");
         if (resourceAsStream == null) {
@@ -85,7 +84,6 @@ public class EventContent {
         resource.put("host", new Host());
         resource.put("os", new Os());
         resource.put("telemetry", new Telemetry());
-
     }
 
     public void setLevel(String level) {

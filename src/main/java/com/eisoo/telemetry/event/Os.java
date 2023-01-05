@@ -1,10 +1,6 @@
 package com.eisoo.telemetry.event;
 
 
-import cn.hutool.core.date.DateUtil;
-
-import java.util.Date;
-
 public class Os {
 
     private  String description = System.getProperty("os.name");

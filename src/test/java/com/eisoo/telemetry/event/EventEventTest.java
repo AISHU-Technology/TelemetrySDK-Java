@@ -19,7 +19,7 @@ public class EventEventTest {
 
     @Test
     public void testMapStdout() {
-        Event event = EventFactory.getEvent(this.getClass());   //生成日志实例
+        Event event = EventFactory.getEvent(this.getClass());   //生成Event实例
         HashMap<String, String> dataContent =new HashMap<>();
         dataContent.put("data","test123str");
         event.info(dataContent);
@@ -62,7 +62,7 @@ public class EventEventTest {
         //若要使用https发送event，需要以下设置
         // EventConfig.setDestination(new HttpsOut("https://10.4.15.62/api/feed_ingester/v1/jobs/job-0e87b9ed98e52c30/events"));
 
-        Event event = EventFactory.getEvent(this.getClass());   //生成日志实例
+        Event event = EventFactory.getEvent(this.getClass());   //生成Event实例
 
         //创建data：自定义类型：Animal
         final Animal animal = new Animal("little cat4", 2);  //
@@ -84,7 +84,7 @@ public class EventEventTest {
         //创建Subject
         Subject subject = new Subject("v1.1.3");
 
-        //创建service
+        //创建link
         Link link = new Link();
         link.setTraceId("a64dfb055e90ccab9bbce30ab31040df");
         link.setSpanId("217400e1dbf690f9");
@@ -108,14 +108,14 @@ public class EventEventTest {
     @Test
     public void testAllLevel() throws InterruptedException {
         BlockingQueue<String> buffer = setAndGetBufferOutput();
-        final Event event = EventFactory.getEvent("this.getClass()");  //生成日志实例
+        final Event event = EventFactory.getEvent("this.getClass()");  //生成Event实例
 
         EventConfig.setLevel(Level.ERROR);                           //（可选）配置事件等级，默认是INFO，后面的等级设置会覆盖前面的设置
         EventConfig.setLevel(Level.WARN);                           //（可选）配置事件等级，默认是INFO，后面的等级设置会覆盖前面的设置
         EventConfig.setLevel(Level.INFO);                           //（可选）配置事件等级，默认是INFO，后面的等级设置会覆盖前面的设置
         final Animal animal = new Animal("little cat5", 2);  //
 
-        event.info(animal);                                        //生成info级别的字符串日志：test
+        event.info(animal);                                        //生成info级别的Event
         event.warn(animal);
         event.error(animal);
 
