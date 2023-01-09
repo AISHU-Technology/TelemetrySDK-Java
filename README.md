@@ -1,21 +1,21 @@
-### sdk使用方式(拉取 2.0.0 版本)：
+### sdk使用方式(拉取 2.2.0 版本)：
 ##### 1. 命令行：
-    1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java -b 2.1.0
-    
-    1.2 $ mvn clean install
+    1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java
+    1.2 $ git checkout -b feature-arp-323692 origin/feature-arp-323692
+    1.3 $ mvn clean install
 
 ##### 2. 在pom.xml里添加：
     <dependency>
         <groupId>com.eisoo</groupId>
         <artifactId>SamplerLogger</artifactId>
-        <version>2.1.0</version>
+        <version>2.2.0</version>
     </dependency>
 
 ##### 3. 使用代码
     //1.字符串日志：
     public void testString(){
-        Logger logger = LoggerFactory.getLogger("test");  //生成日志实例
-        SamplerLogConfig.setLevel(Level.TRACE);                 //（可选）配置系统日志等级，默认是DEBUG
+        Logger logger = LoggerFactory.getLogger("test");  //给个字符类型的日志名称，生成日志实例
+        SamplerLogConfig.setLevel(Level.TRACE);          //（可选）配置系统日志等级，默认是DEBUG
         logger.trace("hello world");
     }
     //可以看见打印信息
@@ -66,9 +66,9 @@
         //Attributes: Animal实例
         final Animal animal = new Animal("little cat", 2);
 
-        final Attributes attributes = new Attributes();
-        attributes.setType("animalType");
-        attributes.setField(animal);
+        Map<String, Object> attr =new HashMap<>();
+        attr.put("animal1", animal);
+        Attributes attributes = new Attributes(attr);
 
         logger.info("bodyAbc", attributes);
     }

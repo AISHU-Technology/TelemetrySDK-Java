@@ -6,6 +6,7 @@ import com.eisoo.telemetry.log.constant.KeyConstant;
 import io.opentelemetry.api.trace.SpanContext;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class SamplerLogger implements com.eisoo.telemetry.log.Logger {
 
@@ -38,17 +39,19 @@ public class SamplerLogger implements com.eisoo.telemetry.log.Logger {
                 bodyMap.put(KeyConstant.TYPE.toString(), body.getType());
                 bodyMap.put(body.getType(), body.getField());
                 //传入的是Attributes类实例
-            } else if (o instanceof Attributes) {
-                final Attributes attributes = (Attributes) o;
-                final HashMap<String, Object> attrMap = new HashMap<>();
-                attrMap.put(KeyConstant.TYPE.toString(), attributes.getType());
-                attrMap.put(attributes.getType(), attributes.getField());
-                log.setAttributes(attrMap);
-                //传入的是span类实例，把原traceId和spanId修改为span的traceId和spanId
-            } else if (o instanceof SpanContext) {
+            } else if(o instanceof Attributes){
+                Attributes attributes = (Attributes) o;
+                log.setAttributes(attributes.getAttributes());
+            } else if(o instanceof Link){
+                log.setLink((Link) o);
+            }else if(o instanceof Service){
+                Service service = (Service) o;
+                Map<String, Object> resource = log.getResource();
+                resource.put("service", service);
+                log.setResource(resource);
+            }else if (o instanceof SpanContext) {
                 final SpanContext spanContext = (SpanContext) o;
-                log.setTraceId(spanContext.getTraceId());
-                log.setSpanId(spanContext.getSpanId());
+                log.setLink(new Link(spanContext.getTraceId(), spanContext.getSpanId()));
             }
         }
 

@@ -4,8 +4,11 @@ package com.eisoo.telemetry;
 import com.eisoo.telemetry.log.*;
 import com.eisoo.telemetry.log.config.SamplerLogConfig;
 import com.eisoo.telemetry.log.output.BufferOut;
+import com.eisoo.telemetry.log.output.HttpOut;
+import com.eisoo.telemetry.log.output.HttpsOut;
 import com.eisoo.telemetry.log.output.Stdout;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.logging.LoggingSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -16,6 +19,8 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 public class SamplerLoggerTest {
@@ -35,7 +40,7 @@ public class SamplerLoggerTest {
         logger.error("test");
         logger.fatal("test");
 
-        String regLog = "^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
+        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
 
         for (int i = 0; i < 6; i++) {
             assertAndPrint(buffer, regLog);
@@ -73,13 +78,48 @@ public class SamplerLoggerTest {
         public void setAge(Integer age) {
             this.age = age;
         }
+    }
 
-        @Override
-        public String toString() {
-            return "Animal{" +
-                    "name='" + name + '\'' +
-                    ", age=" + age +
-                    '}';
+    @Test
+    public void testObjectHttpSend() throws InterruptedException {
+        //设置本地缓存用于正则对比测试
+        BlockingQueue<String> buffer = setAndGetBufferOutput();
+
+        //若要使用http发送log，需要以下设置，记得修改url地址
+//        SamplerLogConfig.setDestination(new HttpOut("http://10.4.130.68/api/feed_ingester/v1/jobs/job-565841e86228ba03/events"));
+
+        //若要使用https发送log，需要以下设置，记得修改url地址
+//        SamplerLogConfig.setDestination(new HttpsOut("https://10.4.130.68/api/feed_ingester/v1/jobs/job-565841e86228ba03/events"));
+
+        final Logger logger = LoggerFactory.getLogger(this.getClass()); //生成日志实例
+
+        //创建service
+        Service service = new Service();
+        service.setName("myServiceName");
+        service.setInstanceId("myServiceInstanceId");
+        service.setVersion("myServiceVersion2.4");
+
+        //创建Attributes
+        Map<String, Object> attr =new HashMap<>();
+        attr.put("attr","test123str");
+        Attributes attributes = new Attributes(attr);
+
+        //创建link
+        Link link = new Link();
+        link.setTraceId("a64dfb055e90ccab9bbce30ab31040df");
+        link.setSpanId("217400e1dbf690f9");
+
+        //把刚刚自定义的各个配置添加到event：
+//        event.warn(animal,service,subject,link,eventType,attributes);                           //生成warn级别的event
+        logger.info("str123testms", attributes, link, service);
+        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
+        assertAndPrint(buffer, regLog);
+
+        //若要测试http或者https网络发生，需要睡眠等一等
+        try {
+            Thread.sleep(1000*1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -90,7 +130,7 @@ public class SamplerLoggerTest {
         final Logger logger = LoggerFactory.getLogger("this.getClass()");  //生成日志实例
 
         //Body: Animal实例
-        final Animal animal = new Animal();
+        final Animal animal = new Animal("little cat", 2);
         animal.setName("little cat");
         animal.setAge(2);
 
@@ -99,10 +139,9 @@ public class SamplerLoggerTest {
         body.setField(animal);
 
         logger.info(body);
+        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Type\":\"animal\",\"animal\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
 
-        String regLog = "\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Type\":\"animal\",\"animal\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
         assertAndPrint(buffer, regLog);
-
     }
 
     //测试给Attributes添加Animal类的实例
@@ -115,17 +154,16 @@ public class SamplerLoggerTest {
         //Attributes: Animal实例
         final Animal animal = new Animal("little cat", 2);
 
-        final Attributes attributes = new Attributes();
-        attributes.setType("animalType");
-        attributes.setField(animal);
+        Map<String, Object> attr =new HashMap<>();
+        attr.put("animal1", animal);
+        Attributes attributes = new Attributes(attr);
 
         logger.trace("bodyAbc", attributes);
         logger.warn("bodyAbc", attributes);
 
-        String regLog = "^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"\\w+\"\\},\"Attributes\":\\{\"Type\":\"animalType\",\"animalType\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"(.*)\\}\\}$";
+        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{\"animal1\":\\{\"name\":\"little cat\",\"age\":2\\}\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
 
         assertAndPrint(buffer, regLog);
-
     }
 
     @Test
@@ -153,10 +191,13 @@ public class SamplerLoggerTest {
         Span span = tracer.spanBuilder("Start my wonderful use case").startSpan();
         span.addEvent("Event 0");
         final String message = "using existed traceId and spanId";
-        logger.info(message, span.getSpanContext());
+        SpanContext spanContext = span.getSpanContext();
+        Link link = new Link(spanContext.getTraceId(), spanContext.getSpanId());
+        logger.info(message, link);
+//        logger.info(message, spanContext);
         span.end();
 
-        String regLog = "^\\{\"Version\":\"v1.6.1\",\"TraceId\":\"[0-9a-f]{32}\",\"SpanId\":\"[0-9a-f]{16}\",\"Timestamp\":[0-9]{19},\"SeverityText\":\"\\w+\",\"Body\":\\{\"Message\":\"" + message + "\"\\},\"Attributes\":\\{\\},\"Resource\":\\{\"Telemetry.SDK.Version\":\"2.0.0\",\"Telemetry.SDK.Name\":\"Telemetry SDK\",\"Telemetry.SDK.Language\":\"java\",\"HostName\":\"[^\"]+\"\\}\\}$";
+        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
 
         assertAndPrint(buffer, regLog);
     }
@@ -167,6 +208,5 @@ public class SamplerLoggerTest {
         stdout.write("test");
         Assert.assertNotNull(stdout);
     }
-
 
 }

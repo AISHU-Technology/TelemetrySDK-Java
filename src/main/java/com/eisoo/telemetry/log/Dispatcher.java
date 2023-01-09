@@ -15,9 +15,10 @@ public class Dispatcher {
     }
 
     private ExecutorService singleThread = null;
-    private static final int CAPACITY = 1024;
+    private static final int CAPACITY = 4096;
+    private static final int CAPACITY2 = 65535;
     private final BlockingQueue<LogContent> eventQueue = new ArrayBlockingQueue<>(CAPACITY);
-
+    private final BlockingQueue<LogContent> eventQueue2 = new LinkedBlockingQueue<>(CAPACITY2);
 
 
     /**
@@ -28,7 +29,13 @@ public class Dispatcher {
             while (true) {
                 LogContent log;
                 try {
-                    log = eventQueue.poll(2, TimeUnit.SECONDS);
+                    log = eventQueue.poll();
+                    if (log == null) {
+                        log = eventQueue2.poll(2, TimeUnit.SECONDS);
+                    }
+                    if (log == null) {
+                        log = eventQueue.poll();
+                    }
                     if (log == null) {
                         break;
                     }
@@ -44,12 +51,13 @@ public class Dispatcher {
     /**
      * 启动事件循环
      */
-    public void serviceStart() {
+    public synchronized void serviceStart() {
         // 创建一个单线程的线程池
-        singleThread = Executors.newSingleThreadExecutor();
-        singleThread.execute(createThread());
-        singleThread.shutdown();
-
+        if (singleThread == null || singleThread.isTerminated()) {
+            singleThread = Executors.newSingleThreadExecutor();
+            singleThread.execute(createThread());
+            singleThread.shutdown();
+        }
     }
 
     protected void dispatch(LogContent logContent) {
@@ -60,16 +68,22 @@ public class Dispatcher {
 
     public void dispatchEvent(LogContent logContent) {
         try {
+            //超过队列容量直接丢弃日志
+            if (eventQueue.size() < CAPACITY) {
+                eventQueue.put(logContent);
+            }else if (eventQueue2.size() < CAPACITY2)  {
+                eventQueue2.put(logContent);
+            }
             //检测是否有活线程，启动线程
             if (singleThread == null || singleThread.isTerminated()) {
                 serviceStart();
             }
-            //超过队列容量直接丢弃日志
-            if (eventQueue.size() < CAPACITY) {
-                eventQueue.put(logContent);
-            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public boolean isCacheFull(){
+        return eventQueue2.size() >= CAPACITY2;
     }
 }

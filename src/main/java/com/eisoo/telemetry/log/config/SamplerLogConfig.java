@@ -1,19 +1,53 @@
 package com.eisoo.telemetry.log.config;
 
 import com.eisoo.telemetry.log.Level;
+import com.eisoo.telemetry.log.constant.KeyConstant;
 import com.eisoo.telemetry.log.output.Destination;
+import com.eisoo.telemetry.log.output.HttpOut;
+import com.eisoo.telemetry.log.output.HttpsOut;
 import com.eisoo.telemetry.log.output.Stdout;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class SamplerLogConfig {
     private SamplerLogConfig() {}
 
-    private static Destination destination = new Stdout();
+    private static Destination destination = genDestination();
 
-    private static Level level = Level.DEBUG;
+    private static Level level = Level.INFO;
     private static final Object lockObj = new Object();
+
+    private static Destination genDestination(){
+        Properties properties = new Properties();
+        InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(KeyConstant.CONFIGFILE.toString());
+        if (resourceAsStream != null) {
+            try {
+                properties.load(resourceAsStream);
+                String httpUrl = properties.getProperty("http.url");
+                if (httpUrl != null) {
+                    return new HttpOut(httpUrl);
+                }
+                String httpsUrl = properties.getProperty("https.url");
+                if (httpsUrl != null) {
+                    return new HttpsOut(httpsUrl);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new Stdout();
+    }
 
     public static Destination getDestination() {
         return destination;
+    }
+
+    public static void setDefaultDestination() {
+        synchronized (lockObj) {
+            SamplerLogConfig.destination = genDestination();
+        }
     }
 
     public static void setDestination(Destination destination) {
@@ -30,3 +64,4 @@ public class SamplerLogConfig {
         SamplerLogConfig.level = level;
     }
 }
+
