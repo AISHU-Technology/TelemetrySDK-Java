@@ -1,7 +1,6 @@
 package com.eisoo.telemetry.event;
 
 
-
 import com.eisoo.telemetry.event.config.EventConfig;
 import com.eisoo.telemetry.event.output.BufferOut;
 import com.eisoo.telemetry.event.output.HttpOut;
@@ -20,13 +19,13 @@ public class EventEventTest {
     @Test
     public void testMapStdout() {
         Event event = EventFactory.getEvent(this.getClass());   //生成Event实例
-        HashMap<String, String> dataContent =new HashMap<>();
-        dataContent.put("data","test123str");
+        HashMap<String, String> dataContent = new HashMap<>();
+        dataContent.put("data", "test123str");
         event.info(dataContent);
 
         //等待打印info级别的event
         try {
-            Thread.sleep(1000*1);
+            Thread.sleep(1000 * 1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -77,8 +76,8 @@ public class EventEventTest {
         service.setVersion("myServiceVersion2.4");
 
         //创建Attributes
-        Map<String, Object> attr =new HashMap<>();
-        attr.put("attr","test123str");
+        Map<String, Object> attr = new HashMap<>();
+        attr.put("attr", "test123str");
         Attributes attributes = new Attributes(attr);
 
         //创建Subject
@@ -90,7 +89,7 @@ public class EventEventTest {
         link.setSpanId("217400e1dbf690f9");
 
         //把刚刚自定义的各个配置添加到event：
-        event.warn(animal,service,subject,link,eventType,attributes);                           //生成warn级别的event
+        event.warn(animal, service, subject, link, eventType, attributes);                           //生成warn级别的event
 
         String regEvent = "^\\{\"EventID\":\"[0-9A-Z]{26}\",\"EventType\":\"[^\"]+\",\"Time\":\"[^\"]+\",\"Level\":\"\\w+\",\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"\\w+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"\\w+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\},\"Subject\":\".*\",\"Link\":\\{\"TraceId\":\"\\w+\",\"SpanId\":\"\\w+\"\\},\"Data\":\\{.*\\}$";
         assertAndPrint(buffer, regEvent);

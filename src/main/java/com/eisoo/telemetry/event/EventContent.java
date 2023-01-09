@@ -52,8 +52,7 @@ public class EventContent {
 
 
     public EventContent() {
-        Long nano =(System.nanoTime() % 1000000L)/100;
-        time = DateUtil.format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+",  nano + "+");
+        time = DateUtil.format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+",  (System.nanoTime() % 1000000L)/100 + "+");
 
         Properties properties = new Properties();
         InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("event.properties");

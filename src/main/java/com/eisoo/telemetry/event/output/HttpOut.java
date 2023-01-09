@@ -1,5 +1,7 @@
 package com.eisoo.telemetry.event.output;
 
+import com.eisoo.telemetry.event.Dispatcher;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -43,15 +45,20 @@ public class HttpOut implements Destination {
             if (responseCode == 204 || responseCode == 200) {
                 return;
             }
-            //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制，但只重试3次
-            if ((responseCode == 429 || responseCode == 500 || responseCode == 503) && repeat < 16) {
+            //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
+            if ((responseCode == 429 || responseCode == 500 || responseCode == 503) && !Dispatcher.getInstance().isCacheFull()) {
                 int rep = repeat + 5;
                 try {
                     Thread.sleep(1000 * rep);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                httpRequest(outputStr, rep);
+
+                if (repeat < 16){
+                    httpRequest(outputStr, rep);
+                }else{
+                    httpRequest(outputStr, repeat);
+                }
             }
             throw new RuntimeException("error: event发送http目的地址:" + serverUrl + ",网络异常:" + responseCode);
         } catch (Exception e) {
