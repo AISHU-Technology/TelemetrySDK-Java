@@ -6,7 +6,7 @@ import java.util.concurrent.*;
 public class BufferOut implements Destination {
 
     private static final int CAPACITY = 1024;
-    private static final BlockingQueue<String> bufferQueue = new ArrayBlockingQueue<>(CAPACITY);
+    private final BlockingQueue<String> bufferQueue = new ArrayBlockingQueue<>(CAPACITY);
 
     @Override
     public void write(String string) {
@@ -21,7 +21,7 @@ public class BufferOut implements Destination {
 
     }
 
-    public static BlockingQueue<String> getBuffer() {
+    public BlockingQueue<String> getBuffer() {
         return bufferQueue;
     }
 

@@ -126,8 +126,9 @@ public class EventEventTest {
     }
 
     private BlockingQueue<String> setAndGetBufferOutput() {
-        EventConfig.setDestination(new BufferOut());
-        return BufferOut.getBuffer();
+        BufferOut bufferOut = new BufferOut();
+        EventConfig.setDestination(bufferOut);
+        return bufferOut.getBuffer();
     }
 
     private void assertAndPrint(BlockingQueue<String> buffer, String s) throws InterruptedException {
