@@ -28,7 +28,6 @@ public class SamplerLoggerBenchmarkTest {
         final long cps = 1000  * number / ms;
         Assert.assertTrue(ms < baseline);
         new Stdout().write("*** Benchmark test result: generate "+ number + " log message takes "+ ms + " ms,  cps: " + cps + ". ***");
-        BufferOut.getBuffer().clear();
     }
 
 

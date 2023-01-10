@@ -34,7 +34,7 @@ public class LogContent {
 
 
     public LogContent() {
-        timestamp = DateUtil.format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+",  (System.nanoTime() % 1000000L)/100 + "+");
+        timestamp = DateUtil.format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+",  String.format("%04d", (System.nanoTime() % 1000000L) / 100) + "+");
         body.put(KeyConstant.MESSAGE.toString(), "");
         resource.put("host", new Host());
         resource.put("os", new Os());

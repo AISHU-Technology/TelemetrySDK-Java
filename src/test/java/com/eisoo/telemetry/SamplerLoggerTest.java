@@ -48,8 +48,9 @@ public class SamplerLoggerTest {
     }
 
     private BlockingQueue<String> setAndGetBufferOutput() {
-        SamplerLogConfig.setDestination(new BufferOut());
-        return BufferOut.getBuffer();
+        BufferOut bufferOut = new BufferOut();
+        SamplerLogConfig.setDestination(bufferOut);
+        return  bufferOut.getBuffer();
     }
 
     private void assertAndPrint(BlockingQueue<String> buffer, String s) throws InterruptedException {
@@ -192,9 +193,9 @@ public class SamplerLoggerTest {
         span.addEvent("Event 0");
         final String message = "using existed traceId and spanId";
         SpanContext spanContext = span.getSpanContext();
-        Link link = new Link(spanContext.getTraceId(), spanContext.getSpanId());
-        logger.info(message, link);
-//        logger.info(message, spanContext);
+//        Link link = new Link(spanContext.getTraceId(), spanContext.getSpanId());
+//        logger.info(message, link);
+        logger.info(message, spanContext);
         span.end();
 
         String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
