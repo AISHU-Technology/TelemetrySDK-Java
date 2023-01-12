@@ -14,14 +14,14 @@ import java.util.Properties;
 public class SamplerLogConfig {
     private SamplerLogConfig() {}
 
-    private static Destination destination = genDestination();
+    private static Destination destination = genDestination(KeyConstant.CONFIG_FILE.toString());
 
     private static Level level = Level.INFO;
     private static final Object lockObj = new Object();
 
-    private static Destination genDestination(){
+    private static Destination genDestination(String filename){
         Properties properties = new Properties();
-        InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(KeyConstant.CONFIGFILE.toString());
+        InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
         if (resourceAsStream != null) {
             try {
                 properties.load(resourceAsStream);
@@ -40,13 +40,14 @@ public class SamplerLogConfig {
         return new Stdout();
     }
 
+
     public static Destination getDestination() {
         return destination;
     }
 
-    public static void setDefaultDestination() {
+    public static void setConfigFileDestination(String filename) {
         synchronized (lockObj) {
-            SamplerLogConfig.destination = genDestination();
+            SamplerLogConfig.destination = genDestination(filename);
         }
     }
 

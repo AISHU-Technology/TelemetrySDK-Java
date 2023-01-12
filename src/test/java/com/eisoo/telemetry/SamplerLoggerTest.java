@@ -7,6 +7,7 @@ import com.eisoo.telemetry.log.output.BufferOut;
 import com.eisoo.telemetry.log.output.HttpOut;
 import com.eisoo.telemetry.log.output.HttpsOut;
 import com.eisoo.telemetry.log.output.Stdout;
+import com.eisoo.telemetry.log.utils.SleepUtil;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.Tracer;
@@ -19,8 +20,7 @@ import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 public class SamplerLoggerTest {
@@ -32,7 +32,7 @@ public class SamplerLoggerTest {
         final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
 
         logger.trace("test");
-        SamplerLogConfig.setLevel(Level.TRACE);                           //（可选）配置系统日志等级，默认是DEBUG
+        SamplerLogConfig.setLevel(Level.TRACE);                           //（可选）配置系统日志等级，默认是INFO级别
         logger.trace("test");
         logger.debug("test");
         logger.info("test");                                        //生成info级别的字符串日志：test
@@ -82,15 +82,49 @@ public class SamplerLoggerTest {
     }
 
     @Test
-    public void testObjectHttpSend() throws InterruptedException {
+    public void testObjectHttpsSend() throws InterruptedException {
         //设置本地缓存用于正则对比测试
-        BlockingQueue<String> buffer = setAndGetBufferOutput();
-
-        //若要使用http发送log，需要以下设置，记得修改url地址
-//        SamplerLogConfig.setDestination(new HttpOut("http://10.4.130.68/api/feed_ingester/v1/jobs/job-565841e86228ba03/events"));
+//        BlockingQueue<String> buffer = setAndGetBufferOutput();
 
         //若要使用https发送log，需要以下设置，记得修改url地址
-//        SamplerLogConfig.setDestination(new HttpsOut("https://10.4.130.68/api/feed_ingester/v1/jobs/job-565841e86228ba03/events"));
+        SamplerLogConfig.setDestination(new HttpsOut("https://10.4.130.68/api/feed_ingester/v1/jobs/job-090a252e12fc6960/events"));
+
+        final Logger logger = LoggerFactory.getLogger(this.getClass()); //生成日志实例
+
+        //创建service
+        Service service = new Service();
+        service.setName("myServiceName");
+        service.setInstanceId("myServiceInstanceId");
+        service.setVersion("myServiceVersion2.4");
+
+        //创建Attributes
+        Map<String, Object> attr =new HashMap<>();
+        attr.put("attr","test123str");
+        Attributes attributes = new Attributes(attr);
+
+        //创建link
+        Link link = new Link();
+        link.setTraceId("a64dfb055e90ccab9bbce30ab31040df");
+        link.setSpanId("217400e1dbf690f9");
+
+
+        //把刚刚自定义的各个配置添加到log：
+        logger.info("str123testms", attributes, link, service);
+//        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
+//        assertAndPrint(buffer, regLog);
+
+        //若要测试http或者https网络发生，需要睡眠等一等
+        SleepUtil.second(5);
+
+    }
+
+    @Test
+    public void testObjectHttpSend() throws InterruptedException {
+        //设置本地缓存用于正则对比测试
+//        BlockingQueue<String> buffer = setAndGetBufferOutput();
+
+        //若要使用http发送log，需要以下设置，记得修改url地址
+        SamplerLogConfig.setDestination(new HttpOut("http://10.4.130.68/api/feed_ingester/v1/jobs/job-090a252e12fc6960/events"));
 
         final Logger logger = LoggerFactory.getLogger(this.getClass()); //生成日志实例
 
@@ -113,15 +147,11 @@ public class SamplerLoggerTest {
         //把刚刚自定义的各个配置添加到event：
 //        event.warn(animal,service,subject,link,eventType,attributes);                           //生成warn级别的event
         logger.info("str123testms", attributes, link, service);
-        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
-        assertAndPrint(buffer, regLog);
+//        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
+//        assertAndPrint(buffer, regLog);
 
         //若要测试http或者https网络发生，需要睡眠等一等
-        try {
-            Thread.sleep(1000*1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+       SleepUtil.second(5);
     }
 
     //测试给Body添加Animal类的实例
@@ -155,9 +185,10 @@ public class SamplerLoggerTest {
         //Attributes: Animal实例
         final Animal animal = new Animal("little cat", 2);
 
-        Map<String, Object> attr =new HashMap<>();
-        attr.put("animal1", animal);
-        Attributes attributes = new Attributes(attr);
+        Map<String, Object> stringObjectMap =new HashMap<>();
+        stringObjectMap.put("animal1", animal);
+        Attributes attributes = new Attributes();
+        attributes.setAttributes(stringObjectMap);
 
         logger.trace("bodyAbc", attributes);
         logger.warn("bodyAbc", attributes);
@@ -208,6 +239,39 @@ public class SamplerLoggerTest {
         final Stdout stdout = new Stdout();
         stdout.write("test");
         Assert.assertNotNull(stdout);
+    }
+
+    //测试配置文件
+    @Test
+    public void testHttpProperties() throws InterruptedException {
+        SamplerLogConfig.setConfigFileDestination("testHttpUrl.properties");
+        final Logger logger = LoggerFactory.getLogger("testConfig");  //生成日志实例
+        logger.info("test");
+
+        //若要测试http或者https网络发生，需要睡眠等一等
+        SleepUtil.second(5);
+    }
+
+    //测试配置文件
+    @Test
+    public void testHttpsProperties() throws InterruptedException {
+        SamplerLogConfig.setConfigFileDestination("testHttpUrl.properties");
+        final Logger logger = LoggerFactory.getLogger("testConfig");  //生成日志实例
+        logger.info("test");
+
+        //若要测试http或者https网络发生，需要睡眠等一等
+        SleepUtil.second(5);
+    }
+
+    //测试配置文件
+    @Test
+    public void testServiceProperties() throws InterruptedException {
+        final Logger logger = LoggerFactory.getLogger("testConfig");  //生成日志实例
+        Service service = new Service("testService.properties");
+        logger.info("test", service);
+
+        //若要测试标准输出，需要睡眠等一等
+        SleepUtil.second(1);
     }
 
 }

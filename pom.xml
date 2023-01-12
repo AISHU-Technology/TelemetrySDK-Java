@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.eisoo</groupId>
-    <artifactId>SamplerLogger</artifactId>
+    <artifactId>TelemetrySDK-Logger</artifactId>
     <version>2.2.0</version>
 
     <properties>

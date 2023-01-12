@@ -11,7 +11,7 @@ public class LoggerContext {
     /**
      * logger缓存，存放通过程序手动创建的logger对象
      */
-    private Map<String,Logger> loggerCache = new HashMap<>();
+    private final Map<String,Logger> loggerCache = new HashMap<>();
 
     public void addLogger(Logger logger){
         loggerCache.put(logger.getName(),logger);

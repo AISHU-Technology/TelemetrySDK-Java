@@ -15,8 +15,12 @@ public class Service {
     private  String version = "UnknownServiceVersion";
 
     public Service() {
+        this(KeyConstant.CONFIG_FILE.toString());
+    }
+
+    public Service(String filename) {
         Properties properties = new Properties();
-        InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(KeyConstant.CONFIGFILE.toString());
+        InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename);
         if (resourceAsStream != null) {
             try {
                 properties.load(resourceAsStream);

@@ -61,7 +61,6 @@ public class Dispatcher {
     }
 
     protected void dispatch(LogContent logContent) {
-
         SamplerLogConfig.getDestination().write(JsonUtil.toJson(logContent));
 
     }
@@ -83,7 +82,7 @@ public class Dispatcher {
         }
     }
 
-    public boolean isCacheFull(){
-        return eventQueue2.size() >= CAPACITY2;
+    public boolean isTerminated(){
+        return singleThread.isTerminated();
     }
 }

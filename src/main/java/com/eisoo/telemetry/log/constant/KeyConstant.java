@@ -3,9 +3,9 @@ package com.eisoo.telemetry.log.constant;
 public enum KeyConstant {
     MESSAGE("Message"),
     TYPE("Type"),
-    CONFIGFILE("slog.properties");
+    CONFIG_FILE("slog.properties");
 
-    private String key;
+    private final String key;
     KeyConstant(String k){
         this.key = k;
     }
