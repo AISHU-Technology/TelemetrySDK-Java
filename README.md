@@ -1,7 +1,7 @@
 ### sdk使用方式(拉取 2.2.0 版本)：
 ##### 1. 命令行：
     1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java
-    1.2 $ git checkout -b feature-arp-323692 origin/feature-arp-323692
+    1.2 $ git checkout -b 2.2.0 origin/2.2.0
     1.3 $ mvn clean install
 
 ##### 2. 在pom.xml里添加：
