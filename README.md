@@ -119,7 +119,7 @@
         //或
         https.url=https://10.4.15.62/api/feed_ingester/v1/jobs/job-0e87b9ed98e52c30/events
 
-    //5.1当使用trace时，应当把SpanContext传入log，以便log能获得相应的TraceId和SpanId
+    //5.1当使用trace时，应当把SpanContext中的TraceId和SpanId传入log，以便log能获得相应的TraceId和SpanId
     public void testTraceIdAndSpanId() {
         final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
 
@@ -141,8 +141,10 @@
         Span span = tracer.spanBuilder("Start my wonderful use case").startSpan();
         span.addEvent("Event 0");
         final String message = "using existed traceId and spanId";
-
-        logger.info(message, span.getSpanContext());
+        SpanContext spanContext = span.getSpanContext();
+        Link link = new Link(spanContext.getTraceId(), spanContext.getSpanId());
+        logger.info(message, link);
+    
         span.end();
 
     }

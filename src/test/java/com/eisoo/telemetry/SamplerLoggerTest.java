@@ -8,15 +8,7 @@ import com.eisoo.telemetry.log.output.HttpOut;
 import com.eisoo.telemetry.log.output.HttpsOut;
 import com.eisoo.telemetry.log.output.Stdout;
 import com.eisoo.telemetry.log.utils.SleepUtil;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanContext;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.exporter.logging.LoggingSpanExporter;
-import io.opentelemetry.sdk.OpenTelemetrySdk;
-import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.sdk.trace.SdkTracerProvider;
-import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
-import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -114,7 +106,7 @@ public class SamplerLoggerTest {
 //        assertAndPrint(buffer, regLog);
 
         //若要测试http或者https网络发生，需要睡眠等一等
-        SleepUtil.second(5);
+        sleepSecond(5);
 
     }
 
@@ -140,9 +132,9 @@ public class SamplerLoggerTest {
         Attributes attributes = new Attributes(attr);
 
         //创建link
-        Link link = new Link();
-        link.setTraceId("a64dfb055e90ccab9bbce30ab31040df");
-        link.setSpanId("217400e1dbf690f9");
+        Link link = new Link("a64dfb055e90ccab9bbce30ab31040df", "217400e1dbf690f9");
+//        link.setTraceId("a64dfb055e90ccab9bbce30ab31040df");
+//        link.setSpanId("217400e1dbf690f9");
 
         //把刚刚自定义的各个配置添加到event：
 //        event.warn(animal,service,subject,link,eventType,attributes);                           //生成warn级别的event
@@ -151,7 +143,7 @@ public class SamplerLoggerTest {
 //        assertAndPrint(buffer, regLog);
 
         //若要测试http或者https网络发生，需要睡眠等一等
-       SleepUtil.second(5);
+       sleepSecond(5);
     }
 
     //测试给Body添加Animal类的实例
@@ -199,42 +191,6 @@ public class SamplerLoggerTest {
     }
 
     @Test
-    public void testTraceIdAndSpanId() throws InterruptedException {
-        BlockingQueue<String> buffer = setAndGetBufferOutput();
-
-        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
-
-
-        Resource serviceNameResource =
-                Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example"));
-
-        // Set to process the spans by the Jaeger Exporter
-        SdkTracerProvider tracerProvider =
-                SdkTracerProvider.builder()
-                        .addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()))
-                        .setResource(Resource.getDefault().merge(serviceNameResource))
-                        .build();
-        OpenTelemetrySdk openTelemetry =
-                OpenTelemetrySdk.builder().setTracerProvider(tracerProvider).build();
-
-        // it's always a good idea to shut down the SDK cleanly at JVM exit.
-        Runtime.getRuntime().addShutdownHook(new Thread(tracerProvider::close));
-        final Tracer tracer = openTelemetry.getTracer("io.opentelemetry.example.JaegerExample");
-        Span span = tracer.spanBuilder("Start my wonderful use case").startSpan();
-        span.addEvent("Event 0");
-        final String message = "using existed traceId and spanId";
-        SpanContext spanContext = span.getSpanContext();
-//        Link link = new Link(spanContext.getTraceId(), spanContext.getSpanId());
-//        logger.info(message, link);
-        logger.info(message, spanContext);
-        span.end();
-
-        String regLog = "^\\{\"Link\":\\{\"TraceId\":\"[0-9a-z]{32}\",\"SpanId\":\"[0-9a-z]{16}\"\\},\"Timestamp\":\"[^\"]+\",\"SeverityText\":\"[^\"]+\",\"Body\":\\{\"Message\":\"[^\"]+\"\\},\"Attributes\":\\{[^\\}]*\\},\"Resource\":\\{\"host\":\\{\"arch\":\"[^\"]+\",\"ip\":\"[^\"]+\",\"name\":\"[^\"]+\"\\},\"os\":\\{\"description\":\"[^\"]+\",\"type\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"service\":\\{\"instance\":\\{\"id\":\"[^\"]+\"\\},\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\},\"telemetry\":\\{\"sdk\":\\{\"language\":\"[^\"]+\",\"name\":\"[^\"]+\",\"version\":\"[^\"]+\"\\}\\}\\}\\}$";
-
-        assertAndPrint(buffer, regLog);
-    }
-
-    @Test
     public void testStdout() {
         final Stdout stdout = new Stdout();
         stdout.write("test");
@@ -249,18 +205,18 @@ public class SamplerLoggerTest {
         logger.info("test");
 
         //若要测试http或者https网络发生，需要睡眠等一等
-        SleepUtil.second(5);
+        sleepSecond(5);
     }
 
     //测试配置文件
     @Test
     public void testHttpsProperties() throws InterruptedException {
-        SamplerLogConfig.setConfigFileDestination("testHttpUrl.properties");
+        SamplerLogConfig.setConfigFileDestination("testHttpsUrl.properties");
         final Logger logger = LoggerFactory.getLogger("testConfig");  //生成日志实例
         logger.info("test");
 
         //若要测试http或者https网络发生，需要睡眠等一等
-        SleepUtil.second(5);
+        sleepSecond(5);
     }
 
     //测试配置文件
@@ -272,6 +228,14 @@ public class SamplerLoggerTest {
 
         //若要测试标准输出，需要睡眠等一等
         SleepUtil.second(1);
+    }
+
+    public static void sleepSecond(long sec) {
+        try {
+            Thread.sleep(1000 * sec);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

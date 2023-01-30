@@ -3,7 +3,6 @@ package com.eisoo.telemetry.log;
 
 import com.eisoo.telemetry.log.config.SamplerLogConfig;
 import com.eisoo.telemetry.log.constant.KeyConstant;
-import io.opentelemetry.api.trace.SpanContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,9 +48,6 @@ public class SamplerLogger implements com.eisoo.telemetry.log.Logger {
                 Map<String, Object> resource = log.getResource();
                 resource.put("service", service);
                 log.setResource(resource);
-            }else if (o instanceof SpanContext) {
-                final SpanContext spanContext = (SpanContext) o;
-                log.setLink(new Link(spanContext.getTraceId(), spanContext.getSpanId()));
             }
         }
 
