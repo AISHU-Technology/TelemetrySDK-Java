@@ -79,7 +79,7 @@ public class SamplerLoggerTest {
 //        BlockingQueue<String> buffer = setAndGetBufferOutput();
 
         //若要使用https发送log，需要以下设置，记得修改url地址
-        SamplerLogConfig.setDestination(new HttpsOut("https://10.4.130.68/api/feed_ingester/v1/jobs/job-090a252e12fc6960/events"));
+        SamplerLogConfig.setDestination(new HttpsOut("https://10.4.15.62:80/api/feed_ingester/v1/jobs/job-ecbfc218ce84d0a8/events"));
 
         final Logger logger = LoggerFactory.getLogger(this.getClass()); //生成日志实例
 
@@ -116,7 +116,7 @@ public class SamplerLoggerTest {
 //        BlockingQueue<String> buffer = setAndGetBufferOutput();
 
         //若要使用http发送log，需要以下设置，记得修改url地址
-        SamplerLogConfig.setDestination(new HttpOut("http://10.4.130.68/api/feed_ingester/v1/jobs/job-090a252e12fc6960/events"));
+        SamplerLogConfig.setDestination(new HttpOut("http://10.4.15.62:80/api/feed_ingester/v1/jobs/job-ecbfc218ce84d0a8/events"));
 
         final Logger logger = LoggerFactory.getLogger(this.getClass()); //生成日志实例
 
