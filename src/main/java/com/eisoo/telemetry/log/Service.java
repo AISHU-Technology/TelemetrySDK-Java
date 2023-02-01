@@ -14,6 +14,12 @@ public class Service {
 
     private  String version = "UnknownServiceVersion";
 
+    private static final Service SERVICE = new Service();
+
+    public static Service getService(){
+        return SERVICE;
+    }
+
     public Service() {
         this(KeyConstant.CONFIG_FILE.toString());
     }

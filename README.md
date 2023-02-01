@@ -2,13 +2,15 @@
 ##### 1. 命令行：
     1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java
     1.2 $ git checkout -b 2.2.0 origin/2.2.0
-    1.3 $ mvn clean install
+    1.3 $ mvn clean install -DskipTests       //离线模式下，需要把所有依赖都打包，则用： $ mvn clean install assembly:assembly -DskipTests
+    
 
 ##### 2. 在pom.xml里添加：
     <dependency>
         <groupId>com.eisoo</groupId>
         <artifactId>TelemetrySDK-Logger</artifactId>
         <version>2.2.0</version>
+        //离线模式下，需要把sdk的依赖加进来：<classifier>jar-with-dependencies</classifier>
     </dependency>
 
 ##### 3. 使用代码
@@ -119,32 +121,3 @@
         //或
         https.url=https://10.4.15.62/api/feed_ingester/v1/jobs/job-0e87b9ed98e52c30/events
 
-    //5.1当使用trace时，应当把SpanContext中的TraceId和SpanId传入log，以便log能获得相应的TraceId和SpanId
-    public void testTraceIdAndSpanId() {
-        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
-
-        Resource serviceNameResource =
-                Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example"));
-
-        // Set to process the spans by the Jaeger Exporter
-        SdkTracerProvider tracerProvider =
-                SdkTracerProvider.builder()
-                        .addSpanProcessor(SimpleSpanProcessor.create(new LoggingSpanExporter()))
-                        .setResource(Resource.getDefault().merge(serviceNameResource))
-                        .build();
-        OpenTelemetrySdk openTelemetry =
-                OpenTelemetrySdk.builder().setTracerProvider(tracerProvider).build();
-
-        // it's always a good idea to shut down the SDK cleanly at JVM exit.
-        Runtime.getRuntime().addShutdownHook(new Thread(tracerProvider::close));
-        final Tracer tracer = openTelemetry.getTracer("io.opentelemetry.example.JaegerExample");
-        Span span = tracer.spanBuilder("Start my wonderful use case").startSpan();
-        span.addEvent("Event 0");
-        final String message = "using existed traceId and spanId";
-        SpanContext spanContext = span.getSpanContext();
-        Link link = new Link(spanContext.getTraceId(), spanContext.getSpanId());
-        logger.info(message, link);
-    
-        span.end();
-
-    }

@@ -61,8 +61,7 @@ public class Dispatcher {
     }
 
     protected void dispatch(LogContent logContent) {
-        SamplerLogConfig.getDestination().write(JsonUtil.toJson(logContent));
-
+        SamplerLogConfig.getDestination().write(logContent.SerializeToJson());
     }
 
     public void dispatchEvent(LogContent logContent) {

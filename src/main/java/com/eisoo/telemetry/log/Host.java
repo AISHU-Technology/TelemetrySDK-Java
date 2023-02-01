@@ -5,11 +5,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Host {
-    private  final String arch = System.getProperty("os.arch");
+    private final String arch = System.getProperty("os.arch");
 
-    private  String ip = "UnknownIP";
+    private String ip = "UnknownIP";
 
-    private  String name = "UnknownHost";
+    private String name = "UnknownHost";
+
+    private static final Host HOST = new Host();
+
+    public static Host getHost() {
+        return HOST;
+    }
 
     public Host() {
         try {

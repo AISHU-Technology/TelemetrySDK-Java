@@ -9,6 +9,11 @@ public class Os {
 
     private  String version = System.getProperty("os.version");
 
+    private static final Os OS = new Os();
+
+    public static Os getOs(){
+        return OS;
+    }
 
     public Os() {
         String dl = description.toLowerCase();

@@ -3,7 +3,13 @@ package com.eisoo.telemetry.log;
 
 public class Telemetry {
 
-    private SDK sdk = new SDK();
+    private final SDK sdk = new SDK();
+
+    private static final Telemetry TELEMETRY = new Telemetry();
+
+    public static final Telemetry getTelemetry(){
+        return TELEMETRY;
+    }
 
     class SDK {
 

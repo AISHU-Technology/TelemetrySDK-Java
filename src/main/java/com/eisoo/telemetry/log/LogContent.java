@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.eisoo.telemetry.log.utils.JsonUtil;
 import com.google.gson.annotations.SerializedName;
 
 
@@ -32,14 +33,15 @@ public class LogContent {
     @SerializedName("Resource")
     private Map<String, Object> resource = new TreeMap<>();
 
+    private DateNano dateNano;
 
     public LogContent() {
-        timestamp = DateUtil.format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+",  String.format("%04d", (System.nanoTime() % 1000000L) / 100) + "+");
+        dateNano = new DateNano(new Date(), System.nanoTime());
         body.put(KeyConstant.MESSAGE.toString(), "");
-        resource.put("host", new Host());
-        resource.put("os", new Os());
-        resource.put("service", new Service());
-        resource.put("telemetry", new Telemetry());
+        resource.put("host", Host.getHost());
+        resource.put("os", Os.getOs());
+        resource.put("service", Service.getService());
+        resource.put("telemetry", Telemetry.getTelemetry());
     }
 
     public void setSeverityText(String severityText) {
@@ -64,5 +66,22 @@ public class LogContent {
 
     public void setLink(Link link) {
         this.link = link;
+    }
+
+    class DateNano {
+        private Date date;
+
+        private long nano;
+
+        public DateNano(Date date, long nano) {
+            this.date = date;
+            this.nano = nano;
+        }
+    }
+
+    public String SerializeToJson() {
+        timestamp = DateUtil.format(dateNano.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+", String.format("%04d", (dateNano.nano % 1000000L) / 100) + "+");
+        dateNano = null;
+        return JsonUtil.toJson(this);
     }
 }
