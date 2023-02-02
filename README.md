@@ -1,7 +1,7 @@
-### sdk使用方式(拉取 2.2.0 版本)：
+### sdk使用方式(拉取 2.2.3 版本)：
 ##### 1. 命令行：
     1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java
-    1.2 $ git checkout -b 2.2.0 origin/2.2.0
+    1.2 $ git checkout -b 2.2.3 origin/2.2.3
     1.3 $ mvn clean install -DskipTests       //离线模式下，需要把所有依赖都打包，则用： $ mvn clean install assembly:assembly -DskipTests
     
 
@@ -9,7 +9,7 @@
     <dependency>
         <groupId>com.eisoo</groupId>
         <artifactId>TelemetrySDK-Logger</artifactId>
-        <version>2.2.0</version>
+        <version>2.2.3</version>
         //离线模式下，需要把sdk的依赖加进来：<classifier>jar-with-dependencies</classifier>
     </dependency>
 
