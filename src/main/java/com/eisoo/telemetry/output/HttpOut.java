@@ -1,6 +1,6 @@
 package com.eisoo.telemetry.output;
 
-import com.eisoo.telemetry.common.Destination;
+import com.eisoo.telemetry.common.Output;
 import com.eisoo.telemetry.common.SerializeToString;
 import com.eisoo.telemetry.utils.TimeUtil;
 import com.eisoo.telemetry.utils.MyX509TrustManager;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import org.apache.commons.logging.Log;
 
-public class HttpOut implements Destination {
+public class HttpOut implements Output {
 
     private ExecutorService threadPool = null;
     private static final int CAPACITY = 4096;

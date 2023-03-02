@@ -3,10 +3,10 @@ package com.eisoo.telemetry.output;
 import java.io.PrintStream;
 import org.apache.commons.logging.Log;
 
-import com.eisoo.telemetry.common.Destination;
+import com.eisoo.telemetry.common.Output;
 import com.eisoo.telemetry.common.SerializeToString;
 
-public class StdOut implements Destination {
+public class StdOut implements Output {
     private final PrintStream out = System.out;
     private Log log;
     boolean needLogging;

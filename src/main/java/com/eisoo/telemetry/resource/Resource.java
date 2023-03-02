@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+
 public class Resource {
     private static List<KeyValue> keyValues = genDefault();
 
-    public Resource(io.opentelemetry.sdk.resources.Resource ir) {
-        KeyValue.extractFromAttributes(ir.getAttributes());
+    public Resource(io.opentelemetry.sdk.resources.Resource ir, Log log) {
+        KeyValue.extractFromAttributes(ir.getAttributes(), log);
     }
 
     private static List<KeyValue> genDefault() {

@@ -1,13 +1,11 @@
 package com.eisoo.telemetry.common;
 
-import java.lang.Exception;
-
-import com.eisoo.telemetry.output.StdOut;
+import com.eisoo.telemetry.output.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public interface Destination {
+public interface Output {
     void write(SerializeToString toString) throws Exception;
 
     void shutdown() throws Exception;
@@ -16,9 +14,9 @@ public interface Destination {
 
     void init(Log log);
 
-    public static Destination getDefaultDestination() {
+    public static Output getDefaultDestination() {
         Log defaultLog = LogFactory.getLog("defaultDestination");
         StdOut defaultDestination = new StdOut(defaultLog);
-        return (Destination) defaultDestination;
+        return (Output) defaultDestination;
     }
 }

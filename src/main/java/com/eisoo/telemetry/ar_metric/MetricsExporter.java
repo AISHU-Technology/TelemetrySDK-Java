@@ -5,8 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.eisoo.telemetry.common.Destination;
-import com.eisoo.telemetry.output.StdOut;
+import com.eisoo.telemetry.common.Output;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.metrics.InstrumentType;
@@ -18,41 +17,37 @@ public final class MetricsExporter implements MetricExporter {
     public final Log log;
     private final AtomicBoolean isShutdown = new AtomicBoolean();
     private final AggregationTemporality aggregationTemporality;
-    private final Destination destination;
+    private final Output output;
 
     /**
      * Returns a new {@link HttpMetricsExporter} with an aggregation temporality
      * of {@link
      * AggregationTemporality#CUMULATIVE}.
      */
-    public static MetricsExporter create() {
-        return create(AggregationTemporality.CUMULATIVE);
-    }
 
     /**
      * Returns a new {@link HttpMetricsExporter} with the given
      * {@code aggregationTemporality}.
      */
 
-    public static MetricsExporter create(AggregationTemporality aggregationTemporality) {
-        return create(aggregationTemporality, Destination.getDefaultDestination());
+    public static MetricsExporter create() {
+        return create(Output.getDefaultDestination());
     }
 
-    public static MetricsExporter create(AggregationTemporality aggregationTemporality, Destination destination) {
+    public static MetricsExporter create(Output output) {
         Log defaultLog = LogFactory.getLog(MetricsExporter.class);
-        return new MetricsExporter(aggregationTemporality, destination, defaultLog);
+        return new MetricsExporter(output, defaultLog);
     }
 
-    public static MetricsExporter create(AggregationTemporality aggregationTemporality, Destination destination,
-            Log log) {
-        return new MetricsExporter(aggregationTemporality, destination, log);
+    public static MetricsExporter create(Output output, Log log) {
+        return new MetricsExporter(output, log);
     }
 
-    private MetricsExporter(AggregationTemporality aggregationTemporality, Destination destination, Log log) {
-        this.aggregationTemporality = aggregationTemporality;
-        this.destination = destination;
+    private MetricsExporter(Output output, Log log) {
+        this.aggregationTemporality = AggregationTemporality.CUMULATIVE;
+        this.output = output;
         this.log = log;
-        destination.init(log);
+        output.init(log);
     }
 
     /**
@@ -78,7 +73,7 @@ public final class MetricsExporter implements MetricExporter {
         for (MetricData metricData : metrics) {
             AnyrobotScopeResource anyrobotScopeResource = new AnyrobotScopeResource(metricData, log);
             try {
-                this.destination.write(anyrobotScopeResource);
+                this.output.write(anyrobotScopeResource);
             } catch (Exception e) {
                 return CompletableResultCode.ofFailure();
             }
@@ -95,7 +90,7 @@ public final class MetricsExporter implements MetricExporter {
     public CompletableResultCode flush() {
         CompletableResultCode resultCode = new CompletableResultCode();
         try {
-            destination.flush();
+            output.flush();
         } catch (Exception e) {
             return resultCode.fail();
         }
