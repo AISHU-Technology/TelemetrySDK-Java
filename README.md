@@ -1,12 +1,12 @@
 ### sdk使用方式(拉取 2.0.0 版本)：
 ##### 1. 命令行：
     1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java -b 2.1.0
-    
+
     1.2 $ mvn clean install
 
 ##### 2. 在pom.xml里添加：
     <dependency>
-        <groupId>com.eisoo</groupId>
+        <groupId>cn.aishu</groupId>
         <artifactId>SamplerLogger</artifactId>
         <version>2.1.0</version>
     </dependency>

@@ -4,9 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.eisoo</groupId>
-    <artifactId>SamplerLogger</artifactId>
-    <version>2.1.0</version>
+    <groupId>cn.aishu</groupId>
+    <artifactId>TelemetrySDK-Java</artifactId>
+    <version>2.2.0</version>
+    <packaging>pom</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,6 +17,10 @@
         <maven.compiler.target>11</maven.compiler.target>
         <jacocoArgLine></jacocoArgLine>
     </properties>
+
+    <modules>
+        <module>/src/main/java/cn/aishu/telemetry/ar_metric</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
@@ -32,6 +37,12 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-semconv -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-semconv</artifactId>
+            <version>1.22.0-alpha</version>
         </dependency>
 
         <!--        测试引入-->
@@ -50,13 +61,6 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-jaeger</artifactId>
             <version>1.22.0</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-semconv -->
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-semconv</artifactId>
-            <version>1.22.0-alpha</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -100,9 +104,6 @@
 			<version>1.2</version>
 		</dependency>
     </dependencies>
-
-
-
     <build>
         <pluginManagement>
             <plugins>
@@ -110,6 +111,10 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -122,9 +127,8 @@
                     <version>3.8.1</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.0.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -141,6 +145,7 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>3.9.1</version>
                 </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>

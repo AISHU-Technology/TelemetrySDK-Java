@@ -1,0 +1,156 @@
+{
+    "Resource": [
+        {
+            "Key": "service.name",
+            "Value": {
+                "Type": "STRING",
+                "Value": "unknown_service:java"
+            }
+        },
+        {
+            "Key": "os.type",
+            "Value": {
+                "Type": "STRING",
+                "Value": "linux"
+            }
+        },
+        {
+            "Key": "os.version",
+            "Value": {
+                "Type": "STRING",
+                "Value": "3.10.0-1160.76.1.el7.x86_64"
+            }
+        },
+        {
+            "Key": "telemetry.sdk.name",
+            "Value": {
+                "Type": "STRING",
+                "Value": "opentelemetry"
+            }
+        },
+        {
+            "Key": "host.ip",
+            "Value": {
+                "Type": "STRING",
+                "Value": "10.4.68.236"
+            }
+        },
+        {
+            "Key": "telemetry.sdk.language",
+            "Value": {
+                "Type": "STRING",
+                "Value": "java"
+            }
+        },
+        {
+            "Key": "service.version",
+            "Value": {
+                "Type": "STRING",
+                "Value": "UnknownServiceVersion"
+            }
+        },
+        {
+            "Key": "service.instance.id",
+            "Value": {
+                "Type": "STRING",
+                "Value": "UnknownServiceInstance"
+            }
+        },
+        {
+            "Key": "os.description",
+            "Value": {
+                "Type": "STRING",
+                "Value": "Linux"
+            }
+        },
+        {
+            "Key": "host.arch",
+            "Value": {
+                "Type": "STRING",
+                "Value": "amd64"
+            }
+        },
+        {
+            "Key": "host.name",
+            "Value": {
+                "Type": "STRING",
+                "Value": "k8s-master"
+            }
+        },
+        {
+            "Key": "telemetry.sdk.version",
+            "Value": {
+                "Type": "STRING",
+                "Value": "1.22.0"
+            }
+        },
+        {
+            "Key": "telemetry.auto.version",
+            "Value": {
+                "Type": "STRING",
+                "Value": "v2.5.0"
+            }
+        }
+    ],
+    "ScopeMetrics": [
+        {
+            "Scope": {
+                "Name": "Opentelemetry-Java"
+            },
+            "Metrics": [
+                {
+                    "Name": "histogram_test",
+                    "Description": "测试histogram",
+                    "Unit": "test",
+                    "Histogram": {
+                        "DataPoints": [
+                            {
+                                "Attributes": [],
+                                "StartTime": "2023-03-02T14:15:02.3023820+08:00",
+                                "Time": "2023-03-02T14:15:02.4355630+08:00",
+                                "Count": 2,
+                                "Sum": 520.0,
+                                "Bounds": [
+                                    0.0,
+                                    5.0,
+                                    10.0,
+                                    25.0,
+                                    50.0,
+                                    75.0,
+                                    100.0,
+                                    250.0,
+                                    500.0,
+                                    750.0,
+                                    1000.0,
+                                    2500.0,
+                                    5000.0,
+                                    7500.0,
+                                    10000.0
+                                ],
+                                "BucketCounts": [
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ]
+                            }
+                        ],
+                        "Temporality": "CumulativeTemporality"
+                    }
+                }
+            ]
+        }
+    ]
+}
