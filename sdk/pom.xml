@@ -20,6 +20,7 @@
 
     <modules>
         <module>/src/main/java/cn/aishu/telemetry/ar_metric</module>
+        <module>../exporter/ar_trace</module>
     </modules>
 
     <dependencyManagement>
