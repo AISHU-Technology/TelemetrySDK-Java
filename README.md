@@ -1,3 +1,16 @@
+### 项目介绍
+本项目是基于 Opentelemetry 官方定义的 Log 数据模型实现的 SDK，包括以下组件
+sdk : 基于 Opentelemetry Log API 的具体实现，用于生成程序日志、业务日志
+exporters: Log 数据导出的具体实现，支持标准输出、上报到数据接收器等导出方式
+### 项目 layout 说明
+├── sdk  // 各执行器公共模块
+│   ├── config  // 相关公共配置
+│   │   ├── config.go
+│   │   └── log.go
+│   ├── manager  与 manager交互
+│   │   └── manager.go
+│   └── resource  资源操作 如 k8s api、创建进程等
+
 ### sdk使用方式(拉取 2.0.0 版本)：
 ##### 1. 命令行：
     1.1 $ git clone ssh://devops.aishu.cn:22/AISHUDevOps/ONE-Architecture/_git/TelemetrySDK-Java -b 2.1.0
