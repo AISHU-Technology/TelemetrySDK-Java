@@ -47,7 +47,6 @@ public final class ArExporter implements SpanExporter {
             sender.send(spanContent);
         }
 
-        TimeUtil.sleepSecond(1);
         return CompletableResultCode.ofSuccess();
     }
 
