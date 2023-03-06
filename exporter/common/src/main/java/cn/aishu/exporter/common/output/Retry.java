@@ -41,8 +41,8 @@ public class Retry {
         return maxElapsedTime;
     }
 
-    public boolean isOK(int retryElapsedTime, int responseCode) {
-        return getEnabled() && (retryElapsedTime < getMaxElapsedTime()) && (responseCode == 429 || responseCode == 500 || responseCode == 503) ;
+    public static boolean isOK(Retry retry, int retryElapsedTime, int responseCode) {
+        return retry.getEnabled() && (retryElapsedTime < retry.getMaxElapsedTime()) && (responseCode == 429 || responseCode == 500 || responseCode == 503) ;
     }
 
 }
