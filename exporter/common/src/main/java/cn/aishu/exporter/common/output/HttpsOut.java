@@ -14,11 +14,9 @@ import java.util.concurrent.*;
 
 public class HttpsOut implements Sender {
     private ExecutorService threadPool = null;
-    private static final int CAPACITY = 4096;
-    private static final int CAPACITY2 = 655360;
-    private final BlockingQueue<Serializer> q1 = new ArrayBlockingQueue<>(CAPACITY);
-    private final BlockingQueue<Serializer> q2 = new LinkedBlockingQueue<>(CAPACITY2);
-    private final int listSize = 80;
+    private static final int CAPACITY = 655360;
+    private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(CAPACITY);
+    private static final int LIST_SIZE = 80;
     private String serverUrl;
     private boolean isShutDown = false;
     private Retry retry;
@@ -43,17 +41,14 @@ public class HttpsOut implements Sender {
 
         try {
             //超过队列容量直接丢弃日志
-            if (q1.size() < CAPACITY) {
-                q1.put(logContent);
-            } else if (q2.size() < CAPACITY2) {
-                q2.put(logContent);
+            if (queue.size() < CAPACITY) {
+                queue.put(logContent);
             }
             //检测是否有活线程，启动线程
-            if (threadPool == null || threadPool.isTerminated()) {
-                serviceStart();
-            }
+            serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            Stdout.println(e.toString());
         }
     }
 
@@ -94,7 +89,7 @@ public class HttpsOut implements Sender {
                 return;
             }
             //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
-            if (retry.isOK(retryElapsedTime,  responseCode) && (q2.size() < CAPACITY2)) {
+            if (retry.isOK(retryElapsedTime,  responseCode) && (queue.size() < CAPACITY)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
                 if(currentRetryInterval > retry.getMaxInterval()){
@@ -119,8 +114,8 @@ public class HttpsOut implements Sender {
      */
     public synchronized void serviceStart() {
         // 创建一个线程池的线程池
-        int threadNum = 5;
         if (threadPool == null || threadPool.isTerminated()) {
+            int threadNum = 5;
             threadPool = Executors.newFixedThreadPool(threadNum);
             for (int i = 0; i < threadNum; i++) {
                 threadPool.submit(createThread());
@@ -136,28 +131,24 @@ public class HttpsOut implements Sender {
             int strLength = 0;
             final int strLengthLimit = 5*1024*1000;
             boolean queueIsEmpty = false;
-            List<String> list = new ArrayList<>(listSize);
+            List<String> list = new ArrayList<>(LIST_SIZE);
             while (true) {
                 Serializer content;
                 try {
-                    content = q1.poll();
-                    if (content == null) {
-                        content = q2.poll();
-                    }
-                    if (content == null) {
-                        content = q1.poll(1, TimeUnit.SECONDS);
-                    }
+                    content = queue.poll(2, TimeUnit.SECONDS);
                     if (content != null) {
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
-                        if (strLength >= strLengthLimit){
-                            strLength = sendAndClearList(list);
+                        if (strLength >= strLengthLimit) {
+                            //如果字符总长度超过了限制，先发送这批trace
+                            sendAndClearList(list);
+                            strLength = 0;
                             list.add(contentStr);
                             continue;
-                        }else {
+                        } else {
                             list.add(contentStr);
                         }
-                    } else if(q1.isEmpty() && q2.isEmpty()){
+                    } else if (queue.isEmpty()) {
                         queueIsEmpty = true;
                     }
                 } catch (InterruptedException ie) {
@@ -166,13 +157,19 @@ public class HttpsOut implements Sender {
                 }
                 int currentSize = list.size();
 
-                if (currentSize == listSize) {
-                    strLength =sendAndClearList(list);
+                if (currentSize == LIST_SIZE) {
+                    //如果trace的条数超过了预设值，先发送这批trace
+                    sendAndClearList(list);
+                    strLength = 0;
                 }
-                if (queueIsEmpty) {
+
+                if (queueIsEmpty && queue.isEmpty()) {
+                    //如果队列已空，发送最后这批trace并
                     if (currentSize != 0) {
-                        strLength = sendAndClearList(list);
-                    }else {
+                        sendAndClearList(list);
+                        strLength = 0;
+                    }
+                    if (queue.isEmpty()) {
                         break;
                     }
                 }
@@ -180,10 +177,9 @@ public class HttpsOut implements Sender {
         };
     }
 
-    private int sendAndClearList(List<String> list) {
+    private void sendAndClearList(List<String> list) {
         httpsRequest(String.join(",", list), 0,0);
         list.clear();
-        return 0;
     }
 }
 

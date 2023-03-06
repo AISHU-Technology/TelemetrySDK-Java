@@ -1,5 +1,6 @@
 package cn.aishu.exporter.common.utils;
 
+import cn.aishu.exporter.common.output.Stdout;
 import cn.hutool.core.date.DateUtil;
 
 import java.util.Date;
@@ -11,7 +12,7 @@ public class TimeUtil {
         try {
             Thread.sleep(1000 * sec);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Stdout.println(e.toString());
         }
     }
 

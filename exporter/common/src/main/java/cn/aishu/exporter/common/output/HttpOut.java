@@ -16,10 +16,8 @@ import java.util.concurrent.*;
 public class HttpOut implements Sender {
 
     private ExecutorService threadPool = null;
-    private static final int CAPACITY = 4096;
-    private static final int CAPACITY2 = 655360;
-    private final BlockingQueue<Serializer> q1 = new ArrayBlockingQueue<>(CAPACITY);
-    private final BlockingQueue<Serializer> q2 = new LinkedBlockingQueue<>(CAPACITY2);
+    private static final int CAPACITY = 655360;
+    private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(CAPACITY);
     private static final int LIST_SIZE = 80;
     private final String serverUrl;
     private boolean isShutDown = false;
@@ -27,7 +25,7 @@ public class HttpOut implements Sender {
     private boolean isGzip = true;
 
     public HttpOut(String addr, Retry retry, boolean isGzip) {
-        serverUrl = addr;
+        this.serverUrl = addr;
         this.isGzip = isGzip;
         this.retry = retry;
     }
@@ -40,19 +38,11 @@ public class HttpOut implements Sender {
 
         try {
             //超过队列容量直接丢弃日志
-            if (q1.size() < CAPACITY) {
-                q1.put(logContent);
-            } else if (q2.size() < CAPACITY2) {
-                q2.put(logContent);
-            } else {
-                q1.poll();
-                q1.put(q2.poll());
-                q2.put(logContent);
+            if (queue.size() < CAPACITY) {
+                queue.put(logContent);
             }
             //检测是否有活线程，启动线程
-            if (threadPool == null || threadPool.isTerminated()) {
-                serviceStart();
-            }
+            serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             Stdout.println(e.toString());
@@ -66,13 +56,10 @@ public class HttpOut implements Sender {
     }
 
     public void httpRequest(String outputStr, int retryInterval, int retryElapsedTime) {
-
         if (outputStr == null || outputStr.isEmpty()) {
             return;
         }
         HttpURLConnection conn = null;
-
-
         try {
             URL url = new URL(serverUrl);
             conn = (HttpURLConnection) url.openConnection();
@@ -96,12 +83,11 @@ public class HttpOut implements Sender {
             outputStream.close();
 
             int responseCode = conn.getResponseCode();
-            System.out.println("mycode:" + responseCode);
             if (responseCode == 204 || responseCode == 200) {
                 return;
             }
             //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
-            if (retry.isOK(retryElapsedTime, responseCode) && (q2.size() < CAPACITY2)) {
+            if (retry.isOK(retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
                 if (currentRetryInterval > retry.getMaxInterval()) {
@@ -127,8 +113,8 @@ public class HttpOut implements Sender {
      */
     public synchronized void serviceStart() {
         // 创建一个线程池的线程池
-        int threadNum = 5;
         if (threadPool == null || threadPool.isTerminated()) {
+            int threadNum = 5;
             threadPool = Executors.newFixedThreadPool(threadNum);
             for (int i = 0; i < threadNum; i++) {
                 threadPool.submit(createThread());
@@ -148,13 +134,7 @@ public class HttpOut implements Sender {
             while (true) {
                 Serializer content;
                 try {
-                    content = q1.poll();
-                    if (content == null) {
-                        content = q2.poll();
-                    }
-                    if (content == null) {
-                        content = q1.poll(1, TimeUnit.SECONDS);
-                    }
+                    content = queue.poll(2, TimeUnit.SECONDS);
                     if (content != null) {
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
@@ -167,7 +147,7 @@ public class HttpOut implements Sender {
                         } else {
                             list.add(contentStr);
                         }
-                    } else if (q1.isEmpty() && q2.isEmpty()) {
+                    } else if (queue.isEmpty()) {
                         queueIsEmpty = true;
                     }
                 } catch (InterruptedException ie) {
@@ -181,22 +161,24 @@ public class HttpOut implements Sender {
                     sendAndClearList(list);
                     strLength = 0;
                 }
-                if (queueIsEmpty) {
+
+                if (queueIsEmpty && queue.isEmpty()) {
                     //如果队列已空，发送最后这批trace并
                     if (currentSize != 0) {
                         sendAndClearList(list);
                         strLength = 0;
                     }
-                    break;
+                    if (queue.isEmpty()) {
+                        break;
+                    }
                 }
             }
         };
     }
 
-    private int sendAndClearList(List<String> list) {
+    private void sendAndClearList(List<String> list) {
         httpRequest(String.join(",", list), 0, 0);
         list.clear();
-        return 0;
     }
 }
 
