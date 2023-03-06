@@ -1,10 +1,9 @@
 package cn.aishu.exporter.ar_metric;
 
 import java.util.List;
-import org.apache.commons.logging.Log;
 
-import cn.aishu.telemetry.common.KeyValue;
-import cn.aishu.telemetry.utils.TimeUtil;
+import cn.aishu.exporter.common.KeyValue;
+import cn.aishu.exporter.common.utils.TimeUtil;
 
 import io.opentelemetry.sdk.metrics.data.DoublePointData;
 import io.opentelemetry.sdk.metrics.data.LongPointData;
@@ -49,19 +48,19 @@ public class AnyrobotDatapoint {
         return this.asDouble;
     }
 
-    public AnyrobotDatapoint(DoublePointData dataPoint, Log log) {
+    public AnyrobotDatapoint(DoublePointData dataPoint) {
         this.time = TimeUtil.epochNanoToTime(dataPoint.getEpochNanos());
         this.startTime = TimeUtil.epochNanoToTime(dataPoint.getStartEpochNanos());
 
         this.asDouble = dataPoint.getValue();
-        this.attributes = KeyValue.extractFromAttributes(dataPoint.getAttributes(), log);
+        this.attributes = KeyValue.extractFromAttributes(dataPoint.getAttributes());
     }
 
-    public AnyrobotDatapoint(LongPointData dataPoint, Log log) {
+    public AnyrobotDatapoint(LongPointData dataPoint) {
         this.time = TimeUtil.epochNanoToTime(dataPoint.getEpochNanos());
         this.startTime = TimeUtil.epochNanoToTime(dataPoint.getStartEpochNanos());
 
         this.asInt = dataPoint.getValue();
-        this.attributes = KeyValue.extractFromAttributes(dataPoint.getAttributes(), log);
+        this.attributes = KeyValue.extractFromAttributes(dataPoint.getAttributes());
     }
 }

@@ -67,7 +67,7 @@ public class AnyrobotMetrics {
                 this.sum = new AnyrobotSum(metricData, log);
                 break;
             case HISTOGRAM:
-                this.histogram = new AnyrobotHistogram(metricData, log);
+                this.histogram = new AnyrobotHistogram(metricData);
                 break;
             case SUMMARY:
             case EXPONENTIAL_HISTOGRAM:

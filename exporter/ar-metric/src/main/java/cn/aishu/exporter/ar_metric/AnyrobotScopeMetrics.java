@@ -27,7 +27,7 @@ public class AnyrobotScopeMetrics {
     }
 
     public AnyrobotScopeMetrics(MetricData metricData, Log log) {
-        this.metrics = new ArrayList<AnyrobotMetrics>();
+        this.metrics = new ArrayList<>();
         this.scope = new AnyrobotScope();
         this.scope.name = metricData.getInstrumentationScopeInfo().getName();
         this.scope.schemaURL = metricData.getInstrumentationScopeInfo().getSchemaUrl();

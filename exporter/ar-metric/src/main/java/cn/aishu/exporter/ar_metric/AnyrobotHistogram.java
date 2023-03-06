@@ -3,9 +3,9 @@ package cn.aishu.exporter.ar_metric;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
-import org.apache.commons.logging.Log;
 
 import io.opentelemetry.sdk.metrics.data.MetricData;
+import io.opentelemetry.sdk.metrics.data.AggregationTemporality;
 import io.opentelemetry.sdk.metrics.data.HistogramData;
 import io.opentelemetry.sdk.metrics.data.HistogramPointData;
 
@@ -26,21 +26,18 @@ public class AnyrobotHistogram {
         return this.temporality;
     }
 
-    public AnyrobotHistogram(MetricData metricData, Log log) {
+    public AnyrobotHistogram(MetricData metricData) {
         HistogramData histogramData = metricData.getHistogramData();
-        switch (histogramData.getAggregationTemporality()) {
-            case DELTA:
-                this.temporality = "DeltaTemporality";
-                break;
-            case CUMULATIVE:
-                this.temporality = "CumulativeTemporality";
-                break;
+        if (histogramData.getAggregationTemporality() == AggregationTemporality.DELTA) {
+            this.temporality = "DeltaTemporality";
+        } else {
+            this.temporality = "CumulativeTemporality";
         }
         histogramData.getPoints();
-        this.dataPoints = new ArrayList<AnyrobotHistogramDatapoint>();
+        this.dataPoints = new ArrayList<>();
         Collection<HistogramPointData> tempPoints = histogramData.getPoints();
         for (HistogramPointData tempDataPoint : tempPoints) {
-            dataPoints.add(new AnyrobotHistogramDatapoint(tempDataPoint, log));
+            dataPoints.add(new AnyrobotHistogramDatapoint(tempDataPoint));
         }
     }
 }
