@@ -1,6 +1,6 @@
 package cn.aishu.exporter.ar_trace.content;
 
-import cn.aishu.exporter.ar_trace.common.KeyValue;
+import cn.aishu.exporter.common.KeyValue;
 import io.opentelemetry.sdk.common.InstrumentationScopeInfo;
 
 import java.util.List;

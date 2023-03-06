@@ -1,6 +1,6 @@
 package cn.aishu.exporter.ar_trace;
 
-import cn.aishu.exporter.ar_trace.common.KeyValue;
+//import cn.aishu.exporter.ar_trace.common.KeyValue;
 import cn.aishu.exporter.common.output.Retry;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import io.opentelemetry.api.common.AttributeKey;

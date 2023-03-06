@@ -1,7 +1,7 @@
 package cn.aishu.exporter.ar_trace;
 
 
-import cn.aishu.exporter.ar_trace.config.SenderGen;
+import cn.aishu.exporter.common.output.SenderGen;
 import cn.aishu.exporter.ar_trace.content.SpanContent;
 import cn.aishu.exporter.common.output.Retry;
 import cn.aishu.exporter.common.output.Sender;

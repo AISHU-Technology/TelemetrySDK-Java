@@ -1,8 +1,8 @@
 package cn.aishu.exporter.ar_trace.content;
 
-import cn.aishu.exporter.ar_trace.common.KeyValue;
+import cn.aishu.exporter.common.KeyValue;
 import cn.aishu.exporter.common.output.Serializer;
-import cn.aishu.exporter.ar_trace.resource.Resource;
+import cn.aishu.exporter.common.Resource;
 import cn.aishu.exporter.common.utils.JsonUtil;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import com.google.gson.annotations.SerializedName;
