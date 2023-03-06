@@ -6,7 +6,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import cn.aishu.exporter.common.output.Sender;
-import cn.aishu.exporter.common.output.Stdout;
+import cn.aishu.exporter.common.output.SenderGen;
+import cn.aishu.exporter.common.output.Retry;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.metrics.InstrumentType;
@@ -31,23 +32,20 @@ public final class MetricsExporter implements MetricExporter {
      * {@code aggregationTemporality}.
      */
 
-    public static MetricsExporter create() {
-        return create(new Stdout());
+    public static MetricsExporterBuilder builder() {
+       return new MetricsExporterBuilder();
     }
 
-    public static MetricsExporter create(Sender output) {
-        Log defaultLog = LogFactory.getLog(MetricsExporter.class);
-        return new MetricsExporter(output, defaultLog);
-    }
-
-    public static MetricsExporter create(Sender output, Log log) {
-        return new MetricsExporter(output, log);
-    }
-
-    private MetricsExporter(Sender output, Log log) {
+    public MetricsExporter(String addr, Retry retry, boolean isGzip) {
         this.aggregationTemporality = AggregationTemporality.CUMULATIVE;
-        this.output = output;
+        this.log = LogFactory.getLog(MetricsExporter.class);
+        this.output = SenderGen.getSender(addr, retry, isGzip);
+    }
+
+    public MetricsExporter(String addr, Retry retry, boolean isGzip, Log log) {
+        this.aggregationTemporality = AggregationTemporality.CUMULATIVE;
         this.log = log;
+        this.output = SenderGen.getSender(addr, retry, isGzip);
     }
 
     /**

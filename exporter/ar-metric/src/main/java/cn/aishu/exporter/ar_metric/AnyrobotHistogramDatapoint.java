@@ -4,7 +4,6 @@ import java.util.List;
 
 import cn.aishu.exporter.common.KeyValue;
 import cn.aishu.exporter.common.utils.TimeUtil;
-import org.apache.commons.logging.Log;
 
 import io.opentelemetry.sdk.metrics.data.HistogramPointData;
 
