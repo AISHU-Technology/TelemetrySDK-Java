@@ -1,80 +1,78 @@
 package cn.aishu.exporter.common;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.logging.Log;
 
+import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 
-public class KeyValue {
+import java.util.ArrayList;
+import java.util.List;
 
-    public KeyValue(String key, String value) {
-        this.key = key;
-        this.value = new TypeValue(value);
-    }
+public class KeyValue {
+    private String Key;
+
+    private TypeValue Value;
 
     public KeyValue() {
     }
 
-    private String key;
-
-    private TypeValue value;
-
-    public String getKey() {
-        return this.key;
+    public KeyValue(String key, String type, String value) {
+        this.Key = key;
+        this.Value = new TypeValue(type, value);
     }
 
-    public TypeValue getValue() {
-        return this.value;
+
+    public static KeyValue createWithStringType(String key, String value) {
+       return new KeyValue(key, "STRING", value);
     }
 
     public void setKey(String key) {
-        this.key = key;
+        Key = key;
     }
 
     public void setValue(TypeValue value) {
-        this.value = value;
+        Value = value;
     }
 
-    public static List<KeyValue> extractFromAttributes(Attributes attributes, Log log) {
+
+    //从Attributes获取keyValue
+    public static List<KeyValue> extractFromAttributes(Attributes attributes){
         List<KeyValue> keyValues = new ArrayList<>();
-        attributes.forEach((k, v) -> {
+        attributes.forEach((k, v)->{
             KeyValue kv = new KeyValue();
             kv.setKey(k.getKey());
             TypeValue tv = new TypeValue();
-            switch (k.getType()) {
-                case BOOLEAN:
-                    tv.setType("BOOL");
-                    break;
-                case LONG:
-                    tv.setType("INT");
-                    break;
-                case STRING:
-                    tv.setType("STRING");
-                    break;
-                case DOUBLE:
-                    tv.setType("FLOAT");
-                    break;
-                case BOOLEAN_ARRAY:
-                    tv.setType("BOOLEANARRAY");
-                    break;
-                case LONG_ARRAY:
-                    tv.setType("INTARRAY");
-                    break;
-                case DOUBLE_ARRAY:
-                    tv.setType("FLOATARRAY");
-                    break;
-                case STRING_ARRAY:
-                    tv.setType("STRINGARRAY");
-                    break;
-                default:
-                    log.error("Unrecognized attribute type");
-            }
-            tv.setValue(v);
+            tv.setType(changeTypeName(k));
+            tv.setValue(v.toString());
             kv.setValue(tv);
             keyValues.add(kv);
         });
         return keyValues;
     }
+
+    //为了适配AR接收器的统一命名
+    private static String changeTypeName(AttributeKey<?> k) {
+        switch (k.getType()){
+            case STRING:
+                return "STRING";
+            case BOOLEAN:
+                return "BOOL";
+            case LONG:
+                return "INT";
+            case DOUBLE:
+                return "FLOAT";
+            case STRING_ARRAY:
+                return "STRINGARRAY";
+            case BOOLEAN_ARRAY:
+                return "BOOLEANARRAY";
+            case LONG_ARRAY:
+                return "INTARRAY";
+            case DOUBLE_ARRAY:
+                return "FLOATARRAY";
+            default:
+                return "Unrecognized attribute type";
+        }
+    }
+
+
 
 }
