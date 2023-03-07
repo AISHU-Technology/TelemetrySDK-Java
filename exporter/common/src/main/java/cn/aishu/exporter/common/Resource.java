@@ -26,8 +26,7 @@ public class Resource {
         serviceMap.forEach((k, v) -> resource.add(KeyValue.createWithStringType(k, v)));
 
         Map<String, String> telemetryMap = Telemetry.getMap();
-        telemetryMap.forEach((k, v) ->
-            resource.add(KeyValue.createWithStringType(k, v)));
+        telemetryMap.forEach((k, v) -> resource.add(KeyValue.createWithStringType(k, v)));
 
         return resource;
     }

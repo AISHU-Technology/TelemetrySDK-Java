@@ -1,6 +1,5 @@
 package cn.aishu.exporter.common.output;
 
-
 import cn.aishu.exporter.common.utils.GzipCompressUtil;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import org.apache.commons.logging.Log;
@@ -28,18 +27,18 @@ public class HttpsSender implements Sender {
     private boolean isGzip = true;
     private int threadNum = 5;
 
-    //5MB
-    private final int strLengthLimit = 5 * 1024 * 1000;
-    private final Log LOGGER =  LogFactory.getLog(getClass());
+    // 5MB
+    private final int STR_LENGTH_LIMIT = 5 * 1024 * 1000;
+    private final Log LOGGER = LogFactory.getLog(getClass());
 
-    public static HttpsSenderBuilder builder(){
+    public static HttpsSenderBuilder builder() {
         return new HttpsSenderBuilder();
     }
 
     public HttpsSender(String addr, Retry retry, boolean isGzip, int cacheCapacity) {
         this.serverUrl = addr;
         this.isGzip = isGzip;
-        if(retry != null){
+        if (retry != null) {
             this.retry = retry;
         }
         try {
@@ -51,11 +50,11 @@ public class HttpsSender implements Sender {
     }
 
     private void httpsSupport() throws NoSuchAlgorithmException, NoSuchProviderException, KeyManagementException {
-        //创建SSLContext对象，并使用我们指定的信任管理器初始化
+        // 创建SSLContext对象，并使用我们指定的信任管理器初始化
         SSLContext sslcontext = SSLContext.getInstance("TLSv1.2");
         System.setProperty("https.protocols", "TLSv1.2");
 
-        sslcontext.init(null, new TrustManager[]{new MyX509TrustManager()}, new java.security.SecureRandom());
+        sslcontext.init(null, new TrustManager[] { new MyX509TrustManager() }, new java.security.SecureRandom());
         HostnameVerifier ignoreHostnameVerifier = new HostnameVerifier() {
             public boolean verify(String host, SSLSession sslsession) {
                 return true;
@@ -67,18 +66,18 @@ public class HttpsSender implements Sender {
 
     @Override
     public void send(Serializer logContent) {
-        if(isShutDown){
+        if (isShutDown) {
             return;
         }
 
         try {
-            //超过队列容量直接丢弃日志
+            // 超过队列容量直接丢弃日志
             if (queue.size() < CAPACITY) {
                 queue.put(logContent);
-            }else{
+            } else {
                 this.LOGGER.warn("缓冲区满，将丢弃新进数据");
             }
-            //检测是否有活线程，启动线程
+            // 检测是否有活线程，启动线程
             serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -100,10 +99,10 @@ public class HttpsSender implements Sender {
         try {
             URL url = new URL(serverUrl);
             conn = (HttpsURLConnection) url.openConnection();
-            if (isGzip){
+            if (isGzip) {
                 conn.setRequestProperty("Content-Type", "Application/octet-stream");
                 conn.setRequestProperty("Content-Encoding", "gzip");
-            }else {
+            } else {
                 conn.setRequestProperty("Content-Type", "Application/json");
             }
             conn.setConnectTimeout(15000);
@@ -113,11 +112,11 @@ public class HttpsSender implements Sender {
             conn.setRequestMethod("POST");
             conn.connect();
 
-            //往服务器端写内容
+            // 往服务器端写内容
             OutputStream outputStream = conn.getOutputStream();
-            if(isGzip){
+            if (isGzip) {
                 outputStream.write(GzipCompressUtil.compress(outputStr).getBytes(StandardCharsets.UTF_8));
-            }else {
+            } else {
                 outputStream.write(outputStr.getBytes(StandardCharsets.UTF_8));
             }
             outputStream.flush();
@@ -127,11 +126,12 @@ public class HttpsSender implements Sender {
             if (responseCode == 204 || responseCode == 200) {
                 return;
             }
-            //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
+            // 当网络不稳定时(TooManyRequests:429, InternalServerError:500,
+            // ServiceUnavailable:503)，触发重发机制
             if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
-                if(currentRetryInterval > retry.getMaxInterval()){
+                if (currentRetryInterval > retry.getMaxInterval()) {
                     currentRetryInterval = retry.getMaxInterval();
                 }
                 int currentRetryElapsedTime = retryElapsedTime + currentRetryInterval;
@@ -175,8 +175,8 @@ public class HttpsSender implements Sender {
                     if (content != null) {
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
-                        if (strLength >= strLengthLimit) {
-                            //如果字符总长度超过了限制，先发送这批trace
+                        if (strLength >= STR_LENGTH_LIMIT) {
+                            // 如果字符总长度超过了限制，先发送这批trace
                             sendAndClearList(list);
                             strLength = 0;
                             list.add(contentStr);
@@ -193,13 +193,13 @@ public class HttpsSender implements Sender {
                 }
 
                 if (list.size() == LIST_SIZE) {
-                    //如果trace的条数超过了预设值，先发送这批trace
+                    // 如果trace的条数超过了预设值，先发送这批trace
                     sendAndClearList(list);
                     strLength = 0;
                 }
 
                 if (queueIsEmpty && queue.isEmpty()) {
-                    //如果队列已空，发送最后这批trace并
+                    // 如果队列已空，发送最后这批trace并
                     if (list.size() != 0) {
                         sendAndClearList(list);
                         strLength = 0;
@@ -217,4 +217,3 @@ public class HttpsSender implements Sender {
         list.clear();
     }
 }
-

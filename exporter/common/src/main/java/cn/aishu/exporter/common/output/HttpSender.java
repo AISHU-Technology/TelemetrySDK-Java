@@ -13,12 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-
 public class HttpSender implements Sender {
 
     private ExecutorService threadPool = null;
-    private  int CAPACITY = 65535;
-    private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(CAPACITY);
+    private int capacity = 1048;
+    private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(capacity);
     private static final int LIST_SIZE = 80;
     private final String url;
     private boolean isShutDown = false;
@@ -27,10 +26,10 @@ public class HttpSender implements Sender {
     private int threadNum = 5;
 
     // 5MB
-    private final int strLengthLimit = 5 * 1024 * 1000;
-    public final Log LOGGER =  LogFactory.getLog(getClass());
+    private static final int STR_LENGTH_LIMIT = 5 * 1024 * 1000;
+    public final Log logger = LogFactory.getLog(getClass());
 
-    public static HttpSenderBuilder builder(){
+    public static HttpSenderBuilder builder() {
         return new HttpSenderBuilder();
     }
 
@@ -41,9 +40,8 @@ public class HttpSender implements Sender {
             this.retry = retry;
         }
 
-        this.CAPACITY = cacheCapacity;
+        this.capacity = cacheCapacity;
     }
-
 
     @Override
     public void send(Serializer logContent) {
@@ -53,17 +51,17 @@ public class HttpSender implements Sender {
 
         try {
             // 超过队列容量直接丢弃日志
-            if (queue.size() < CAPACITY) {
+            if (queue.size() < capacity) {
                 queue.put(logContent);
-            }else{
-                this.LOGGER.warn("缓冲区满，将丢弃新进数据");
+            } else {
+                this.logger.warn("缓冲区满，将丢弃新进数据");
             }
 
-            //检测是否有活线程，启动线程
+            // 检测是否有活线程，启动线程
             serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            this.LOGGER.error(e);
+            this.logger.error(e);
         }
     }
 
@@ -81,10 +79,9 @@ public class HttpSender implements Sender {
         try {
             URL url = new URL(this.url);
             conn = (HttpURLConnection) url.openConnection();
-            if (isGzip){
-//                conn.setRequestProperty("Content-Type", "Application/octet-stream");
+            if (isGzip) {
                 conn.setRequestProperty("Content-Encoding", "gzip");
-            }else {
+            } else {
                 conn.setRequestProperty("Content-Type", "Application/json");
             }
             conn.setConnectTimeout(15000);
@@ -110,15 +107,14 @@ public class HttpSender implements Sender {
             outputStream.close();
 
             int responseCode = conn.getResponseCode();
-            System.out.println("mycode:" + responseCode);
             if (responseCode == 204 || responseCode == 200) {
                 return;
             } else {
-                Stdout.println(conn.getResponseMessage());
+                this.logger.error(conn.getResponseMessage());
             }
             // 当网络不稳定时(TooManyRequests:429, InternalServerError:500,
             // ServiceUnavailable:503)，触发重发机制
-            if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
+            if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < capacity)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
                 if (currentRetryInterval > retry.getMaxInterval()) {
@@ -129,9 +125,9 @@ public class HttpSender implements Sender {
 
                 httpRequest(outputStr, currentRetryInterval, currentRetryElapsedTime);
             }
-            this.LOGGER.error("error: 发送http目的地址:" + this.url + ",网络异常:" + responseCode);
+            this.logger.error("error: 发送http目的地址:" + this.url + ",网络异常:" + responseCode);
         } catch (Exception e) {
-            this.LOGGER.error(e);
+            this.logger.error(e);
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -166,7 +162,7 @@ public class HttpSender implements Sender {
                     if (content != null) {
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
-                        if (strLength >= strLengthLimit) {
+                        if (strLength >= STR_LENGTH_LIMIT) {
                             // 如果字符总长度超过了限制，先发送这批trace
                             sendAndClearList(list);
                             strLength = 0;
@@ -184,14 +180,14 @@ public class HttpSender implements Sender {
                 }
 
                 if (list.size() == LIST_SIZE) {
-                    //如果trace的条数超过了预设值，先发送这批trace
+                    // 如果trace的条数超过了预设值，先发送这批trace
                     sendAndClearList(list);
                     strLength = 0;
                 }
 
                 if (queueIsEmpty && queue.isEmpty()) {
-                    //如果队列已空，发送最后这批trace并
-                    if (list.size() != 0) {
+                    // 如果队列已空，发送最后这批trace并
+                    if (list.isEmpty()) {
                         sendAndClearList(list);
                         strLength = 0;
                     }
