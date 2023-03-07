@@ -1,35 +1,23 @@
 package cn.aishu.exporter.ar_trace;
 
-import cn.aishu.exporter.common.output.Retry;
+import cn.aishu.exporter.common.output.Sender;
 
 public class ArExporterBuilder {
-    private String addr;
-    private Retry retry;
-    private boolean isGzip = true;
+    private Sender sender;
 
     public ArExporterBuilder() {
     }
 
-    public ArExporterBuilder(Retry retry) {
-        this.retry = retry;
+    public ArExporterBuilder(Sender sender) {
+        this.sender = sender;
     }
 
-    public ArExporterBuilder setSendAddr(String addr){
-        this.addr = addr;
-        return this;
-    }
-
-    public ArExporterBuilder setRetry(Retry retry){
-        this.retry = retry;
-        return this;
-    }
-
-    public ArExporterBuilder setGzip(boolean isGzip){
-        this.isGzip = isGzip;
+    public ArExporterBuilder setSender(Sender sender){
+        this.sender =sender;
         return this;
     }
 
     public ArExporter build(){
-        return new ArExporter(addr, retry, isGzip);
+        return new ArExporter(sender);
     }
 }

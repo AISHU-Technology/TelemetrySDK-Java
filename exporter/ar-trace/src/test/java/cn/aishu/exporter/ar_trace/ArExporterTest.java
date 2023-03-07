@@ -1,6 +1,7 @@
 package cn.aishu.exporter.ar_trace;
 
 //import cn.aishu.exporter.ar_trace.common.KeyValue;
+import cn.aishu.exporter.common.output.HttpSender;
 import cn.aishu.exporter.common.output.Retry;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import io.opentelemetry.api.common.AttributeKey;
@@ -30,11 +31,24 @@ public class ArExporterTest {
                 Retry.builder().setInitialInterval(1).setMaxInterval(2).setMaxElapsedTime(3).build();
         }
 
-        @Test
-        public void testTraceExporterHttp() {
-                testBuilder();
-                Resource serviceNameResource = Resource.create(io.opentelemetry.api.common.Attributes
-                                .of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example2"));
+        // Set to process the spans by the Jaeger Exporter
+        SdkTracerProvider tracerProvider =
+                SdkTracerProvider.builder()
+//                        .addSpanProcessor(BatchSpanProcessor.builder(LoggingSpanExporter.create()).build())
+//                        .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter()))
+                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.builder()
+                                .setSender(HttpSender.builder()
+                                        .setUrl("http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-4f1931764308121e/events")
+                                        .setGzip(true)
+                                        .setRetry(Retry.builder().setMaxInterval(5).build())
+                                        .build())
+                                .build()))
+//                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create("http://localhost:8089")))
+//                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create("http://localhost:8080")))
+                        .setResource(Resource.getDefault().merge(serviceNameResource))
+                        .build();
+        OpenTelemetrySdk openTelemetry =
+                OpenTelemetrySdk.builder().setTracerProvider(tracerProvider).build();
 
                 // Set to process the spans by the Jaeger Exporter
                 SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
@@ -72,8 +86,9 @@ public class ArExporterTest {
                                 .build();
                 OpenTelemetrySdk openTelemetry = OpenTelemetrySdk.builder().setTracerProvider(tracerProvider).build();
 
-                Span span = tracer.spanBuilder("Start my wonderful use case2").startSpan();
-                span.addEvent("Event 02");
+        span.end();
+        TimeUtil.sleepSecond(5);
+    }
 
                 span.end();
                 TimeUtil.sleepSecond(15);

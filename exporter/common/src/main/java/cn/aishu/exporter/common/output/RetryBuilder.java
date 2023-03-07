@@ -4,7 +4,7 @@ package cn.aishu.exporter.common.output;
 public class RetryBuilder {
     // Enabled 是否启用重发机制。
     private  Boolean enabled = true;
-    // InitialInterval 第一次重发与上一次发送的时间间隔。
+    // InitialInterval 第一次重发与上一次发送的时间间隔。单位是秒
     private int initialInterval = 5;
     // MaxInterval 两次重发的最长时间间隔。
     private Integer maxInterval = 15;
