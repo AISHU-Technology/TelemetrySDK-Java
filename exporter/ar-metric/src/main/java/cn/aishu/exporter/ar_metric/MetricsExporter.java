@@ -19,7 +19,7 @@ public final class MetricsExporter implements MetricExporter {
     public final Log log;
     private final AtomicBoolean isShutdown = new AtomicBoolean();
     private final AggregationTemporality aggregationTemporality;
-    private final Sender output;
+    private final Sender sender;
 
     /**
      * Returns a new {@link HttpMetricsExporter} with an aggregation temporality
@@ -32,20 +32,19 @@ public final class MetricsExporter implements MetricExporter {
      * {@code aggregationTemporality}.
      */
 
-    public static MetricsExporterBuilder builder() {
-        return new MetricsExporterBuilder();
+    public static MetricsExporter create(Sender sender) {
+        Log log = LogFactory.getLog(MetricsExporter.class);
+        return new MetricsExporter(sender, log);
     }
 
-    public MetricsExporter(String addr, Retry retry, boolean isGzip) {
-        this.aggregationTemporality = AggregationTemporality.CUMULATIVE;
-        this.log = LogFactory.getLog(MetricsExporter.class);
-        this.output = SenderGen.getSender(addr, retry, isGzip);
+    public static MetricsExporter create(Sender sender, Log log) {
+        return new MetricsExporter(sender, log);
     }
 
-    public MetricsExporter(String addr, Retry retry, boolean isGzip, Log log) {
+    private MetricsExporter(Sender sender, Log log) {
         this.aggregationTemporality = AggregationTemporality.CUMULATIVE;
         this.log = log;
-        this.output = SenderGen.getSender(addr, retry, isGzip);
+        this.sender = sender;
     }
 
     /**
@@ -70,7 +69,7 @@ public final class MetricsExporter implements MetricExporter {
         }
         for (MetricData metricData : metrics) {
             AnyrobotScopeResource anyrobotScopeResource = new AnyrobotScopeResource(metricData, log);
-            this.output.send(anyrobotScopeResource);
+            this.sender.send(anyrobotScopeResource);
         }
         return CompletableResultCode.ofSuccess();
     }
