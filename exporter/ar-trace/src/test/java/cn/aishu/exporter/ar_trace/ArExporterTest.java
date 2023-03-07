@@ -1,6 +1,7 @@
 package cn.aishu.exporter.ar_trace;
 
 //import cn.aishu.exporter.ar_trace.common.KeyValue;
+import cn.aishu.exporter.common.output.HttpSender;
 import cn.aishu.exporter.common.output.Retry;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import io.opentelemetry.api.common.AttributeKey;
@@ -41,12 +42,11 @@ public class ArExporterTest {
 //                        .addSpanProcessor(BatchSpanProcessor.builder(LoggingSpanExporter.create()).build())
 //                        .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter()))
                         .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.builder()
-                                .setGzip(false)
-//                                .setRetry(new Retry(true, 1,2,3))
-//                                .setRetry(Retry.builder().setInitialInterval(1).setMaxInterval(2).setMaxElapsedTime(3).build())
-//                                .setSendAddr("http://localhost:8089")
-                                .setSendAddr("http://localhost:8080")
-//                                .setSendAddr("http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-4f1931764308121e/events")
+                                .setSender(HttpSender.builder()
+                                        .setUrl("http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-4f1931764308121e/events")
+                                        .setGzip(true)
+                                        .setRetry(Retry.builder().setMaxInterval(5).build())
+                                        .build())
                                 .build()))
 //                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create("http://localhost:8089")))
 //                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create("http://localhost:8080")))
@@ -63,7 +63,7 @@ public class ArExporterTest {
         span.addEvent("Event 02");
 
         span.end();
-        TimeUtil.sleepSecond(15);
+        TimeUtil.sleepSecond(5);
     }
 
 

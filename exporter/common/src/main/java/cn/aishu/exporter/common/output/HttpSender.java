@@ -3,41 +3,52 @@ package cn.aishu.exporter.common.output;
 
 import cn.aishu.exporter.common.utils.GzipCompressUtil;
 import cn.aishu.exporter.common.utils.TimeUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class HttpsOut implements Sender {
+
+public class HttpSender implements Sender {
+
     private ExecutorService threadPool = null;
-    private static final int CAPACITY = 655360;
+    private  int CAPACITY = 65535;
     private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(CAPACITY);
     private static final int LIST_SIZE = 80;
-    private String serverUrl;
+    private final String url;
     private boolean isShutDown = false;
     private Retry retry = new Retry();
     private boolean isGzip = true;
+    private int threadNum = 5;
 
-    public HttpsOut(String addr, Retry retry, boolean isGzip) {
-        this.serverUrl = addr;
+    // 5MB
+    private final int strLengthLimit = 5 * 1024 * 1000;
+    public final Log LOGGER =  LogFactory.getLog(getClass());
+
+    public static HttpSenderBuilder builder(){
+        return new HttpSenderBuilder();
+    }
+
+    public HttpSender(String url, Retry retry, boolean isGzip, int cacheCapacity) {
+        this.url = url;
         this.isGzip = isGzip;
         if(retry != null){
             this.retry = retry;
         }
-        try {
-            MyX509TrustManager.httpsSupport();
-        } catch (Exception e) {
-            Stdout.println(e.toString());
-        }
+
+        this.CAPACITY = cacheCapacity;
     }
+
 
     @Override
     public void send(Serializer logContent) {
-        if(isShutDown){
+        if (isShutDown) {
             return;
         }
 
@@ -45,12 +56,15 @@ public class HttpsOut implements Sender {
             //超过队列容量直接丢弃日志
             if (queue.size() < CAPACITY) {
                 queue.put(logContent);
+            }else{
+                this.LOGGER.warn("缓冲区满，将丢弃新进数据");
             }
+
             //检测是否有活线程，启动线程
             serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            Stdout.println(e.toString());
+            this.LOGGER.error(e);
         }
     }
 
@@ -60,20 +74,21 @@ public class HttpsOut implements Sender {
         threadPool.shutdown();
     }
 
-    public void httpsRequest(String outputStr, int retryInterval, int retryElapsedTime) {
+    public void httpRequest(String outputStr, int retryInterval, int retryElapsedTime) {
         if (outputStr == null || outputStr.isEmpty()) {
             return;
         }
-        HttpsURLConnection conn = null;
+        HttpURLConnection conn = null;
         try {
-            URL url = new URL(serverUrl);
-            conn = (HttpsURLConnection) url.openConnection();
+            URL url = new URL(this.url);
+            conn = (HttpURLConnection) url.openConnection();
             if (isGzip){
-                conn.setRequestProperty("Content-Type", "Application/octet-stream");
+//                conn.setRequestProperty("Content-Type", "Application/octet-stream");
                 conn.setRequestProperty("Content-Encoding", "gzip");
             }else {
                 conn.setRequestProperty("Content-Type", "Application/json");
             }
+            conn.setConnectTimeout(15000);
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setUseCaches(false);
@@ -82,32 +97,35 @@ public class HttpsOut implements Sender {
 
             //往服务器端写内容
             OutputStream outputStream = conn.getOutputStream();
-            if(isGzip){
-                outputStream.write(GzipCompressUtil.compress(outputStr).getBytes(StandardCharsets.UTF_8));
-            }else {
+            if (isGzip) {
+                outputStream.write(GzipCompressUtil.compressData(outputStr, StandardCharsets.UTF_8.toString()));
+            } else {
                 outputStream.write(outputStr.getBytes(StandardCharsets.UTF_8));
             }
+
             outputStream.flush();
             outputStream.close();
 
             int responseCode = conn.getResponseCode();
+            System.out.println("mycode:" + responseCode);
             if (responseCode == 204 || responseCode == 200) {
                 return;
             }
             //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
-            if (Retry.isOK(retry,retryElapsedTime,  responseCode) && (queue.size() < CAPACITY)) {
+            if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
-                if(currentRetryInterval > retry.getMaxInterval()){
+                if (currentRetryInterval > retry.getMaxInterval()) {
                     currentRetryInterval = retry.getMaxInterval();
                 }
                 int currentRetryElapsedTime = retryElapsedTime + currentRetryInterval;
                 TimeUtil.sleepSecond(currentRetryInterval);
-                httpsRequest(outputStr, currentRetryInterval, currentRetryElapsedTime);
+
+                httpRequest(outputStr, currentRetryInterval, currentRetryElapsedTime);
             }
-            Stdout.println("error: event发送https目的地址:" + serverUrl + ",网络异常:" + responseCode);
+            this.LOGGER.error("error: 发送http目的地址:" + this.url + ",网络异常:" + responseCode);
         } catch (Exception e) {
-            Stdout.println(e.toString());
+            this.LOGGER.error(e);
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -121,7 +139,6 @@ public class HttpsOut implements Sender {
     public synchronized void serviceStart() {
         // 创建一个线程池的线程池
         if (threadPool == null || threadPool.isTerminated()) {
-            int threadNum = 5;
             threadPool = Executors.newFixedThreadPool(threadNum);
             for (int i = 0; i < threadNum; i++) {
                 threadPool.submit(createThread());
@@ -135,13 +152,11 @@ public class HttpsOut implements Sender {
     Runnable createThread() {
         return () -> {
             int strLength = 0;
-            final int strLengthLimit = 5*1024*1000;
             boolean queueIsEmpty = false;
             List<String> list = new ArrayList<>(LIST_SIZE);
             while (true) {
-                Serializer content;
                 try {
-                    content = queue.poll(2, TimeUnit.SECONDS);
+                    Serializer content = queue.poll(100, TimeUnit.MILLISECONDS);
                     if (content != null) {
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
@@ -161,9 +176,8 @@ public class HttpsOut implements Sender {
                     Thread.currentThread().interrupt();
                     return;
                 }
-                int currentSize = list.size();
 
-                if (currentSize == LIST_SIZE) {
+                if (list.size() == LIST_SIZE) {
                     //如果trace的条数超过了预设值，先发送这批trace
                     sendAndClearList(list);
                     strLength = 0;
@@ -171,11 +185,11 @@ public class HttpsOut implements Sender {
 
                 if (queueIsEmpty && queue.isEmpty()) {
                     //如果队列已空，发送最后这批trace并
-                    if (currentSize != 0) {
+                    if (list.size() != 0) {
                         sendAndClearList(list);
                         strLength = 0;
                     }
-                    if (queue.isEmpty()) {
+                    if (this.isShutDown && this.queue.isEmpty()) {
                         break;
                     }
                 }
@@ -184,7 +198,7 @@ public class HttpsOut implements Sender {
     }
 
     private void sendAndClearList(List<String> list) {
-        httpsRequest("[" + String.join(",", list) + "]", 0,0);
+        httpRequest("[" + String.join(",", list) + "]", 0, 0);
         list.clear();
     }
 }

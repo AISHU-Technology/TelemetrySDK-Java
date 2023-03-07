@@ -1,6 +1,8 @@
 package cn.aishu.exporter.common.output;
 
 
+import java.net.HttpURLConnection;
+
 public class Retry {
     // Enabled 是否启用重发机制。
     private  Boolean enabled = true;
@@ -42,7 +44,7 @@ public class Retry {
     }
 
     public static boolean isOK(Retry retry, int retryElapsedTime, int responseCode) {
-        return retry.getEnabled() && (retryElapsedTime < retry.getMaxElapsedTime()) && (responseCode == 429 || responseCode == 500 || responseCode == 503) ;
+        return retry.getEnabled() && (retryElapsedTime < retry.getMaxElapsedTime()) && (responseCode ==  429 || responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR || responseCode == HttpURLConnection.HTTP_UNAVAILABLE) ;
     }
 
 }

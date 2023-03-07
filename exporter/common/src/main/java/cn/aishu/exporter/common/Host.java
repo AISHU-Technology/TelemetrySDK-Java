@@ -23,7 +23,7 @@ public class Host {
             this.name = inetAddress.getHostName();
             this.ip = inetAddress.getHostAddress();
         } catch (UnknownHostException e) {
-            //暂时吃掉该异常
+            //TODO：
         }
     }
 

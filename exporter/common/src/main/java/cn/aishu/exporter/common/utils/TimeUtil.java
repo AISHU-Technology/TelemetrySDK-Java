@@ -2,17 +2,22 @@ package cn.aishu.exporter.common.utils;
 
 import cn.aishu.exporter.common.output.Stdout;
 import cn.hutool.core.date.DateUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Date;
 
 public class TimeUtil {
+    private final Log LOGGER =  LogFactory.getLog(getClass());
+
     private TimeUtil() {}
 
     public static void sleepSecond(long sec) {
         try {
             Thread.sleep(1000 * sec);
         } catch (InterruptedException e) {
-            Stdout.println(e.toString());
+            TimeUtil timeUtil = new TimeUtil();
+            timeUtil.LOGGER.error(e);
         }
     }
 

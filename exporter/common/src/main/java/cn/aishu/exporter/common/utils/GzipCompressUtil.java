@@ -1,7 +1,8 @@
 package cn.aishu.exporter.common.utils;
 
 
-import cn.aishu.exporter.common.output.Stdout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,19 +15,21 @@ public class GzipCompressUtil {
 
     private static final String GZIP_ENCODE_UTF_8 = "UTF-8";
     private static final String GZIP_ENCODE_ISO_8859_1 = "ISO-8859-1";
+    private final Log LOGGER =  LogFactory.getLog(getClass());
 
     public static byte[] compressData(String str, String encoding) {
         if (str == null || str.length() == 0) {
             return new byte[] {};
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        GZIPOutputStream gzip;
+        GZIPOutputStream gzip ;
         try {
             gzip = new GZIPOutputStream(out);
             gzip.write(str.getBytes(encoding));
             gzip.close();
         } catch (IOException e) {
-            Stdout.println("压缩数据失败：" + e.getMessage());
+            GzipCompressUtil gzipCompressUtil = new GzipCompressUtil();
+            gzipCompressUtil.LOGGER.error("压缩数据失败：" + e.getMessage());
         }
         return out.toByteArray();
     }
