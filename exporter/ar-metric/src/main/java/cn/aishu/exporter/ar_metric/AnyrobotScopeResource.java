@@ -8,12 +8,13 @@ import cn.aishu.exporter.common.KeyValue;
 
 import cn.aishu.exporter.common.utils.JsonUtil;
 import cn.aishu.exporter.common.Resource;
+import cn.aishu.exporter.common.output.Serializer;
 
 import io.opentelemetry.sdk.metrics.data.MetricData;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AnyrobotScopeResource {
+public class AnyrobotScopeResource implements Serializer {
 
     @SerializedName("Resource")
     public List<KeyValue> resource;

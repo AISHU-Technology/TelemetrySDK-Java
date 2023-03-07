@@ -2,6 +2,7 @@ package cn.aishu.exporter.ar_metric;
 
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.exporter.jaeger.internal.protobuf.internal.Time;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.metrics.LongCounter;
@@ -11,7 +12,9 @@ import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
+import cn.aishu.exporter.common.output.Retry;
+
+import cn.aishu.exporter.common.utils.TimeUtil;
 
 public class MetricsExporterTest {
 
@@ -27,8 +30,13 @@ public class MetricsExporterTest {
                 // Resource resource = Resource.create(attribute);
                 System.out.println(resource.toString());
                 // build the meter provider
-                PeriodicMetricReader reader = PeriodicMetricReader.builder(MetricsExporter.create())
-                                .setInterval(1, TimeUnit.SECONDS).build();
+                PeriodicMetricReader reader = PeriodicMetricReader
+                                .builder(MetricsExporter.builder()
+                                                .setRetry(Retry.builder().setInitialInterval(1).setMaxInterval(2)
+                                                                .setMaxElapsedTime(3).build())
+                                                .setSendAddr("http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-4281ede3f5874efe/events")
+                                                .build())
+                                .build();
                 SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
                                 .registerMetricReader(reader)
                                 .setResource(resource)
@@ -65,5 +73,7 @@ public class MetricsExporterTest {
                 testHistogram.record(500);
                 io.opentelemetry.sdk.common.CompletableResultCode res = reader.shutdown();
                 System.out.println(res.isDone());
+
+                TimeUtil.sleepSecond(10);
         }
 }

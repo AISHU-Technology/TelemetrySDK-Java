@@ -33,7 +33,7 @@ public final class MetricsExporter implements MetricExporter {
      */
 
     public static MetricsExporterBuilder builder() {
-       return new MetricsExporterBuilder();
+        return new MetricsExporterBuilder();
     }
 
     public MetricsExporter(String addr, Retry retry, boolean isGzip) {
@@ -68,8 +68,10 @@ public final class MetricsExporter implements MetricExporter {
         if (isShutdown.get()) {
             return CompletableResultCode.ofFailure();
         }
-        AnyrobotMetricsList anyrobotMetricsList = new AnyrobotMetricsList(metrics, this.log);
-        this.output.send(anyrobotMetricsList);
+        for (MetricData metricData : metrics) {
+            AnyrobotScopeResource anyrobotScopeResource = new AnyrobotScopeResource(metricData, log);
+            this.output.send(anyrobotScopeResource);
+        }
         return CompletableResultCode.ofSuccess();
     }
 

@@ -1,6 +1,5 @@
 package cn.aishu.exporter.common.output;
 
-
 import cn.aishu.exporter.common.utils.GzipCompressUtil;
 import cn.aishu.exporter.common.utils.TimeUtil;
 
@@ -11,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-
 
 public class HttpOut implements Sender {
 
@@ -27,7 +25,7 @@ public class HttpOut implements Sender {
     public HttpOut(String addr, Retry retry, boolean isGzip) {
         this.serverUrl = addr;
         this.isGzip = isGzip;
-        if(retry != null){
+        if (retry != null) {
             this.retry = retry;
         }
     }
@@ -39,11 +37,11 @@ public class HttpOut implements Sender {
         }
 
         try {
-            //超过队列容量直接丢弃日志
+            // 超过队列容量直接丢弃日志
             if (queue.size() < CAPACITY) {
                 queue.put(logContent);
             }
-            //检测是否有活线程，启动线程
+            // 检测是否有活线程，启动线程
             serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -65,22 +63,21 @@ public class HttpOut implements Sender {
         try {
             URL url = new URL(serverUrl);
             conn = (HttpURLConnection) url.openConnection();
-            if (isGzip){
-                conn.setRequestProperty("Content-Type", "Application/octet-stream");
-                conn.setRequestProperty("Content-Encoding", "gzip");
-            }else {
-                conn.setRequestProperty("Content-Type", "Application/json");
-            }
+            conn.setRequestProperty("Content-Type", "Application/json;charset=utf-8");
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setUseCaches(false);
             conn.setRequestMethod("POST");
+            if (isGzip) {
+                conn.setRequestProperty("Content-Encoding", "gzip");
+                conn.setRequestProperty("Content-Length", "-1");
+            }
             conn.connect();
 
-            //往服务器端写内容
+            // 往服务器端写内容
             OutputStream outputStream = conn.getOutputStream();
             if (isGzip) {
-                outputStream.write(GzipCompressUtil.compress(outputStr).getBytes(StandardCharsets.UTF_8));
+                outputStream.write(GzipCompressUtil.compressData(outputStr, "UTF-8"));
             } else {
                 outputStream.write(outputStr.getBytes(StandardCharsets.UTF_8));
             }
@@ -91,8 +88,11 @@ public class HttpOut implements Sender {
             int responseCode = conn.getResponseCode();
             if (responseCode == 204 || responseCode == 200) {
                 return;
+            } else {
+                Stdout.println(conn.getResponseMessage());
             }
-            //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
+            // 当网络不稳定时(TooManyRequests:429, InternalServerError:500,
+            // ServiceUnavailable:503)，触发重发机制
             if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
@@ -145,7 +145,7 @@ public class HttpOut implements Sender {
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
                         if (strLength >= strLengthLimit) {
-                            //如果字符总长度超过了限制，先发送这批trace
+                            // 如果字符总长度超过了限制，先发送这批trace
                             sendAndClearList(list);
                             strLength = 0;
                             list.add(contentStr);
@@ -163,13 +163,13 @@ public class HttpOut implements Sender {
                 int currentSize = list.size();
 
                 if (currentSize == LIST_SIZE) {
-                    //如果trace的条数超过了预设值，先发送这批trace
+                    // 如果trace的条数超过了预设值，先发送这批trace
                     sendAndClearList(list);
                     strLength = 0;
                 }
 
                 if (queueIsEmpty && queue.isEmpty()) {
-                    //如果队列已空，发送最后这批trace并
+                    // 如果队列已空，发送最后这批trace并
                     if (currentSize != 0) {
                         sendAndClearList(list);
                         strLength = 0;
@@ -185,8 +185,6 @@ public class HttpOut implements Sender {
     private void sendAndClearList(List<String> list) {
         httpRequest("[" + String.join(",", list) + "]", 0, 0);
 
-
         list.clear();
     }
 }
-
