@@ -21,13 +21,15 @@ public class HttpOut implements Sender {
     private static final int LIST_SIZE = 80;
     private final String serverUrl;
     private boolean isShutDown = false;
-    private Retry retry;
+    private Retry retry = new Retry();
     private boolean isGzip = true;
 
     public HttpOut(String addr, Retry retry, boolean isGzip) {
         this.serverUrl = addr;
         this.isGzip = isGzip;
-        this.retry = retry;
+        if(retry != null){
+            this.retry = retry;
+        }
     }
 
     @Override
@@ -63,7 +65,12 @@ public class HttpOut implements Sender {
         try {
             URL url = new URL(serverUrl);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Content-Type", "Application/json");
+            if (isGzip){
+                conn.setRequestProperty("Content-Type", "Application/octet-stream");
+                conn.setRequestProperty("Content-Encoding", "gzip");
+            }else {
+                conn.setRequestProperty("Content-Type", "Application/json");
+            }
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setUseCaches(false);
@@ -71,12 +78,11 @@ public class HttpOut implements Sender {
             conn.connect();
 
             //往服务器端写内容
-            String arrStr = "[" + outputStr + "]";  //ar的http接收器需要以数组的形式传
             OutputStream outputStream = conn.getOutputStream();
             if (isGzip) {
-                outputStream.write(GzipCompressUtil.compress(arrStr).getBytes(StandardCharsets.UTF_8));
+                outputStream.write(GzipCompressUtil.compress(outputStr).getBytes(StandardCharsets.UTF_8));
             } else {
-                outputStream.write(arrStr.getBytes(StandardCharsets.UTF_8));
+                outputStream.write(outputStr.getBytes(StandardCharsets.UTF_8));
             }
 
             outputStream.flush();
@@ -87,7 +93,7 @@ public class HttpOut implements Sender {
                 return;
             }
             //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
-            if (retry.isOK(retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
+            if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
                 if (currentRetryInterval > retry.getMaxInterval()) {
@@ -98,9 +104,9 @@ public class HttpOut implements Sender {
 
                 httpRequest(outputStr, currentRetryInterval, currentRetryElapsedTime);
             }
-            Stdout.println("error: event发送http目的地址:" + serverUrl + ",网络异常:" + responseCode);
+            Stdout.println("error: 发送http目的地址:" + serverUrl + ",网络异常:" + responseCode);
         } catch (Exception e) {
-            Stdout.println(e.toString());
+            Stdout.println("发送http" + e.toString());
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -177,7 +183,9 @@ public class HttpOut implements Sender {
     }
 
     private void sendAndClearList(List<String> list) {
-        httpRequest(String.join(",", list), 0, 0);
+        httpRequest("[" + String.join(",", list) + "]", 0, 0);
+
+
         list.clear();
     }
 }
