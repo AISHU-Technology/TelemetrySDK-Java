@@ -10,9 +10,6 @@ import java.util.zip.GZIPOutputStream;
 
 public class GzipCompressUtil {
 
-    private GzipCompressUtil() {
-    }
-
     private static final String GZIP_ENCODE_UTF_8 = "UTF-8";
     private final Log logger = LogFactory.getLog(getClass());
 

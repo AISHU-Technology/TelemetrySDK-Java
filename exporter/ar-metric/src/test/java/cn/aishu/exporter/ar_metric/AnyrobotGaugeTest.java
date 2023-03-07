@@ -50,7 +50,4 @@ public class AnyrobotGaugeTest {
         Assert.assertEquals(1, testGauge.dataPoints.size());
     }
 
-    @Test
-    public void testAnyrobotWrongType() {
-    }
 }

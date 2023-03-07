@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.api.metrics.Meter;
-import io.opentelemetry.exporter.jaeger.internal.protobuf.internal.Time;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.metrics.LongCounter;
@@ -14,7 +13,6 @@ import io.opentelemetry.api.metrics.LongUpDownCounter;
 import io.opentelemetry.api.metrics.DoubleHistogram;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
-import org.apache.commons.logging.Log;
 
 import cn.aishu.exporter.common.output.Retry;
 
@@ -79,12 +77,5 @@ public class MetricsExporterTest {
                 System.out.println(res.isDone());
 
                 TimeUtil.sleepSecond(10);
-        }
-
-        @Test
-        public void testExporter() {
-                Log mockLog = mock(Log.class);
-                MetricsExporter metricsExporter = new MetricsExporter("test",mockLog,);
-
         }
 }
