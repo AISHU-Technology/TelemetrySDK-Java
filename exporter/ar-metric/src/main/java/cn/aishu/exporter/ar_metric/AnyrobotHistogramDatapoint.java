@@ -17,9 +17,9 @@ public class AnyrobotHistogramDatapoint {
     @SerializedName("Time")
     String time;
     @SerializedName("Count")
-    long count;
+    Long count;
     @SerializedName("Sum")
-    double sum;
+    Double sum;
     @SerializedName("Bounds")
     List<Double> boundaries;
     @SerializedName("BucketCounts")

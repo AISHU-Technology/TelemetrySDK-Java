@@ -6,7 +6,6 @@ import org.junit.Test;
 import cn.aishu.exporter.common.utils.TimeUtil;
 
 import static org.mockito.Mockito.*;
-
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
