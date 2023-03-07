@@ -23,16 +23,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ArExporterTest {
-    public static void main(String[] args) {
-        Retry.builder().setInitialInterval(1).setMaxInterval(2).setMaxElapsedTime(3).build();
-    }
 
-    public static void testBuilder(){
-        Retry.builder().setInitialInterval(1).setMaxInterval(2).setMaxElapsedTime(3).build();
-    }
     @Test
     public void testTraceExporterHttp(){
-        testBuilder();
         Resource serviceNameResource =
                 Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example2"));
 
@@ -40,16 +33,13 @@ public class ArExporterTest {
         SdkTracerProvider tracerProvider =
                 SdkTracerProvider.builder()
 //                        .addSpanProcessor(BatchSpanProcessor.builder(LoggingSpanExporter.create()).build())
-//                        .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter()))
-                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.builder()
-                                .setSender(HttpSender.builder()
-                                        .setUrl("http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-4f1931764308121e/events")
-                                        .setGzip(true)
-                                        .setRetry(Retry.builder().setMaxInterval(5).build())
-                                        .build())
-                                .build()))
-//                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create("http://localhost:8089")))
-//                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create("http://localhost:8080")))
+                        .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter()))
+//                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create(
+//                                HttpSender.create("http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-4f1931764308121e/events",
+//                                        Retry.create(true,5,15,30),
+//                                        true, 4096)))
+//
+//                        )
                         .setResource(Resource.getDefault().merge(serviceNameResource))
                         .build();
         OpenTelemetrySdk openTelemetry =

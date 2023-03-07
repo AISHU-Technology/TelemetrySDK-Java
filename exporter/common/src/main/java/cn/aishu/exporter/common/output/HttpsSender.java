@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 
 public class HttpsSender implements Sender {
     private ExecutorService threadPool = null;
-    private int CAPACITY = 65535;
+    private int CAPACITY = 4096;
     private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(CAPACITY);
     private static final int LIST_SIZE = 80;
     private String serverUrl;
@@ -32,8 +32,8 @@ public class HttpsSender implements Sender {
     private final int strLengthLimit = 5 * 1024 * 1000;
     private final Log LOGGER =  LogFactory.getLog(getClass());
 
-    public static HttpsSenderBuilder builder(){
-        return new HttpsSenderBuilder();
+    public static HttpsSender create(String url, Retry retry, boolean isGzip, int cacheCapacity){
+        return new HttpsSender(url, retry, isGzip, cacheCapacity);
     }
 
     public HttpsSender(String addr, Retry retry, boolean isGzip, int cacheCapacity) {
@@ -48,6 +48,8 @@ public class HttpsSender implements Sender {
             this.LOGGER.error(e);
         }
         this.CAPACITY = cacheCapacity;
+        //启动发送线程
+        serviceStart();
     }
 
     private void httpsSupport() throws NoSuchAlgorithmException, NoSuchProviderException, KeyManagementException {
@@ -78,8 +80,6 @@ public class HttpsSender implements Sender {
             }else{
                 this.LOGGER.warn("缓冲区满，将丢弃新进数据");
             }
-            //检测是否有活线程，启动线程
-            serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             this.LOGGER.error(e);
@@ -101,7 +101,6 @@ public class HttpsSender implements Sender {
             URL url = new URL(serverUrl);
             conn = (HttpsURLConnection) url.openConnection();
             if (isGzip){
-                conn.setRequestProperty("Content-Type", "Application/octet-stream");
                 conn.setRequestProperty("Content-Encoding", "gzip");
             }else {
                 conn.setRequestProperty("Content-Type", "Application/json");
@@ -116,7 +115,7 @@ public class HttpsSender implements Sender {
             //往服务器端写内容
             OutputStream outputStream = conn.getOutputStream();
             if(isGzip){
-                outputStream.write(GzipCompressUtil.compress(outputStr).getBytes(StandardCharsets.UTF_8));
+                outputStream.write(GzipCompressUtil.compressData(outputStr, StandardCharsets.UTF_8.toString()));
             }else {
                 outputStream.write(outputStr.getBytes(StandardCharsets.UTF_8));
             }

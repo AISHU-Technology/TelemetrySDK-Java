@@ -8,6 +8,9 @@ exporters: Log 数据导出的具体实现，支持标准输出、上报到数�
 │   ├── ar-metric        指标数据导出到 AnyRobot 数据接收器
 │   │   ├── pom.xml
 │   │   └── src
+│   ├── ar-trace        链路数据导出到 AnyRobot 数据接收器
+│   │   ├── pom.xml
+│   │   └── src
 │   └── common           公共包，封装数据导出协议和编码
 │       ├── pom.xml
 │       └── src

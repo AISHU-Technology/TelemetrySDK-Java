@@ -1,6 +1,5 @@
 package cn.aishu.exporter.common.utils;
 
-import cn.aishu.exporter.common.output.Stdout;
 import cn.hutool.core.date.DateUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

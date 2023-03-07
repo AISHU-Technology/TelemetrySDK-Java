@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 public class HttpSender implements Sender {
 
     private ExecutorService threadPool = null;
-    private  int CAPACITY = 65535;
+    private  int CAPACITY = 4096;
     private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(CAPACITY);
     private static final int LIST_SIZE = 80;
     private final String url;
@@ -31,8 +31,9 @@ public class HttpSender implements Sender {
     private final int strLengthLimit = 5 * 1024 * 1000;
     public final Log LOGGER =  LogFactory.getLog(getClass());
 
-    public static HttpSenderBuilder builder(){
-        return new HttpSenderBuilder();
+
+    public static HttpSender create(String url, Retry retry, boolean isGzip, int cacheCapacity){
+        return new HttpSender(url, retry, isGzip, cacheCapacity);
     }
 
     public HttpSender(String url, Retry retry, boolean isGzip, int cacheCapacity) {
@@ -43,6 +44,8 @@ public class HttpSender implements Sender {
         }
 
         this.CAPACITY = cacheCapacity;
+        //启动发送线程
+        serviceStart();
     }
 
 
@@ -59,9 +62,6 @@ public class HttpSender implements Sender {
             }else{
                 this.LOGGER.warn("缓冲区满，将丢弃新进数据");
             }
-
-            //检测是否有活线程，启动线程
-            serviceStart();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             this.LOGGER.error(e);
@@ -83,7 +83,6 @@ public class HttpSender implements Sender {
             URL url = new URL(this.url);
             conn = (HttpURLConnection) url.openConnection();
             if (isGzip){
-//                conn.setRequestProperty("Content-Type", "Application/octet-stream");
                 conn.setRequestProperty("Content-Encoding", "gzip");
             }else {
                 conn.setRequestProperty("Content-Type", "Application/json");
@@ -102,12 +101,10 @@ public class HttpSender implements Sender {
             } else {
                 outputStream.write(outputStr.getBytes(StandardCharsets.UTF_8));
             }
-
             outputStream.flush();
             outputStream.close();
 
             int responseCode = conn.getResponseCode();
-            System.out.println("mycode:" + responseCode);
             if (responseCode == 204 || responseCode == 200) {
                 return;
             }

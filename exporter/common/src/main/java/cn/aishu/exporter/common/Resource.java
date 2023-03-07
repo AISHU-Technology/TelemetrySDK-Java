@@ -7,30 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Resource {
-    private static List<KeyValue> keyValues = genDefault();
-
-    public Resource(io.opentelemetry.sdk.resources.Resource ir) {
-        KeyValue.extractFromAttributes(ir.getAttributes());
-    }
-
-    private static List<KeyValue> genDefault() {
-        List<KeyValue> resource = new ArrayList<>();
-
-        Map<String, String> map = Host.getMap();
-        map.forEach((k, v) -> resource.add(KeyValue.createWithStringType(k, v)));
-
-        Map<String, String> osMap = Os.getMap();
-        osMap.forEach((k, v) -> resource.add(KeyValue.createWithStringType(k, v)));
-
-        Map<String, String> serviceMap = Service.getMap();
-        serviceMap.forEach((k, v) -> resource.add(KeyValue.createWithStringType(k, v)));
-
-        Map<String, String> telemetryMap = Telemetry.getMap();
-        telemetryMap.forEach((k, v) ->
-            resource.add(KeyValue.createWithStringType(k, v)));
-
-        return resource;
-    }
 
     public static List<KeyValue> getResource(Attributes attributes) {
         Map<String, String> map = Host.getMap();

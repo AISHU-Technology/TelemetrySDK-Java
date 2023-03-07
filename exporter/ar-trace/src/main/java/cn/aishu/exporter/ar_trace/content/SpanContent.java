@@ -60,13 +60,7 @@ public class SpanContent implements Serializer {
     @SerializedName("ChildSpanCount")
     private int childSpanCount;
 
-    private SpanData span;
-
     public SpanContent(SpanData span) {
-        this.span = span;
-    }
-
-    public String toJson() {
         this.name = span.getName();
         this.spanContext = new SpanCtx(span.getSpanContext());
         this.parentSpanContext = new SpanCtx(span.getParentSpanContext());
@@ -84,7 +78,10 @@ public class SpanContent implements Serializer {
         this.droppedLinks = span.getTotalRecordedLinks() - span.getLinks().size();
         // childSpanCount在java版本的spanData中未找到相应属性
         this.childSpanCount = 0;
-        span = null;
+    }
+
+
+    public String toJson() {
 
         return JsonUtil.toJson(this);
     }

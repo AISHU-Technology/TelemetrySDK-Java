@@ -34,9 +34,5 @@ public class GzipCompressUtil {
         return out.toByteArray();
     }
 
-    public static String compress(String str) throws IOException {
-        return new String(compressData(str, GZIP_ENCODE_UTF_8), GZIP_ENCODE_ISO_8859_1);
-    }
-
 }
 
