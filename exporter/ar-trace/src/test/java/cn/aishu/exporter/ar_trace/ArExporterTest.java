@@ -2,6 +2,7 @@ package cn.aishu.exporter.ar_trace;
 
 //import cn.aishu.exporter.ar_trace.common.KeyValue;
 import cn.aishu.exporter.common.output.HttpSender;
+import cn.aishu.exporter.common.output.HttpsSender;
 import cn.aishu.exporter.common.output.Retry;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import io.opentelemetry.api.common.AttributeKey;
@@ -34,16 +35,24 @@ public class ArExporterTest {
         SdkTracerProvider tracerProvider =
                 SdkTracerProvider.builder()
 //                        .addSpanProcessor(BatchSpanProcessor.builder(LoggingSpanExporter.create()).build())
-                        .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter())
+
+
+                        .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter()))
+
 //                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create(
-//                                HttpSender.create("http://10.4.15.62/api/feed_ingester/v1/jobs/job-0988e01371fd21c9/events")))
+//                                HttpSender.create("http://10.4.15.62/api/feed_ingester/v1/jobs/job-0988e01371fd21c9/events"))))
+
+//                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create(
+//                                HttpsSender.create("https://localhost:8000/api/feed_ingester/v1/jobs/job-4f1931764308121e/events",
+//                                        Retry.create(true,5,15,30),
+//                                        false, 4096))))
 
 //                        .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create(
 //                                HttpSender.create("http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-4f1931764308121e/events",
 //                                        Retry.create(true,5,15,30),
-//                                        true, 4096)))
+//                                        true, 4096))))
 //
-                        )
+
                         .setResource(Resource.getDefault().merge(serviceNameResource))
                         .build();
         OpenTelemetrySdk openTelemetry =

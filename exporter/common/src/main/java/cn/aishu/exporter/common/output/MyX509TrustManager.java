@@ -21,4 +21,5 @@ public class MyX509TrustManager implements X509TrustManager {
     public X509Certificate[] getAcceptedIssuers() {
         return null;
     }
+
 }

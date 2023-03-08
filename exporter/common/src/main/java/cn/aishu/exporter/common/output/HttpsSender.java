@@ -32,8 +32,8 @@ public class HttpsSender implements Sender {
     private final Log logger = LogFactory.getLog(getClass());
 
 
-    public static HttpSender create(String url){
-        return new HttpSender(url);}
+    public static HttpsSender create(String url){
+        return new HttpsSender(url);}
 
     public static HttpsSender create(String url, Retry retry, boolean isGzip, int cacheCapacity) {
         return new HttpsSender(url, retry, isGzip, cacheCapacity);
@@ -54,7 +54,7 @@ public class HttpsSender implements Sender {
         try {
             httpsSupport();
         } catch (Exception e) {
-            this.logger.error(e);
+            this.logger.error("httpsSupport", e);
         }
         this.capacity = cacheCapacity;
         //启动发送线程
