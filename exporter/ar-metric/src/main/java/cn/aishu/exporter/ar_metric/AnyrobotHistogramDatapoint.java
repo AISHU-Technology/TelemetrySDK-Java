@@ -2,9 +2,8 @@ package cn.aishu.exporter.ar_metric;
 
 import java.util.List;
 
-import cn.aishu.telemetry.common.KeyValue;
-import cn.aishu.telemetry.utils.TimeUtil;
-import org.apache.commons.logging.Log;
+import cn.aishu.exporter.common.KeyValue;
+import cn.aishu.exporter.common.utils.TimeUtil;
 
 import io.opentelemetry.sdk.metrics.data.HistogramPointData;
 
@@ -18,9 +17,9 @@ public class AnyrobotHistogramDatapoint {
     @SerializedName("Time")
     String time;
     @SerializedName("Count")
-    long count;
+    Long count;
     @SerializedName("Sum")
-    double sum;
+    Double sum;
     @SerializedName("Bounds")
     List<Double> boundaries;
     @SerializedName("BucketCounts")
@@ -54,11 +53,11 @@ public class AnyrobotHistogramDatapoint {
         return this.bucketCounts;
     }
 
-    public AnyrobotHistogramDatapoint(HistogramPointData histogramPointData, Log log) {
+    public AnyrobotHistogramDatapoint(HistogramPointData histogramPointData) {
         this.time = TimeUtil.epochNanoToTime(histogramPointData.getEpochNanos());
         this.startTime = TimeUtil.epochNanoToTime(histogramPointData.getStartEpochNanos());
 
-        this.attributes = KeyValue.extractFromAttributes(histogramPointData.getAttributes(), log);
+        this.attributes = KeyValue.extractFromAttributes(histogramPointData.getAttributes());
         this.count = histogramPointData.getCount();
         this.sum = histogramPointData.getSum();
         this.boundaries = histogramPointData.getBoundaries();

@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2023-03-06T15:33:27.5442200+08:00",
+    "category": "metric",
+    "labels": {
+        "Temporality": "CumulativeTemporality",
+        "Unit": "test",
+        "le": "+Inf"
+    },
+    "metrics": {
+        "histogram_test": 2
+    },
+    "resource": {
+        "job_id": "job-4281ede3f5874efe",
+        "service": {
+            "instance": {
+                "id": "UnknownServiceInstance"
+            },
+            "name": "unknown_service:java",
+            "version": "UnknownServiceVersion"
+        },
+        "telemetry": {
+            "sdk": {
+                "language": "java",
+                "name": "opentelemetry",
+                "version": "1.22.0"
+            }
+        }
+    },
+    "starttime": "2023-03-06T15:33:27.4219420+08:00",
+    "type": "json_opentelemetry_metric"
+}

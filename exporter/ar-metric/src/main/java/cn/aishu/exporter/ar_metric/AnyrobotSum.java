@@ -12,6 +12,7 @@ import io.opentelemetry.sdk.metrics.data.SumData;
 import io.opentelemetry.sdk.metrics.data.PointData;
 import io.opentelemetry.sdk.metrics.data.DoublePointData;
 import io.opentelemetry.sdk.metrics.data.LongPointData;
+import io.opentelemetry.sdk.metrics.data.AggregationTemporality;
 
 public class AnyrobotSum {
     @SerializedName("DataPoints")
@@ -38,7 +39,7 @@ public class AnyrobotSum {
     }
 
     public AnyrobotSum(MetricData metricData, Log log) {
-        SumData sumData;
+        SumData<? extends PointData> sumData;
         switch (metricData.getType()) {
             case LONG_SUM:
                 sumData = metricData.getLongSumData();
@@ -51,22 +52,19 @@ public class AnyrobotSum {
                 return;
         }
         this.isMonotonic = sumData.isMonotonic();
-        switch (sumData.getAggregationTemporality()) {
-            case DELTA:
-                this.temporality = "DeltaTemporality";
-                break;
-            case CUMULATIVE:
-                this.temporality = "CumulativeTemporality";
-                break;
+        if (sumData.getAggregationTemporality() == AggregationTemporality.DELTA) {
+            this.temporality = "DeltaTemporality";
+        } else {
+            this.temporality = "CumulativeTemporality";
         }
 
-        this.dataPoints = new ArrayList<AnyrobotDatapoint>();
-        Collection<PointData> tempPoints = sumData.getPoints();
+        this.dataPoints = new ArrayList<>();
+        Collection<? extends PointData> tempPoints = sumData.getPoints();
         for (PointData tempDataPoint : tempPoints) {
             if (tempDataPoint instanceof DoublePointData) {
-                dataPoints.add(new AnyrobotDatapoint((DoublePointData) tempDataPoint, log));
+                dataPoints.add(new AnyrobotDatapoint((DoublePointData) tempDataPoint));
             } else if (tempDataPoint instanceof LongPointData) {
-                dataPoints.add(new AnyrobotDatapoint((LongPointData) tempDataPoint, log));
+                dataPoints.add(new AnyrobotDatapoint((LongPointData) tempDataPoint));
             }
         }
     }

@@ -1,6 +1,6 @@
 package cn.aishu.exporter.ar_metric;
 
-
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.apache.commons.logging.Log;
@@ -15,14 +15,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class AnyrobotGauge {
     @SerializedName("DataPoints")
-    ArrayList<AnyrobotDatapoint> dataPoints;
+    List<AnyrobotDatapoint> dataPoints;
 
-    public ArrayList<AnyrobotDatapoint> getDataPoints() {
+    public List<AnyrobotDatapoint> getDataPoints() {
         return this.dataPoints;
     }
 
     public AnyrobotGauge(MetricData metricData, Log log) {
-        GaugeData gaugeData;
+        GaugeData<? extends PointData> gaugeData;
         switch (metricData.getType()) {
             case LONG_GAUGE:
                 gaugeData = metricData.getLongGaugeData();
@@ -35,12 +35,12 @@ public class AnyrobotGauge {
                 return;
         }
         this.dataPoints = new ArrayList<>();
-        Collection<PointData> tempPoints = gaugeData.getPoints();
+        Collection<? extends PointData> tempPoints = gaugeData.getPoints();
         for (PointData tempDataPoint : tempPoints) {
             if (tempDataPoint instanceof DoublePointData) {
-                dataPoints.add(new AnyrobotDatapoint((DoublePointData) tempDataPoint, log));
+                dataPoints.add(new AnyrobotDatapoint((DoublePointData) tempDataPoint));
             } else if (tempDataPoint instanceof LongPointData) {
-                dataPoints.add(new AnyrobotDatapoint((LongPointData) tempDataPoint, log));
+                dataPoints.add(new AnyrobotDatapoint((LongPointData) tempDataPoint));
             } else {
                 log.error("AnyrobotGauge:Unrecognized data point type");
             }

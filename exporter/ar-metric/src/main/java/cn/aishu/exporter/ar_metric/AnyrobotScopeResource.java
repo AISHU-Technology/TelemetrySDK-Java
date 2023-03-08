@@ -4,20 +4,21 @@ import java.util.List;
 import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 
-import cn.aishu.telemetry.common.KeyValue;
-import cn.aishu.telemetry.common.SerializeToString;
-import cn.aishu.telemetry.utils.JsonUtil;
+import cn.aishu.exporter.common.KeyValue;
+
+import cn.aishu.exporter.common.utils.JsonUtil;
+import cn.aishu.exporter.common.Resource;
+import cn.aishu.exporter.common.output.Serializer;
 
 import io.opentelemetry.sdk.metrics.data.MetricData;
-import cn.aishu.telemetry.resource.Resource;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AnyrobotScopeResource implements SerializeToString {
+public class AnyrobotScopeResource implements Serializer {
 
     @SerializedName("Resource")
     public List<KeyValue> resource;
-    private transient String schemaURL;
+    public transient String schemaURL;
     @SerializedName("ScopeMetrics")
     public List<AnyrobotScopeMetrics> scopeMetrics;
 

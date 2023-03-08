@@ -5,7 +5,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cn.aishu.telemetry.common.Output;
+import cn.aishu.exporter.common.output.Sender;
+import cn.aishu.exporter.common.output.SenderGen;
+import cn.aishu.exporter.common.output.Retry;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.metrics.InstrumentType;
@@ -17,7 +19,7 @@ public final class MetricsExporter implements MetricExporter {
     public final Log log;
     private final AtomicBoolean isShutdown = new AtomicBoolean();
     private final AggregationTemporality aggregationTemporality;
-    private final Output output;
+    private final Sender sender;
 
     /**
      * Returns a new {@link HttpMetricsExporter} with an aggregation temporality
@@ -30,24 +32,19 @@ public final class MetricsExporter implements MetricExporter {
      * {@code aggregationTemporality}.
      */
 
-    public static MetricsExporter create() {
-        return create(Output.getDefaultDestination());
+    public static MetricsExporter create(Sender sender) {
+        Log log = LogFactory.getLog(MetricsExporter.class);
+        return new MetricsExporter(sender, log);
     }
 
-    public static MetricsExporter create(Output output) {
-        Log defaultLog = LogFactory.getLog(MetricsExporter.class);
-        return new MetricsExporter(output, defaultLog);
+    public static MetricsExporter create(Sender sender, Log log) {
+        return new MetricsExporter(sender, log);
     }
 
-    public static MetricsExporter create(Output output, Log log) {
-        return new MetricsExporter(output, log);
-    }
-
-    private MetricsExporter(Output output, Log log) {
+    private MetricsExporter(Sender sender, Log log) {
         this.aggregationTemporality = AggregationTemporality.CUMULATIVE;
-        this.output = output;
         this.log = log;
-        output.init(log);
+        this.sender = sender;
     }
 
     /**
@@ -72,11 +69,7 @@ public final class MetricsExporter implements MetricExporter {
         }
         for (MetricData metricData : metrics) {
             AnyrobotScopeResource anyrobotScopeResource = new AnyrobotScopeResource(metricData, log);
-            try {
-                this.output.write(anyrobotScopeResource);
-            } catch (Exception e) {
-                return CompletableResultCode.ofFailure();
-            }
+            this.sender.send(anyrobotScopeResource);
         }
         return CompletableResultCode.ofSuccess();
     }
@@ -89,11 +82,6 @@ public final class MetricsExporter implements MetricExporter {
     @Override
     public CompletableResultCode flush() {
         CompletableResultCode resultCode = new CompletableResultCode();
-        try {
-            output.flush();
-        } catch (Exception e) {
-            return resultCode.fail();
-        }
         return resultCode.succeed();
     }
 
@@ -104,9 +92,5 @@ public final class MetricsExporter implements MetricExporter {
             return CompletableResultCode.ofSuccess();
         }
         return flush();
-    }
-
-    public static class Builder {
-
     }
 }

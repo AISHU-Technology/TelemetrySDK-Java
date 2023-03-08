@@ -1,6 +1,5 @@
 package cn.aishu.exporter.common.output;
 
-
 import cn.aishu.exporter.common.utils.GzipCompressUtil;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import org.apache.commons.logging.Log;
@@ -14,40 +13,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-
 public class HttpSender implements Sender {
-
     private ExecutorService threadPool = null;
-    private  int CAPACITY = 4096;
-    private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(CAPACITY);
+    private int capacity = 4096;
+    private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(capacity);
+
     private static final int LIST_SIZE = 80;
-    private final String url;
+    private String url;
     private boolean isShutDown = false;
     private Retry retry = new Retry();
     private boolean isGzip = true;
     private int threadNum = 5;
 
     // 5MB
-    private final int strLengthLimit = 5 * 1024 * 1000;
-    public final Log LOGGER =  LogFactory.getLog(getClass());
+    private static final int STR_LENGTH_LIMIT = 5 * 1024 * 1000;
+    public final Log logger = LogFactory.getLog(getClass());
+
 
 
     public static HttpSender create(String url, Retry retry, boolean isGzip, int cacheCapacity){
-        return new HttpSender(url, retry, isGzip, cacheCapacity);
-    }
+        return new HttpSender(url, retry, isGzip, cacheCapacity);}
 
     public HttpSender(String url, Retry retry, boolean isGzip, int cacheCapacity) {
         this.url = url;
         this.isGzip = isGzip;
-        if(retry != null){
+        if (retry != null) {
             this.retry = retry;
         }
 
-        this.CAPACITY = cacheCapacity;
+        this.capacity = cacheCapacity;
         //启动发送线程
         serviceStart();
     }
-
 
     @Override
     public void send(Serializer logContent) {
@@ -56,15 +53,15 @@ public class HttpSender implements Sender {
         }
 
         try {
-            //超过队列容量直接丢弃日志
-            if (queue.size() < CAPACITY) {
+            // 超过队列容量直接丢弃日志
+            if (queue.size() < capacity) {
                 queue.put(logContent);
             }else{
-                this.LOGGER.warn("缓冲弃区满，将丢新进数据" + logContent.toJson());
+                this.logger.warn("缓冲弃区满，将丢新进数据" + logContent.toJson());
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            this.LOGGER.error(e);
+            this.logger.error(e);
         }
     }
 
@@ -82,9 +79,9 @@ public class HttpSender implements Sender {
         try {
             URL url = new URL(this.url);
             conn = (HttpURLConnection) url.openConnection();
-            if (isGzip){
+            if (this.isGzip){
                 conn.setRequestProperty("Content-Encoding", "gzip");
-            }else {
+            } else {
                 conn.setRequestProperty("Content-Type", "Application/json");
             }
             conn.setConnectTimeout(15000);
@@ -94,7 +91,7 @@ public class HttpSender implements Sender {
             conn.setRequestMethod("POST");
             conn.connect();
 
-            //往服务器端写内容
+            // 往服务器端写内容
             OutputStream outputStream = conn.getOutputStream();
             if (isGzip) {
                 outputStream.write(GzipCompressUtil.compressData(outputStr, StandardCharsets.UTF_8.toString()));
@@ -107,9 +104,12 @@ public class HttpSender implements Sender {
             int responseCode = conn.getResponseCode();
             if (responseCode == 204 || responseCode == 200) {
                 return;
+            } else {
+                this.logger.error(conn.getResponseMessage());
             }
-            //当网络不稳定时(TooManyRequests:429, InternalServerError:500, ServiceUnavailable:503)，触发重发机制
-            if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < CAPACITY)) {
+            // 当网络不稳定时(TooManyRequests:429, InternalServerError:500,
+            // ServiceUnavailable:503)，触发重发机制
+            if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < capacity)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
 
                 if (currentRetryInterval > retry.getMaxInterval()) {
@@ -120,9 +120,9 @@ public class HttpSender implements Sender {
 
                 httpRequest(outputStr, currentRetryInterval, currentRetryElapsedTime);
             }
-            this.LOGGER.error("error: 发送http目的地址:" + this.url + ",网络异常:" + responseCode);
+            this.logger.error("error: 发送http目的地址:" + this.url + ",网络异常:" + responseCode);
         } catch (Exception e) {
-            this.LOGGER.error(e);
+            this.logger.error(e);
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -157,8 +157,8 @@ public class HttpSender implements Sender {
                     if (content != null) {
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
-                        if (strLength >= strLengthLimit) {
-                            //如果字符总长度超过了限制，先发送这批trace
+                        if (strLength >= STR_LENGTH_LIMIT) {
+                            // 如果字符总长度超过了限制，先发送这批trace
                             sendAndClearList(list);
                             strLength = 0;
                             list.add(contentStr);
@@ -175,14 +175,14 @@ public class HttpSender implements Sender {
                 }
 
                 if (list.size() == LIST_SIZE) {
-                    //如果trace的条数超过了预设值，先发送这批trace
+                    // 如果trace的条数超过了预设值，先发送这批trace
                     sendAndClearList(list);
                     strLength = 0;
                 }
 
                 if (queueIsEmpty && queue.isEmpty()) {
-                    //如果队列已空，发送最后这批trace并
-                    if (list.size() != 0) {
+                    // 如果队列已空，发送最后这批trace并
+                    if (!list.isEmpty()) {
                         sendAndClearList(list);
                         strLength = 0;
                     }
@@ -199,4 +199,3 @@ public class HttpSender implements Sender {
         list.clear();
     }
 }
-

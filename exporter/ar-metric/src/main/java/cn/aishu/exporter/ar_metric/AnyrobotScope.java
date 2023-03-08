@@ -7,7 +7,7 @@ public class AnyrobotScope {
     String name;
     @SerializedName("Version")
     String version;
-    @SerializedName("schemaURL")
+    @SerializedName("SchemaURL")
     String schemaURL;
 
     public void setName(String name) {

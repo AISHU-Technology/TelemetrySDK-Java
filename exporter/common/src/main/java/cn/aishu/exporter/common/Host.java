@@ -1,8 +1,11 @@
 package cn.aishu.exporter.common;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -17,7 +20,6 @@ public class Host {
 
     private static final Host HOST = new Host();
 
-    private final Log LOGGER =  LogFactory.getLog(getClass());
 
     public Host() {
         try {
@@ -25,11 +27,12 @@ public class Host {
             this.name = inetAddress.getHostName();
             this.ip = inetAddress.getHostAddress();
         } catch (UnknownHostException e) {
-            this.LOGGER.error(e);
+            Log logger = LogFactory.getLog(getClass());
+            logger.error(e.getMessage(), e);
         }
     }
 
-    public static Map<String, String> getMap(){
+    public static Map<String, String> getMap() {
         HashMap<String, String> map = new HashMap<>();
         map.put(ResourceAttributes.HOST_ARCH.getKey(), Host.HOST.arch);
         map.put("host.ip", Host.HOST.ip);
