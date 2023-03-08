@@ -2,7 +2,7 @@ package cn.aishu.exporter.common.output;
 
 import java.io.PrintStream;
 
-public class Stdout implements Sender {
+public class StdSender implements Sender {
     private static final PrintStream out = System.out;
 
     @Override

@@ -60,7 +60,7 @@ public class HttpSender implements Sender {
             if (queue.size() < CAPACITY) {
                 queue.put(logContent);
             }else{
-                this.LOGGER.warn("缓冲区满，将丢弃新进数据");
+                this.LOGGER.warn("缓冲弃区满，将丢新进数据" + logContent.toJson());
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -166,7 +166,7 @@ public class HttpSender implements Sender {
                         } else {
                             list.add(contentStr);
                         }
-                    } else if (queue.isEmpty()) {
+                    } else {
                         queueIsEmpty = true;
                     }
                 } catch (InterruptedException ie) {

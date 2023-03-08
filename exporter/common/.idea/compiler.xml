@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="common" />
+        <module name="opentelemetry-exporter-common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="common" target="1.8" />
+      <module name="opentelemetry-exporter-common" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

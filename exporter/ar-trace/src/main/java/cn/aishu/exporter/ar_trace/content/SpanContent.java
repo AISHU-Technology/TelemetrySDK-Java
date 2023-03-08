@@ -68,8 +68,8 @@ public class SpanContent implements Serializer {
         startTime = TimeUtil.epochNanoToTime(span.getStartEpochNanos());
         endTime = TimeUtil.epochNanoToTime(span.getEndEpochNanos());
         this.attributes = KeyValue.extractFromAttributes(span.getAttributes());
-        this.links = span.getLinks().stream().map(e -> new Link(e)).collect(Collectors.toList());
-        this.events = span.getEvents().stream().map(e -> new Event(e)).collect(Collectors.toList());
+        this.links = span.getLinks().stream().map(Link::new).collect(Collectors.toList());
+        this.events = span.getEvents().stream().map(Event::new).collect(Collectors.toList());
         this.status = new Status(span.getStatus());
         this.instrumentationScope = new InstrumentationScope(span.getInstrumentationScopeInfo());
         this.resource = Resource.getResource(span.getResource().getAttributes());

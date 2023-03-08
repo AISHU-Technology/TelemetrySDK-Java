@@ -58,12 +58,7 @@ public class HttpsSender implements Sender {
         System.setProperty("https.protocols", "TLSv1.2");
 
         sslcontext.init(null, new TrustManager[]{new MyX509TrustManager()}, new java.security.SecureRandom());
-        HostnameVerifier ignoreHostnameVerifier = new HostnameVerifier() {
-            public boolean verify(String host, SSLSession sslsession) {
-                return true;
-            }
-        };
-        HttpsURLConnection.setDefaultHostnameVerifier(ignoreHostnameVerifier);
+        HttpsURLConnection.setDefaultHostnameVerifier((k,v)->{return true;});
         HttpsURLConnection.setDefaultSSLSocketFactory(sslcontext.getSocketFactory());
     }
 

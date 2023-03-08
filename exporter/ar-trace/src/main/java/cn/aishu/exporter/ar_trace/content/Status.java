@@ -5,14 +5,14 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 
 public class Status {
     @SerializedName("Code")
-    private String Code;
+    private String code;
 
     @SerializedName("Description")
-    private String Description;
+    private String description;
 
     public Status(StatusData status) {
-        Code = status.getStatusCode().toString();
-        Description = status.getDescription();
+        this.code = status.getStatusCode().toString();
+        this.description = status.getDescription();
     }
 
 }

@@ -15,9 +15,6 @@ public class Event {
     @SerializedName("Attributes")
     private List<KeyValue> attributes;
 
-    @SerializedName("EpochNanos")
-    private long epochNanos;
-
     @SerializedName("Time")
     private String time;
 
@@ -30,7 +27,6 @@ public class Event {
     public Event(EventData eventData) {
         this.name = eventData.getName();
         this.attributes = KeyValue.extractFromAttributes(eventData.getAttributes());
-        this.epochNanos = eventData.getEpochNanos();
         this.time = TimeUtil.epochNanoToTime(eventData.getEpochNanos());
         this.totalAttributeCount = eventData.getTotalAttributeCount();
         this.droppedAttributesCount = eventData.getDroppedAttributesCount();
