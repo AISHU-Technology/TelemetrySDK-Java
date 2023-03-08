@@ -4,6 +4,7 @@ package cn.aishu.exporter.common.output;
 import java.net.HttpURLConnection;
 
 public class Retry {
+    private static final int HTTP_TOO_MANY_REQUESTS = 429;
     // Enabled 是否启用重发机制。
     private  Boolean enabled = true;
     // InitialInterval 第一次重发与上一次发送的时间间隔:单位是秒(s)
@@ -12,6 +13,7 @@ public class Retry {
     private int maxInterval = 15;
     // MaxElapsedTime 重发最长持续的时间:单位是秒(s)
     private int maxElapsedTime = 30;
+
 
     public Retry() {
     }
@@ -60,7 +62,7 @@ public class Retry {
     }
 
     public static boolean isOK(Retry retry, int retryElapsedTime, int responseCode) {
-        return retry.getEnabled() && (retryElapsedTime < retry.getMaxElapsedTime()) && (responseCode ==  429 || responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR || responseCode == HttpURLConnection.HTTP_UNAVAILABLE) ;
+        return retry.getEnabled() && (retryElapsedTime < retry.getMaxElapsedTime()) && (responseCode ==  HTTP_TOO_MANY_REQUESTS || responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR || responseCode == HttpURLConnection.HTTP_UNAVAILABLE) ;
     }
 
 }

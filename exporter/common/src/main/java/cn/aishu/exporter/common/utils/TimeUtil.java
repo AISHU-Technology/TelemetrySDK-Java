@@ -7,7 +7,6 @@ import org.apache.commons.logging.LogFactory;
 import java.util.Date;
 
 public class TimeUtil {
-    private final Log logger = LogFactory.getLog(getClass());
 
     private TimeUtil() {
     }
@@ -16,8 +15,9 @@ public class TimeUtil {
         try {
             Thread.sleep(1000 * sec);
         } catch (InterruptedException e) {
-            TimeUtil timeUtil = new TimeUtil();
-            timeUtil.logger.error(e);
+            final Log logger = LogFactory.getLog(TimeUtil.class);
+            logger.error(e);
+            Thread.currentThread().interrupt();
         }
     }
 

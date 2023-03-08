@@ -3,7 +3,7 @@ package cn.aishu.exporter.ar_trace;
 
 import cn.aishu.exporter.ar_trace.content.SpanContent;
 import cn.aishu.exporter.common.output.Sender;
-import cn.aishu.exporter.common.output.Stdout;
+import cn.aishu.exporter.common.output.StdSender;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
@@ -12,7 +12,7 @@ import java.util.*;
 
 
 public final class ArExporter implements SpanExporter {
-    private Sender sender = new Stdout();
+    private Sender sender = new StdSender();
 
     public ArExporter() {
     }

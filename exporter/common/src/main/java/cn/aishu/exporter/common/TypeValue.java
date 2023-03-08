@@ -1,23 +1,27 @@
 package cn.aishu.exporter.common;
 
-public class TypeValue {
-    private  String Type;
+import com.google.gson.annotations.SerializedName;
 
-    private  String Value;
+public class TypeValue {
+    @SerializedName("Type")
+    private  String type;
+
+    @SerializedName("Value")
+    private  String value;
 
     public TypeValue() {
     }
 
     public TypeValue(String type, String value) {
-        Type = type;
-        Value = value;
+        this.type = type;
+        this.value = value;
     }
 
     public void setType(String type) {
-        Type = type;
+        this.type = type;
     }
 
     public void setValue(String value) {
-        Value = value;
+        this.value = value;
     }
 }

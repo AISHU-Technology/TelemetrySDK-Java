@@ -14,28 +14,35 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class HttpSender implements Sender {
+    private static final int THREAD_NUM = 5;
+    private static final int STR_LIST_SIZE_LIMIT = 80;
+    private static final int STR_LENGTH_LIMIT = 5 * 1024 * 1000;  // 5MB
+    private static final int HTTP_TIMEOUT_MILLISECONDS = 15000;
+
     private ExecutorService threadPool = null;
     private int capacity = 4096;
     private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(capacity);
-
-    private static final int LIST_SIZE = 80;
-    private String url;
+    private String serverUrl;
     private boolean isShutDown = false;
     private Retry retry = new Retry();
-    private boolean isGzip = true;
-    private int threadNum = 5;
-
-    // 5MB
-    private static final int STR_LENGTH_LIMIT = 5 * 1024 * 1000;
-    public final Log logger = LogFactory.getLog(getClass());
+    private boolean isGzip;
+    private final Log logger = LogFactory.getLog(getClass());
 
 
+    public static HttpSender create(String url){
+        return new HttpSender(url);}
 
     public static HttpSender create(String url, Retry retry, boolean isGzip, int cacheCapacity){
         return new HttpSender(url, retry, isGzip, cacheCapacity);}
 
+    public HttpSender(String url) {
+        this.serverUrl = url;
+        //启动发送线程
+        serviceStart();
+    }
+
     public HttpSender(String url, Retry retry, boolean isGzip, int cacheCapacity) {
-        this.url = url;
+        this.serverUrl = url;
         this.isGzip = isGzip;
         if (retry != null) {
             this.retry = retry;
@@ -77,14 +84,13 @@ public class HttpSender implements Sender {
         }
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(this.url);
-            conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) new URL(this.serverUrl).openConnection();
             if (this.isGzip){
                 conn.setRequestProperty("Content-Encoding", "gzip");
             } else {
                 conn.setRequestProperty("Content-Type", "Application/json");
             }
-            conn.setConnectTimeout(15000);
+            conn.setConnectTimeout(HTTP_TIMEOUT_MILLISECONDS);
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setUseCaches(false);
@@ -102,7 +108,7 @@ public class HttpSender implements Sender {
             outputStream.close();
 
             int responseCode = conn.getResponseCode();
-            if (responseCode == 204 || responseCode == 200) {
+            if (responseCode == HttpURLConnection.HTTP_NO_CONTENT || responseCode == HttpURLConnection.HTTP_OK) {
                 return;
             } else {
                 this.logger.error(conn.getResponseMessage());
@@ -120,7 +126,7 @@ public class HttpSender implements Sender {
 
                 httpRequest(outputStr, currentRetryInterval, currentRetryElapsedTime);
             }
-            this.logger.error("error: 发送http目的地址:" + this.url + ",网络异常:" + responseCode);
+            this.logger.error("error: 发送http目的地址:" + this.serverUrl + ",网络异常:" + responseCode);
         } catch (Exception e) {
             this.logger.error(e);
         } finally {
@@ -136,8 +142,8 @@ public class HttpSender implements Sender {
     public synchronized void serviceStart() {
         // 创建一个线程池的线程池
         if (threadPool == null || threadPool.isTerminated()) {
-            threadPool = Executors.newFixedThreadPool(threadNum);
-            for (int i = 0; i < threadNum; i++) {
+            threadPool = Executors.newFixedThreadPool(THREAD_NUM);
+            for (int i = 0; i < THREAD_NUM; i++) {
                 threadPool.submit(createThread());
             }
         }
@@ -149,12 +155,14 @@ public class HttpSender implements Sender {
     Runnable createThread() {
         return () -> {
             int strLength = 0;
-            boolean queueIsEmpty = false;
-            List<String> list = new ArrayList<>(LIST_SIZE);
-            while (true) {
+            List<String> list = new ArrayList<>(STR_LIST_SIZE_LIMIT);
+            boolean getNull;
+            boolean loop = true;
+            while (loop) {
                 try {
                     Serializer content = queue.poll(100, TimeUnit.MILLISECONDS);
                     if (content != null) {
+                        getNull = false;
                         String contentStr = content.toJson();
                         strLength += contentStr.length();
                         if (strLength >= STR_LENGTH_LIMIT) {
@@ -167,27 +175,25 @@ public class HttpSender implements Sender {
                             list.add(contentStr);
                         }
                     } else {
-                        queueIsEmpty = true;
+                        getNull = true;
                     }
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     return;
                 }
-
-                if (list.size() == LIST_SIZE) {
+                if (list.size() == STR_LIST_SIZE_LIMIT) {
                     // 如果trace的条数超过了预设值，先发送这批trace
                     sendAndClearList(list);
                     strLength = 0;
                 }
-
-                if (queueIsEmpty && queue.isEmpty()) {
-                    // 如果队列已空，发送最后这批trace并
+                if (getNull) {
+                    // 如果此次循环没有获取到数据，把之前缓存的数据先发送出去，防止数据滞留不发
                     if (!list.isEmpty()) {
                         sendAndClearList(list);
                         strLength = 0;
                     }
                     if (this.isShutDown && this.queue.isEmpty()) {
-                        break;
+                        loop = false;
                     }
                 }
             }

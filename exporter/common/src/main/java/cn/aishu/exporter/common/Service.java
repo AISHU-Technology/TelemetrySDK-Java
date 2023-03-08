@@ -11,7 +11,7 @@ public class Service {
 
     private  String version = "UnknownServiceVersion";
 
-    private static Service SERVICE = new Service();
+    private static final Service SERVICE = new Service();
 
 
     class Instance{

@@ -1,6 +1,7 @@
 package cn.aishu.exporter.common;
 
 
+import com.google.gson.annotations.SerializedName;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 
@@ -8,16 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KeyValue {
-    private String Key;
+    @SerializedName("Key")
+    private String key;
 
-    private TypeValue Value;
+    @SerializedName("Value")
+    private TypeValue value;
 
     public KeyValue() {
     }
 
     public KeyValue(String key, String type, String value) {
-        this.Key = key;
-        this.Value = new TypeValue(type, value);
+        this.key = key;
+        this.value = new TypeValue(type, value);
     }
 
 
@@ -26,11 +29,11 @@ public class KeyValue {
     }
 
     public void setKey(String key) {
-        Key = key;
+        this.key = key;
     }
 
     public void setValue(TypeValue value) {
-        Value = value;
+        this.value = value;
     }
 
 

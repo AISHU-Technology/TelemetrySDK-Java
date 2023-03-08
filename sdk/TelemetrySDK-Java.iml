@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -12,20 +12,28 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-api:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-context:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-exporter-logging:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk-metrics:1.7.1-alpha" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-api-metrics:1.7.1-alpha" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk-common:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk-trace:1.7.1" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-exporter-jaeger:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: io.opentelemetry:opentelemetry-exporter-otlp-common:1.7.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: io.grpc:grpc-stub:1.41.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.jackson.jr:jackson-jr-objects:2.13.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.jackson.core:jackson-core:2.13.0" level="project" />
-    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-semconv:1.7.1-alpha" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-api:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-context:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-semconv:1.22.0-alpha" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-exporter-logging:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk-metrics:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk-logs:1.22.0-alpha" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-api-logs:1.22.0-alpha" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk-common:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-sdk-trace:1.22.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-exporter-jaeger:1.22.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.opentelemetry:opentelemetry-exporter-common:1.22.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.okhttp3:okhttp:4.10.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.okio:okio-jvm:3.0.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.5.31" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.6.20" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains:annotations:13.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.jackson.jr:jackson-jr-objects:2.14.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.fasterxml.jackson.core:jackson-core:2.14.1" level="project" />
     <orderEntry type="library" name="Maven: io.grpc:grpc-protobuf:1.42.1" level="project" />
     <orderEntry type="library" name="Maven: io.grpc:grpc-api:1.42.1" level="project" />
     <orderEntry type="library" name="Maven: io.grpc:grpc-context:1.42.1" level="project" />
@@ -85,5 +93,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.ow2.asm:asm-analysis:9.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.ow2.asm:asm-tree:9.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jacoco:org.jacoco.report:0.8.7" level="project" />
+    <orderEntry type="library" name="Maven: cn.hutool:hutool-all:5.7.16" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
   </component>
 </module>

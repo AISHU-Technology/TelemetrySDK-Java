@@ -12,6 +12,6 @@ public class StdSender implements Sender {
 
     @Override
     public void shutDown() {
-
+        //对于标准输出不需要实现
     }
 }

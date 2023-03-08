@@ -5,12 +5,10 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
 public class GzipCompressUtil {
 
-    private static final String GZIP_ENCODE_UTF_8 = "UTF-8";
     private final Log logger = LogFactory.getLog(getClass());
 
     public static byte[] compressData(String str, String encoding) {
