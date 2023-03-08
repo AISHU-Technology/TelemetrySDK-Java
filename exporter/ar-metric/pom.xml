@@ -31,9 +31,21 @@
             <artifactId>opentelemetry-sdk</artifactId>
             <version>1.23.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-api -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <version>1.23.1</version>
+        </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-logging</artifactId>
+            <version>1.23.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-sdk -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-metrics</artifactId>
             <version>1.23.1</version>
         </dependency>
 
@@ -127,6 +139,9 @@
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.6.1</version>
+                    <configuration>
+                        <release>8</release>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>

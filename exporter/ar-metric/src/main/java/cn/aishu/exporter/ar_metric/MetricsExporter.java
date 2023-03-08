@@ -6,8 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import cn.aishu.exporter.common.output.Sender;
-import cn.aishu.exporter.common.output.SenderGen;
-import cn.aishu.exporter.common.output.Retry;
+import cn.aishu.exporter.common.output.StdSender;
 
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.metrics.InstrumentType;
@@ -31,6 +30,12 @@ public final class MetricsExporter implements MetricExporter {
      * Returns a new {@link HttpMetricsExporter} with the given
      * {@code aggregationTemporality}.
      */
+
+    public static MetricsExporter create() {
+        Log log = LogFactory.getLog(MetricsExporter.class);
+        Sender sender = new StdSender();
+        return new MetricsExporter(sender, log);
+    }
 
     public static MetricsExporter create(Sender sender) {
         Log log = LogFactory.getLog(MetricsExporter.class);

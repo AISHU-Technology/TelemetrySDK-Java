@@ -14,7 +14,8 @@ import io.opentelemetry.api.metrics.DoubleHistogram;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 
-import cn.aishu.exporter.common.output.HttpOut;
+import cn.aishu.exporter.common.output.HttpSender;
+import cn.aishu.exporter.common.output.Retry;
 
 import cn.aishu.exporter.common.utils.TimeUtil;
 
@@ -33,7 +34,9 @@ public class MetricsExporterTest {
                 System.out.println(resource.toString());
                 // build the meter provider
                 PeriodicMetricReader reader = PeriodicMetricReader
-                                .builder(MetricsExporter().create())
+                                .builder(MetricsExporter.create(HttpSender.create(
+                                                "http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-8ccac392cea4329c/events",
+                                                Retry.create(true, 2, 10, 20), true, 10)))
                                 .build();
                 SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
                                 .registerMetricReader(reader)
