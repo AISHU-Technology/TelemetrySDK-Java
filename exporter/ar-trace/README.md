@@ -1,6 +1,8 @@
 # 开发指南
 
-本项目生成包含所有依赖包的命令： mvn clean install assembly:assembly -DskipTests
+本项目生成包含所有依赖包的命令： 
+由于本项目依赖：opentelemetry-exporter-common，需要到common项目里先安装好：mvn clean install
+再回到本项目生成两个jar包：mvn clean install assembly:assembly -DskipTests
 
 
 ## 导入TelemetrySDK-Trace(Java)
@@ -84,5 +86,60 @@ public class TraceExporterTest {
         span.end();
     }
 }
+
+
+//跨函数调用：
+ public  void testChain () {
+        final Resource serviceNameResource =
+                Resource.create(io.opentelemetry.api.common.Attributes.of(ResourceAttributes.SERVICE_NAME, "otel-jaeger-example2"));
+
+        // Set to process the spans by the Jaeger Exporter
+        final SdkTracerProvider tracerProvider =
+                SdkTracerProvider.builder()
+                        .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter()))
+
+                        //发送到anyRobot：
+//                    .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create(
+//                                HttpSender.create("http://10.4.15.62/api/feed_ingester/v1/jobs/job-0988e01371fd21c9/events",
+//                                        Retry.create(true,5,15,30),
+//                                        true, 4096))))
+
+                        .setResource(Resource.getDefault().merge(serviceNameResource))
+                        .build();
+        final OpenTelemetrySdk openTelemetry =
+                OpenTelemetrySdk.builder().setTracerProvider(tracerProvider).build();
+
+        // it's always a good idea to shut down the SDK cleanly at JVM exit.
+//    Runtime.getRuntime().addShutdownHook(new Thread(tracerProvider::close));
+        Tracer tracer = openTelemetry.getTracer("io.opentelemetry.example.JaegerExample2");
+        Span span = tracer.spanBuilder("main").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            doSomething(tracer);
+        } finally {
+            span.end();
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(tracerProvider::close));
+        TimeUtil.sleepSecond(1);
+    }
+
+    private static void doSomething(Tracer tracer) {
+        Span span = tracer.spanBuilder("doSomething").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            // Do some work here
+            doSomethingElse(tracer);
+        } finally {
+            span.end();
+        }
+    }
+
+    private static void doSomethingElse(Tracer tracer) {
+        Span span = tracer.spanBuilder("doSomethingElse").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            // Do some more work here
+
+        } finally {
+            span.end();
+        }
+    }
 ```
 
