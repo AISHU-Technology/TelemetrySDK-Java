@@ -29,11 +29,18 @@ public class HttpSender implements Sender {
     private final Log logger = LogFactory.getLog(getClass());
 
 
-    public static HttpSender create(String url){
+    public static Sender create(String url){
+        if(url.startsWith("https")){
+            return new HttpsSender(url);
+        }
         return new HttpSender(url);}
 
-    public static HttpSender create(String url, Retry retry, boolean isGzip, int cacheCapacity){
-        return new HttpSender(url, retry, isGzip, cacheCapacity);}
+    public static Sender create(String url, Retry retry, boolean isGzip, int cacheCapacity){
+        if(url.startsWith("https")){
+            return new HttpsSender(url, retry, isGzip, cacheCapacity);
+        }
+        return new HttpSender(url, retry, isGzip, cacheCapacity);
+    }
 
     public HttpSender(String url) {
         this.serverUrl = url;
