@@ -48,7 +48,7 @@ public class AnyrobotSum {
                 sumData = metricData.getDoubleSumData();
                 break;
             default:
-                log.error("Unexpected Sum type");
+                log.error("AnyrobotSum:Unexpected Sum type");
                 return;
         }
         this.isMonotonic = sumData.isMonotonic();

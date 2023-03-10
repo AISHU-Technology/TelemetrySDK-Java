@@ -71,7 +71,7 @@ public class AnyrobotMetrics {
                 break;
             case SUMMARY:
             case EXPONENTIAL_HISTOGRAM:
-                log.error("unsupported metric types");
+                log.error("AnyrobotMetrics:unsupported metric types");
         }
     }
 }

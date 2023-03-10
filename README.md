@@ -1,7 +1,10 @@
 ### 项目介绍
-本项目是基于 Opentelemetry 官方定义的 Log 数据模型实现的 SDK，包括以下组件
+本项目是基于 Opentelemetry 官方定义的数据模型实现的 SDK，包括以下组件
 sdk : 基于 Opentelemetry Log API 的具体实现，用于生成程序日志、业务日志
-exporters: Log 数据导出的具体实现，支持标准输出、上报到数据接收器等导出方式
+exporters: 数据导出的具体实现，支持标准输出、上报到数据接收器等导出方式
+
+
+目前包含Metrics和Trace的实现
 ### 项目 layout 说明
 ```
 ├── exporter             数据导出器

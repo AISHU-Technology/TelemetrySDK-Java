@@ -1,23 +1,21 @@
 package cn.aishu.exporter.ar_metric;
 
+import java.time.Duration;
+
 import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-
-import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.api.metrics.Meter;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.metrics.LongCounter;
-import io.opentelemetry.api.metrics.LongUpDownCounter;
-import io.opentelemetry.api.metrics.DoubleHistogram;
-import io.opentelemetry.sdk.metrics.SdkMeterProvider;
-import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 
 import cn.aishu.exporter.common.output.HttpSender;
 import cn.aishu.exporter.common.output.Retry;
-
 import cn.aishu.exporter.common.utils.TimeUtil;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.DoubleHistogram;
+import io.opentelemetry.api.metrics.LongCounter;
+import io.opentelemetry.api.metrics.LongUpDownCounter;
+import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.sdk.metrics.SdkMeterProvider;
+import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
+import io.opentelemetry.sdk.resources.Resource;
 
 public class MetricsExporterTest {
 
@@ -37,7 +35,7 @@ public class MetricsExporterTest {
                                 .builder(MetricsExporter.create(HttpSender.create(
                                                 "http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-8ccac392cea4329c/events",
                                                 Retry.create(true, 2, 10, 20), true, 10)))
-                                .build();
+                                .setInterval(Duration.ofDays(1)).build();
                 SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
                                 .registerMetricReader(reader)
                                 .setResource(resource)

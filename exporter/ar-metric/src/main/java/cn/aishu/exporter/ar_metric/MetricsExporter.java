@@ -93,7 +93,7 @@ public final class MetricsExporter implements MetricExporter {
     @Override
     public CompletableResultCode shutdown() {
         if (!isShutdown.compareAndSet(false, true)) {
-            log.info("Calling shutdown() multiple times.");
+            log.info("MetricsExporter:Calling shutdown() multiple times.");
             return CompletableResultCode.ofSuccess();
         }
         return flush();

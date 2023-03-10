@@ -1,20 +1,21 @@
 package cn.aishu.exporter.ar_metric;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import cn.aishu.exporter.common.utils.TimeUtil;
-
-import static org.mockito.Mockito.*;
+import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.junit.runner.RunWith;
 
-import io.opentelemetry.sdk.metrics.data.DoublePointData;
-import io.opentelemetry.sdk.metrics.data.LongPointData;
+import cn.aishu.exporter.common.utils.TimeUtil;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
+import io.opentelemetry.sdk.metrics.data.DoublePointData;
+import io.opentelemetry.sdk.metrics.data.LongPointData;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TimeUtil.class)
