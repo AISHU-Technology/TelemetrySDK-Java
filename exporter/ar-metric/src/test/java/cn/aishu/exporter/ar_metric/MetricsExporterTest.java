@@ -1,11 +1,12 @@
 package cn.aishu.exporter.ar_metric;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
-import cn.aishu.exporter.common.output.HttpSender;
-import cn.aishu.exporter.common.output.Retry;
+import cn.aishu.exporter.common.output.StdSender;
 import cn.aishu.exporter.common.utils.TimeUtil;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -32,18 +33,21 @@ public class MetricsExporterTest {
                 System.out.println(resource.toString());
                 // build the meter provider
                 PeriodicMetricReader reader = PeriodicMetricReader
-                                .builder(MetricsExporter.create(HttpSender.create(
-                                                "http://10.4.68.236:13048/api/feed_ingester/v1/jobs/job-8ccac392cea4329c/events",
-                                                Retry.create(true, 2, 10, 20), true, 10)))
+                                .builder(MetricsExporter.create(new StdSender()))
                                 .setInterval(Duration.ofDays(1)).build();
                 SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
                                 .registerMetricReader(reader)
                                 .setResource(resource)
                                 .build();
                 // build meter with instrument scope name
+                List<String> testList = new ArrayList<String>();
+                testList.add("test1");
+                testList.add("test2");
                 Meter meter = sdkMeterProvider.meterBuilder(instrumentScopeName).build();
                 Attributes attributes = Attributes.of(AttributeKey.stringKey("key.1.2"), "SomeWork",
-                                AttributeKey.stringKey("key.1.3"), "SomeWork");
+                                AttributeKey.stringKey("key.1.3"), "SomeWork",
+                                AttributeKey.booleanKey("testBool"), false,
+                                AttributeKey.stringArrayKey("testArray"), testList);
                 // build counter metric, only record positive values, such as numbers of request
                 // count
                 LongCounter counter = meter.counterBuilder("http_request_count")

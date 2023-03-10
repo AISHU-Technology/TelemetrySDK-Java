@@ -1,6 +1,5 @@
 package cn.aishu.exporter.common;
 
-
 import com.google.gson.annotations.SerializedName;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -23,9 +22,8 @@ public class KeyValue {
         this.value = new TypeValue(type, value);
     }
 
-
     public static KeyValue createWithStringType(String key, String value) {
-       return new KeyValue(key, "STRING", value);
+        return new KeyValue(key, "STRING", value);
     }
 
     public void setKey(String key) {
@@ -36,25 +34,24 @@ public class KeyValue {
         this.value = value;
     }
 
-
-    //从Attributes获取keyValue
-    public static List<KeyValue> extractFromAttributes(Attributes attributes){
+    // 从Attributes获取keyValue
+    public static List<KeyValue> extractFromAttributes(Attributes attributes) {
         List<KeyValue> keyValues = new ArrayList<>();
-        attributes.forEach((k, v)->{
+        attributes.forEach((k, v) -> {
             KeyValue kv = new KeyValue();
             kv.setKey(k.getKey());
             TypeValue tv = new TypeValue();
             tv.setType(changeTypeName(k));
-            tv.setValue(v.toString());
+            tv.setValue(v);
             kv.setValue(tv);
             keyValues.add(kv);
         });
         return keyValues;
     }
 
-    //为了适配AR接收器的统一命名
+    // 为了适配AR接收器的统一命名
     private static String changeTypeName(AttributeKey<?> k) {
-        switch (k.getType()){
+        switch (k.getType()) {
             case STRING:
                 return "STRING";
             case BOOLEAN:
@@ -75,7 +72,5 @@ public class KeyValue {
                 return "Unrecognized attribute type";
         }
     }
-
-
 
 }
