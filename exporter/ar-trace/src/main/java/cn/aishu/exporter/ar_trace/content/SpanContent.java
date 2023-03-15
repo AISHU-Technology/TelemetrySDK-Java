@@ -4,7 +4,6 @@ import cn.aishu.exporter.common.KeyValue;
 import cn.aishu.exporter.common.output.Serializer;
 import cn.aishu.exporter.common.Resource;
 import cn.aishu.exporter.common.utils.JsonUtil;
-import cn.aishu.exporter.common.utils.TimeUtil;
 import com.google.gson.annotations.SerializedName;
 import io.opentelemetry.sdk.trace.data.SpanData;
 
@@ -25,10 +24,10 @@ public class SpanContent implements Serializer {
     private int spanKind;
 
     @SerializedName("StartTime")
-    private String startTime;
+    private long startTime;
 
     @SerializedName("EndTime")
-    private String endTime;
+    private long endTime;
 
     @SerializedName("Attributes")
     private List<KeyValue> attributes;
@@ -65,8 +64,8 @@ public class SpanContent implements Serializer {
         this.spanContext = new SpanCtx(span.getSpanContext());
         this.parentSpanContext = new SpanCtx(span.getParentSpanContext());
         this.spanKind = span.getKind().ordinal() + 1;
-        startTime = TimeUtil.epochNanoToTime(span.getStartEpochNanos());
-        endTime = TimeUtil.epochNanoToTime(span.getEndEpochNanos());
+        startTime = span.getStartEpochNanos();
+        endTime = span.getEndEpochNanos();
         this.attributes = KeyValue.extractFromAttributes(span.getAttributes());
         this.links = span.getLinks().stream().map(Link::new).collect(Collectors.toList());
         this.events = span.getEvents().stream().map(Event::new).collect(Collectors.toList());
