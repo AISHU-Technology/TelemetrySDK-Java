@@ -1,39 +1,67 @@
 # 开发指南
 
-本项目生成包含所有依赖包的命令： 
-由于本项目依赖：opentelemetry-exporter-common，需要到common项目里先安装好：mvn clean install
-再回到本项目生成两个jar包：mvn clean install assembly:assembly -DskipTests
-
-
 ## 导入TelemetrySDK-Trace(Java)
 **第1步** 检查版本兼容性
 Trace
 - 查看SDK[兼容列表](../../../docs/compatibility.md)，检查待埋点业务代码的Java版本是否符合要求。
 - 在pom.xml中引入相应版本的sdk包
 
+``` 
+本项目生成包含所有依赖包的命令： 
+由于本项目依赖：opentelemetry-exporter-common，需要到common项目里运行命令：mvn clean install assembly:assembly -DskipTests
+生成两个jar包： opentelemetry-exporter-common-1.0.0.jar 和 opentelemetry-exporter-common-1.0.0-jar-with-dependencies.jar
+再回到本项目ar-trace,运行命令：mvn clean install -DskipTests
+生成jar包: opentelemetry-exporter-ar-trace-1.0.0.jar
+``` 
+
 ## 导入Trace Exporter
-- 在pom.xml中引入包
+### 如果无法连外网拉依赖：
+#### 1.需同时部署ar_trace和common包, 即：如下2个包：
+``` 
+opentelemetry-exporter-common-1.0.0-jar-with-dependencies.jar
+opentelemetry-exporter-ar-trace-1.0.0.jar
+ ```
+
+#### 2.改包名：
+```把opentelemetry-exporter-common-1.0.0-jar-with-dependencies.jar 改成：opentelemetry-exporter-common-1.0.0.jar```
+
+#### 3.1 把2个包放到maven仓库
+ ```  然后pom里面引用：
+   <dependency>
+   <groupId>cn.aishu</groupId>
+   <artifactId>opentelemetry-exporter-ar-trace</artifactId>
+   <version>1.0.0</version>
+   </dependency>
+   ```
+
+
+#### 3.2 对于没有maven本地仓库的情况，把两个jar包（opentelemetry-exporter-ar-trace-1.0.0.jar 与 opentelemetry-exporter-common-1.0.0.jar） 放在与项目src同级目录，用以下方法引用。使用导入本地jar文件的方式引入包，这样可以在离线环境下使用
 ```
 <dependency>
-    <groupId>cn.aishu</groupId>
-    <artifactId>opentelemetry-exporter-ar-trace</artifactId>
-    <version>1.0.0</version>
-    <classifier>jar-with-dependencies</classifier>
+<groupId>cn.aishu</groupId>
+<artifactId>opentelemetry-exporter-ar-trace</artifactId>
+<version>1.0.0</version>
+<type>jar</type>
+<scope>system</scope>
+<systemPath>${project.basedir}/opentelemetry-exporter-ar-trace-1.0.0.jar</systemPath>
 </dependency>
 ```
-- 对于没有maven本地仓库的情况，把两个jar包（opentelemetry-exporter-ar-trace-1.0.0.jar
-  与 opentelemetry-exporter-ar-trace-1.0.0-jar-with-dependencies.jar）
-  放在与项目src同级目录，用以下方法引用。使用导入本地jar文件的方式引入包，这样可以在离线环境下使用
+
+#### 4.1 ps：如果maven可以访问外网拉包：直接使用这两个小包就好：
 ```
-<dependency>
-    <groupId>cn.aishu</groupId>
-    <artifactId>opentelemetry-exporter-ar-trace</artifactId>
-    <version>1.0.0</version>
-    <type>jar</type>
-    <scope>system</scope>
-    <systemPath>${project.basedir}/opentelemetry-exporter-ar-trace-1.0.0-jar-with-dependencies.jar</systemPath>
-</dependency>
+opentelemetry-exporter-common-1.0.0.jar 
+opentelemetry-exporter-ar-trace-1.0.0.jar
 ```
+#### 4.2 然后pom.xml里面引用：
+ ```  
+   <dependency>
+   <groupId>cn.aishu</groupId>
+   <artifactId>opentelemetry-exporter-ar-trace</artifactId>
+   <version>1.0.0</version>
+   </dependency>
+   ```
+
+
 
 ## 使用TelemetrySDK-Trace(Java)
 以实际使用为准。

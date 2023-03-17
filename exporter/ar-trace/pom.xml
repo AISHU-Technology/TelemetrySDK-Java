@@ -22,7 +22,7 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-bom</artifactId>
-            <version>1.22.0</version>
+            <version>1.23.1</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -47,12 +47,12 @@
     <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-sdk-trace</artifactId>
-        <version>1.22.0</version>
+        <version>1.23.1</version>
     </dependency>
     <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-exporter-logging</artifactId>
-        <version>1.22.0</version>
+        <version>1.23.1</version>
     </dependency>
 
     <dependency>
@@ -69,7 +69,7 @@
     <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-sdk</artifactId>
-        <version>1.22.0</version>
+        <version>1.23.1</version>
     </dependency>
 </dependencies>
 
@@ -140,9 +140,6 @@
                 </execution>
             </executions>
         </plugin>
-
-
-
     </plugins>
 </build>
 
