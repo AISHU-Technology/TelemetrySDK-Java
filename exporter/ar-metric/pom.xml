@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.aishu</groupId>
-    <artifactId>opentelemetry-metrics-exporter</artifactId>
+    <artifactId>opentelemetry-exporter-ar-metrics</artifactId>
     <version>1.0.0</version>
 
     <name>opentelemetry_metrics_exporter</name>
