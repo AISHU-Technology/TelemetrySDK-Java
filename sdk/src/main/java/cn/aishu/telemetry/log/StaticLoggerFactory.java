@@ -16,7 +16,7 @@ public class StaticLoggerFactory implements ILoggerFactory {
     @Override
     public Logger getLogger(String name) {
         Logger logger = loggerContext.getLoggerCache().get(name);
-        if (logger == null) {
+        if(logger == null){
             logger = newLogger(name);
         }
         return logger;

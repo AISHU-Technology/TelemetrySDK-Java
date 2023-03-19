@@ -1,27 +1,29 @@
 package cn.aishu.telemetry.log;
 
-import cn.aishu.telemetry.log.constant.KeyConstant;
-import cn.aishu.telemetry.log.utils.IdGenerator;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import cn.aishu.exporter.common.Host;
+import cn.aishu.exporter.common.Os;
+import cn.aishu.exporter.common.Telemetry;
+import cn.aishu.exporter.common.output.Serializer;
+import cn.aishu.exporter.common.utils.JsonUtil;
+import cn.aishu.telemetry.log.constant.KeyConstant;
+
+import cn.hutool.core.date.DateUtil;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+
 import com.google.gson.annotations.SerializedName;
 
-public class LogContent {
 
-    @SerializedName("Version")
-    private String version = "v1.6.1";
-
-    @SerializedName("TraceId")
-    private String traceId = IdGenerator.random().generateTraceId();
-
-    @SerializedName("SpanId")
-    private String spanId = IdGenerator.random().generateSpanId();
+public class LogContent implements Serializer {
+    @SerializedName("Link")
+    private Link link = new Link();
 
     @SerializedName("Timestamp")
-    private Long timestamp = System.currentTimeMillis() * 1000000L + System.nanoTime() % 1000000L;
+    private String timestamp;
 
     @SerializedName("SeverityText")
     private String severityText = Level.INFO.toString();
@@ -33,33 +35,21 @@ public class LogContent {
     private Map<String, Object> attributes = new HashMap<>();
 
     @SerializedName("Resource")
-    private Map<String, String> resource = new HashMap<>();
+    private Map<String, Object> resource = new TreeMap<>();
+
+    private DateNano dateNano;
 
     public LogContent() {
-
+        dateNano = new DateNano(new Date(), System.nanoTime());
         body.put(KeyConstant.MESSAGE.toString(), "");
-        resource.put("Telemetry.SDK.Name", "Telemetry SDK");
-        resource.put("Telemetry.SDK.Version", "2.0.0");
-        resource.put("Telemetry.SDK.Language", "java");
-        resource.put("HostName", "UnknownHost");
-        try {
-            resource.put("HostName", InetAddress.getLocalHost().getHostName());
-        } catch (UnknownHostException e) {
-            // 暂时吃掉该异常
-        }
-
+        resource.put("host", Host.getHost());
+        resource.put("os", Os.getOs());
+        resource.put("service", Service.getService());
+        resource.put("telemetry", Telemetry.getTelemetry());
     }
 
     public void setSeverityText(String severityText) {
         this.severityText = severityText;
-    }
-
-    public void setTraceId(String traceId) {
-        this.traceId = traceId;
-    }
-
-    public void setSpanId(String spanId) {
-        this.spanId = spanId;
     }
 
     public void setAttributes(Map<String, Object> attributes) {
@@ -70,4 +60,32 @@ public class LogContent {
         this.body = body;
     }
 
+    public void setResource(Map<String, Object> resource) {
+        this.resource = resource;
+    }
+
+    public Map<String, Object> getResource() {
+        return resource;
+    }
+
+    public void setLink(Link link) {
+        this.link = link;
+    }
+
+    class DateNano {
+        private Date date;
+
+        private long nano;
+
+        public DateNano(Date date, long nano) {
+            this.date = date;
+            this.nano = nano;
+        }
+    }
+
+    public String toJson() {
+        timestamp = DateUtil.format(dateNano.date, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX").replace("+", String.format("%04d", (dateNano.nano % 1000000L) / 100) + "+");
+        dateNano = null;
+        return JsonUtil.toJsonSimple(this);
+    }
 }

@@ -10,8 +10,16 @@ public class JsonUtil {
     private static final GsonBuilder gsonBuilder = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE);
     private static final Gson gson = gsonBuilder.create();
 
-    //序列化成json格式
+    private static final GsonBuilder gsonBuilderSimple = new GsonBuilder();
+    private static final Gson gsonSimple = gsonBuilderSimple.create();
+
+    //序列化成首字母大写json格式
     public static String toJson(Object object){
         return gson.toJson(object);
+    }
+
+    //序列化成简单的json格式
+    public static String toJsonSimple(Object object){
+        return gsonSimple.toJson(object);
     }
 }

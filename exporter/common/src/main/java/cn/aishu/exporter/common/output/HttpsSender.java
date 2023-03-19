@@ -58,11 +58,7 @@ public class HttpsSender implements Sender {
         if (retry != null) {
             this.retry = retry;
         }
-        try {
-            httpsSupport();
-        } catch (Exception e) {
-            this.logger.error("httpsSupport", e);
-        }
+
         this.capacity = cacheCapacity;
         //启动发送线程
         serviceStart();
@@ -162,6 +158,11 @@ public class HttpsSender implements Sender {
      * 启动事件循环
      */
     public synchronized void serviceStart() {
+        try {
+            httpsSupport();
+        } catch (Exception e) {
+            this.logger.error("httpsSupport", e);
+        }
         // 创建一个线程池的线程池
         if (threadPool == null || threadPool.isTerminated()) {
             threadPool = Executors.newFixedThreadPool(THREAD_NUM);

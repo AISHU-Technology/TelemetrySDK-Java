@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Host {
+    private static final String HOST_IP = "host.ip";
+
     private final String arch = System.getProperty("os.arch");
 
     private String ip = "UnknownIP";
@@ -20,6 +22,9 @@ public class Host {
 
     private static final Host HOST = new Host();
 
+    public static Host getHost() {
+        return HOST;
+    }
 
     public Host() {
         try {
@@ -35,7 +40,7 @@ public class Host {
     public static Map<String, String> getMap() {
         HashMap<String, String> map = new HashMap<>();
         map.put(ResourceAttributes.HOST_ARCH.getKey(), Host.HOST.arch);
-        map.put("host.ip", Host.HOST.ip);
+        map.put(HOST_IP, Host.HOST.ip);
         map.put(ResourceAttributes.HOST_NAME.getKey(), Host.HOST.name);
         return map;
     }

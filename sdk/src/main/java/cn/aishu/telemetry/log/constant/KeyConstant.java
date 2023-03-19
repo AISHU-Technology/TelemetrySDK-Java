@@ -2,11 +2,11 @@ package cn.aishu.telemetry.log.constant;
 
 public enum KeyConstant {
     MESSAGE("Message"),
-    TYPE("Type");
+    TYPE("Type"),
+    CONFIG_FILE("slog.properties");
 
-    private String key;
-
-    KeyConstant(String k) {
+    private final String key;
+    KeyConstant(String k){
         this.key = k;
     }
 

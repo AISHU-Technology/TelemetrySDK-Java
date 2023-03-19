@@ -14,6 +14,9 @@ public class Os {
 
     private static final Os OS = new Os();
 
+    public static Os getOs(){
+        return OS;
+    }
 
     public Os() {
         String dl = description.toLowerCase();

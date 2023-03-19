@@ -54,7 +54,6 @@ public class HttpSender implements Sender {
         if (retry != null) {
             this.retry = retry;
         }
-
         this.capacity = cacheCapacity;
         //启动发送线程
         serviceStart();
@@ -91,7 +90,8 @@ public class HttpSender implements Sender {
         }
         HttpURLConnection conn = null;
         try {
-            conn = (HttpURLConnection) new URL(this.serverUrl).openConnection();
+            URL creator = new URL(this.serverUrl);
+            conn = (HttpURLConnection) creator.openConnection();
             if (this.isGzip){
                 conn.setRequestProperty("Content-Encoding", "gzip");
             } else {
@@ -124,7 +124,6 @@ public class HttpSender implements Sender {
             // ServiceUnavailable:503)，触发重发机制
             if (Retry.isOK(retry, retryElapsedTime, responseCode) && (queue.size() < capacity)) {
                 int currentRetryInterval = retryInterval + retry.getInitialInterval();
-
                 if (currentRetryInterval > retry.getMaxInterval()) {
                     currentRetryInterval = retry.getMaxInterval();
                 }
@@ -135,7 +134,7 @@ public class HttpSender implements Sender {
             }
             this.logger.error("error: 发送http目的地址:" + this.serverUrl + ",网络异常:" + responseCode);
         } catch (Exception e) {
-            this.logger.error(e);
+            this.logger.error("http send error:" , e);
         } finally {
             if (conn != null) {
                 conn.disconnect();

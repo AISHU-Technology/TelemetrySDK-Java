@@ -1,6 +1,6 @@
 package cn.aishu.telemetry.log;
 
-public interface Logger {
+public interface Logger{
     void trace(Object... o);
 
     void info(Object... o);
@@ -15,3 +15,4 @@ public interface Logger {
 
     String getName();
 }
+

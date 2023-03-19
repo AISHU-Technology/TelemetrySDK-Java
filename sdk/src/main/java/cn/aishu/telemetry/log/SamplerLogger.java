@@ -1,56 +1,58 @@
 package cn.aishu.telemetry.log;
 
+
 import cn.aishu.telemetry.log.config.SamplerLogConfig;
 import cn.aishu.telemetry.log.constant.KeyConstant;
-import io.opentelemetry.api.trace.SpanContext;
 
 import java.util.HashMap;
+import java.util.Map;
 
-public class SamplerLogger implements cn.aishu.telemetry.log.Logger {
+public class SamplerLogger implements Logger {
 
     static final Dispatcher dispatcher = Dispatcher.getInstance();
 
     private String name;
 
     private void common(Level l, Object... objects) {
-        // 日志等级低于配置，直接返回
+        //日志等级低于配置，直接返回
         if (l.toInt() < SamplerLogConfig.getLevel().toInt()) {
             return;
         }
 
         LogContent log = new LogContent();
 
-        // 日志等级
+        //日志等级
         log.setSeverityText(l.toString());
 
-        // 消息体
+        //消息体
         HashMap<String, Object> bodyMap = new HashMap<>();
 
+
         for (Object o : objects) {
-            // 消息体只有字符串时才可以有Message属性
+            //消息体只有字符串时才可以有Message属性
             if (o instanceof String && bodyMap.isEmpty()) {
                 bodyMap.put(KeyConstant.MESSAGE.toString(), o);
-                // 消息体是一个Body类实例
+                //消息体是一个Body类实例
             } else if (o instanceof Body) {
                 Body body = (Body) o;
                 bodyMap.put(KeyConstant.TYPE.toString(), body.getType());
                 bodyMap.put(body.getType(), body.getField());
-                // 传入的是Attributes类实例
-            } else if (o instanceof Attributes) {
-                final Attributes attributes = (Attributes) o;
-                final HashMap<String, Object> attrMap = new HashMap<>();
-                attrMap.put(KeyConstant.TYPE.toString(), attributes.getType());
-                attrMap.put(attributes.getType(), attributes.getField());
-                log.setAttributes(attrMap);
-                // 传入的是span类实例，把原traceId和spanId修改为span的traceId和spanId
-            } else if (o instanceof SpanContext) {
-                final SpanContext spanContext = (SpanContext) o;
-                log.setTraceId(spanContext.getTraceId());
-                log.setSpanId(spanContext.getSpanId());
+                //传入的是Attributes类实例
+            } else if(o instanceof Attributes){
+                Attributes attributes = (Attributes) o;
+                log.setAttributes(attributes.getAttributes());
+            } else if(o instanceof Link){
+                log.setLink((Link) o);
+            }else if(o instanceof Service){
+                Service service = (Service) o;
+                Map<String, Object> resource = log.getResource();
+                resource.put("service", service);
+                log.setResource(resource);
             }
         }
 
         log.setBody(bodyMap);
+
 
         dispatcher.dispatchEvent(log);
     }

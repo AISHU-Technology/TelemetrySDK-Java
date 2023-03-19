@@ -1,21 +1,23 @@
 package cn.aishu.telemetry.log;
 
+
 import cn.aishu.telemetry.log.config.SamplerLogConfig;
-import cn.aishu.telemetry.log.utils.JsonUtil;
 
 import java.util.concurrent.*;
+
 
 public class Dispatcher {
 
     private static final Dispatcher INSTANCE = new Dispatcher();
 
+    private ExecutorService singleThread = null;
+    private static final int CAPACITY = 65535;
+    private final BlockingQueue<LogContent> eventQueue = new LinkedBlockingQueue<>(CAPACITY);
+
     public static Dispatcher getInstance() {
         return INSTANCE;
     }
 
-    private ExecutorService singleThread = null;
-    private static final int CAPACITY = 1024;
-    private final BlockingQueue<LogContent> eventQueue = new ArrayBlockingQueue<>(CAPACITY);
 
     /**
      * 事件循环逻辑
@@ -35,38 +37,39 @@ public class Dispatcher {
                 }
                 dispatch(log);
             }
+            SamplerLogConfig.getSender().shutDown();
         };
     }
 
     /**
      * 启动事件循环
      */
-    public void serviceStart() {
+    public synchronized void serviceStart() {
         // 创建一个单线程的线程池
-        singleThread = Executors.newSingleThreadExecutor();
-        singleThread.execute(createThread());
-        singleThread.shutdown();
-
+        if (singleThread == null || singleThread.isTerminated()) {
+            singleThread = Executors.newSingleThreadExecutor();
+            singleThread.execute(createThread());
+            singleThread.shutdown();
+        }
     }
 
     protected void dispatch(LogContent logContent) {
-
-        SamplerLogConfig.getDestination().write(JsonUtil.toJson(logContent));
-
+        SamplerLogConfig.getSender().send(logContent);
     }
 
     public void dispatchEvent(LogContent logContent) {
         try {
-            // 检测是否有活线程，启动线程
-            if (singleThread == null || singleThread.isTerminated()) {
-                serviceStart();
-            }
             // 超过队列容量直接丢弃日志
             if (eventQueue.size() < CAPACITY) {
                 eventQueue.put(logContent);
+            }
+            // 检测是否有活线程，启动线程
+            if (singleThread == null || singleThread.isTerminated()) {
+                serviceStart();
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
+
 }

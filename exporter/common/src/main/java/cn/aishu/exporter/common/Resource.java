@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Resource {
-    private Resource() {
-    }
+    private Resource() {}
 
     public static List<KeyValue> getResource(Attributes attributes) {
         Map<String, String> map = Host.getMap();

@@ -17,6 +17,7 @@ import io.opentelemetry.sdk.metrics.data.MetricData;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ AnyrobotScopeMetrics.class })
 public class AnyrobotScopeMetricsTest {
+
     @Test
     public void testAnyrobotScopeMetrics() {
         AnyrobotMetrics mockAnyrobotMetrics = mock(AnyrobotMetrics.class);
@@ -42,4 +43,5 @@ public class AnyrobotScopeMetricsTest {
         AnyrobotScopeMetrics testScopeMetrics = new AnyrobotScopeMetrics(mockMetricData, mockLog);
         Assert.assertEquals(1, testScopeMetrics.metrics.size());
     }
+
 }
