@@ -1,8 +1,6 @@
 package cn.aishu.telemetry.log;
 
 
-import cn.aishu.telemetry.log.*;
-
 import cn.aishu.telemetry.log.config.SamplerLogConfig;
 import cn.aishu.telemetry.log.output.BufferOut;
 

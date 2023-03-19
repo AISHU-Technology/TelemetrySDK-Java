@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.eisoo</groupId>
-    <artifactId>TelemetrySDK-Logger</artifactId>
-    <version>2.2.3</version>
+    <groupId>cn.aishu</groupId>
+    <artifactId>opentelemetry-exporter-ar-log</artifactId>
+    <version>1.0.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,17 +23,6 @@
             <artifactId>opentelemetry-exporter-common</artifactId>
             <version>1.0.0</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>cn.hutool</groupId>-->
-<!--            <artifactId>hutool-all</artifactId>-->
-<!--            <version>5.7.16</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>com.google.code.gson</groupId>-->
-<!--            <artifactId>gson</artifactId>-->
-<!--            <version>2.8.8</version>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>
