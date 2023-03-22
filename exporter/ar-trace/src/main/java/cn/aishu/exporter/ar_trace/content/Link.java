@@ -41,6 +41,9 @@ public class Link {
     }
 
     public Link(LinkData linkData) {
+        if (linkData == null){
+            return;
+        }
         this.spanContext = new SpanCtx(linkData.getSpanContext());
         this.attributes = KeyValue.extractFromAttributes(linkData.getAttributes());
         this.totalAttributeCount = linkData.getTotalAttributeCount();
