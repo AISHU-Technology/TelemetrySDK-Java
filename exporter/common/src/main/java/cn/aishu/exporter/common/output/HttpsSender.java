@@ -1,11 +1,5 @@
 package cn.aishu.exporter.common.output;
 
-import cn.aishu.exporter.common.utils.GzipCompressUtil;
-import cn.aishu.exporter.common.utils.TimeUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.net.ssl.*;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,12 +8,26 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import cn.aishu.exporter.common.utils.GzipCompressUtil;
+import cn.aishu.exporter.common.utils.TimeUtil;
 
 public class HttpsSender implements Sender {
     private static final int THREAD_NUM = 5;
     private static final int STR_LIST_SIZE_LIMIT = 80;
-    private static final int STR_LENGTH_LIMIT = 5 * 1024 * 1000;  // 5MB
+    private static final int STR_LENGTH_LIMIT = 5 * 1024 * 1000; // 5MB
     private static final int HTTP_TIMEOUT_MILLISECONDS = 15000;
 
     private ExecutorService threadPool = null;
@@ -31,16 +39,15 @@ public class HttpsSender implements Sender {
     private boolean isGzip;
     private final Log logger = LogFactory.getLog(getClass());
 
-
-    public static Sender create(String url){
-        if (url.startsWith("https")){
+    public static Sender create(String url) {
+        if (url.startsWith("https")) {
             return new HttpsSender(url);
         }
         return new HttpSender(url);
     }
 
-    public static Sender create(String url, Retry retry, boolean isGzip, int cacheCapacity){
-        if(url.startsWith("https")){
+    public static Sender create(String url, Retry retry, boolean isGzip, int cacheCapacity) {
+        if (url.startsWith("https")) {
             return new HttpsSender(url, retry, isGzip, cacheCapacity);
         }
         return new HttpSender(url, retry, isGzip, cacheCapacity);
@@ -48,7 +55,7 @@ public class HttpsSender implements Sender {
 
     public HttpsSender(String url) {
         this.serverUrl = url;
-        //启动发送线程
+        // 启动发送线程
         serviceStart();
     }
 
@@ -60,7 +67,7 @@ public class HttpsSender implements Sender {
         }
 
         this.capacity = cacheCapacity;
-        //启动发送线程
+        // 启动发送线程
         serviceStart();
     }
 
@@ -68,7 +75,7 @@ public class HttpsSender implements Sender {
         // 创建SSLContext对象，并使用我们指定的信任管理器初始化
         SSLContext sslcontext = SSLContext.getInstance("TLSv1.2");
         System.setProperty("https.protocols", "TLSv1.2");
-        sslcontext.init(null, new TrustManager[]{new MyX509TrustManager()}, new java.security.SecureRandom());
+        sslcontext.init(null, new TrustManager[] { new MyX509TrustManager() }, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultHostnameVerifier((host, sslSession) -> true);
         HttpsURLConnection.setDefaultSSLSocketFactory(sslcontext.getSocketFactory());
     }
