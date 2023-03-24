@@ -2,7 +2,7 @@ package com.eisoo.telemetry.log;
 
 
 import com.eisoo.telemetry.log.config.SamplerLogConfig;
-import com.eisoo.telemetry.log.utils.JsonUtil;
+import com.eisoo.telemetry.log.output.Stdout;
 
 import java.util.concurrent.*;
 
@@ -65,23 +65,27 @@ public class Dispatcher {
     }
 
     public void dispatchEvent(LogContent logContent) {
-        try {
-            //超过队列容量直接丢弃日志
-            if (eventQueue.size() < CAPACITY) {
-                eventQueue.put(logContent);
-            }else if (eventQueue2.size() < CAPACITY2)  {
-                eventQueue2.put(logContent);
+        if (SamplerLogConfig.getDestination() instanceof Stdout) {
+            SamplerLogConfig.getDestination().write(logContent.SerializeToJson());
+        } else {
+            try {
+                //超过队列容量直接丢弃日志
+                if (eventQueue.size() < CAPACITY) {
+                    eventQueue.put(logContent);
+                } else if (eventQueue2.size() < CAPACITY2) {
+                    eventQueue2.put(logContent);
+                }
+                //检测是否有活线程，启动线程
+                if (singleThread == null || singleThread.isTerminated()) {
+                    serviceStart();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-            //检测是否有活线程，启动线程
-            if (singleThread == null || singleThread.isTerminated()) {
-                serviceStart();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 
-    public boolean isTerminated(){
+    public boolean isTerminated() {
         return singleThread.isTerminated();
     }
 }

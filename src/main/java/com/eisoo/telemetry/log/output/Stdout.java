@@ -1,12 +1,13 @@
 package com.eisoo.telemetry.log.output;
 
-import java.io.PrintStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Stdout implements Destination{
-    private final PrintStream out = System.out;
+    private static final Logger logger = LoggerFactory.getLogger("LogbackSender");
 
     @Override
-    public void write(String string) {
-        out.println(string);
+    public void write(String logContent) {
+        logger.info(logContent);
     }
 }
