@@ -20,7 +20,7 @@ public class HttpSender implements Sender {
     private static final int HTTP_TIMEOUT_MILLISECONDS = 15000;
 
     private ExecutorService threadPool = null;
-    private int capacity = 4096;
+    private int capacity = 65535;
     private final BlockingQueue<Serializer> queue = new LinkedBlockingQueue<>(capacity);
     private String serverUrl;
     private boolean isShutDown = false;

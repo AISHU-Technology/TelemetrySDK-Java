@@ -20,6 +20,9 @@ public class InstrumentationScope {
     private String schemaUrl;
 
     public InstrumentationScope(InstrumentationScopeInfo info) {
+        if (info == null){
+            return;
+        }
         this.name = info.getName();
         this.attributes = KeyValue.extractFromAttributes(info.getAttributes());
         this.version = info.getVersion();

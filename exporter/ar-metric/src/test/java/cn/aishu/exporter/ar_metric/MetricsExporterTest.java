@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.aishu.exporter.common.output.HttpSender;
 import org.junit.Test;
 
 import cn.aishu.exporter.common.output.StdSender;
@@ -33,7 +34,10 @@ public class MetricsExporterTest {
                 System.out.println(resource.toString());
                 // build the meter provider
                 PeriodicMetricReader reader = PeriodicMetricReader
-                                .builder(MetricsExporter.create(new StdSender()))
+                                .builder(MetricsExporter.create(
+                                        new StdSender()                                         //导出到标准输出
+//                                        HttpSender.create("http://localhost:8080/")           //导出到Ar接收器
+                                ))
                                 .setInterval(Duration.ofDays(1)).build();
                 SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
                                 .registerMetricReader(reader)

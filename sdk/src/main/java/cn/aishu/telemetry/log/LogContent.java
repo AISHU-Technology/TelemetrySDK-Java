@@ -52,6 +52,10 @@ public class LogContent implements Serializer {
         this.severityText = severityText;
     }
 
+    public String getSeverityText() {
+        return severityText;
+    }
+
     public void setAttributes(Map<String, Object> attributes) {
         this.attributes = attributes;
     }

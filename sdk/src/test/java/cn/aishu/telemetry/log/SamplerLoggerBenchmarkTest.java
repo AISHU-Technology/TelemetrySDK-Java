@@ -3,7 +3,6 @@ package cn.aishu.telemetry.log;
 
 import cn.aishu.telemetry.log.config.SamplerLogConfig;
 import cn.aishu.telemetry.log.output.BufferOut;
-//import com.eisoo.telemetry.log.output.Stdout;
 import org.junit.Assert;
 import org.junit.Test;
 

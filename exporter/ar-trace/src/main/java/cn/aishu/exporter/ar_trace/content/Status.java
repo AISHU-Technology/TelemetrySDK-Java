@@ -11,6 +11,9 @@ public class Status {
     private String description;
 
     public Status(StatusData status) {
+        if (status == null){
+            return;
+        }
         //code的值与go版本的保持一致
         switch (status.getStatusCode()) {
             case UNSET:
@@ -25,5 +28,4 @@ public class Status {
         }
         this.description = status.getDescription();
     }
-
 }

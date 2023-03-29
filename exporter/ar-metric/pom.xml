@@ -6,7 +6,7 @@
 
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-ar-metrics</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <name>opentelemetry_metrics_exporter</name>
     <!-- FIXME change it to the project's website -->
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>cn.aishu</groupId>
             <artifactId>opentelemetry-exporter-common</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
 
         <!-- 测试引入 -->

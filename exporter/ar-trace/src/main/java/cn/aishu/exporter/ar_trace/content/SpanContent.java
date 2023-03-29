@@ -60,6 +60,9 @@ public class SpanContent implements Serializer {
     private int childSpanCount;
 
     public SpanContent(SpanData span) {
+        if (span == null){
+            return;
+        }
         this.name = span.getName();
         this.spanContext = new SpanCtx(span.getSpanContext());
         this.parentSpanContext = new SpanCtx(span.getParentSpanContext());
@@ -81,7 +84,6 @@ public class SpanContent implements Serializer {
 
 
     public String toJson() {
-
         return JsonUtil.toJson(this);
     }
 
