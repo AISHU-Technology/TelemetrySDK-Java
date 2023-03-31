@@ -9,79 +9,79 @@ Metric
 -  opentelemetry-exporter-ar-metrics组件 需要依赖 opentelemetry-exporter-common组件
 -  我们一共提供了有四个包：
 ```
-  opentelemetry-exporter-common-1.1.0.jar //小包，需要有maven仓库下载其它第三方包，如io.opentelemetry
-  opentelemetry-exporter-common-1.1.0-jar-with-dependencies.jar //大包，包含了所有依赖包
-  opentelemetry-exporter-ar-metrics-1.1.0.jar //小包，需要有maven仓库下载其它第三方包，如io.opentelemetry
-  opentelemetry-exporter-ar-metrics-1.1.0-jar-with-dependencies.jar   //大包，包含了所有依赖包，包括opentelemetry-exporter-common
+  opentelemetry-exporter-common-2.4.0.jar //小包，需要有maven仓库下载其它第三方包，如io.opentelemetry
+  opentelemetry-exporter-common-2.4.0-jar-with-dependencies.jar //大包，包含了所有依赖包
+  opentelemetry-exporter-ar-metrics-2.4.0.jar //小包，需要有maven仓库下载其它第三方包，如io.opentelemetry
+  opentelemetry-exporter-ar-metrics-2.4.0-jar-with-dependencies.jar   //大包，包含了所有依赖包，包括opentelemetry-exporter-common
 ```
 
 ### 导包方法（根据部署环境选择以下三种方法的一种即可）
 #### 1.1 最佳实践：【离线环境下可以使用】
-###### 1.1.1 把metrics大包（opentelemetry-exporter-ar-metrics-1.1.0-jar-with-dependencies.jar）用以下命令安装到maven仓库：【注意：-Dfile指定jar包的地址填写正确。】
-- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-metrics-1.1.0-jar-with-dependencies.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-metrics -Dversion=1.1.0 -Dpackaging=jar
+###### 1.1.1 把metrics大包（opentelemetry-exporter-ar-metrics-2.4.0-jar-with-dependencies.jar）用以下命令安装到maven仓库：【注意：-Dfile指定jar包的地址填写正确。】
+- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-metrics-2.4.0-jar-with-dependencies.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-metrics -Dversion=2.4.0 -Dpackaging=jar
 ###### 1.1.2 在pom.xml中引用：
 ```
 <dependency>
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-ar-metrics</artifactId>
-    <version>1.1.0</version>
+    <version>2.4.0</version>
 </dependency>
 ```
 
 #### 1.2 对于需要同时使用【ar-trace, ar-metrics, ar-log】且不可以连外网拉第三方库的情况：【优点: 离线环境下可以使用，比同时使用三个大包体积小】
 ###### 1.2.1 把common大包安装到maven仓库：【注意：-Dfile指定jar包的地址填写正确。】
-- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-common-1.1.0-jar-with-dependencies.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-common -Dversion=1.1.0 -Dpackaging=jar
+- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-common-2.4.0-jar-with-dependencies.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-common -Dversion=2.4.0 -Dpackaging=jar
 ###### 1.2.2 把ar-trace小包安装到maven仓库：
-- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-trace-1.1.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-trace -Dversion=1.1.0 -Dpackaging=jar
+- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-trace-2.4.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-trace -Dversion=2.4.0 -Dpackaging=jar
 ###### 1.2.3 把ar-metrics小包安装到maven仓库：
-- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-metrics-1.1.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-metrics -Dversion=1.1.0 -Dpackaging=jar
+- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-metrics-2.4.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-metrics -Dversion=2.4.0 -Dpackaging=jar
 ###### 1.2.4 把ar-log小包安装到maven仓库：
-- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-log-1.1.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-log -Dversion=1.1.0 -Dpackaging=jar
+- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-log-2.4.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-log -Dversion=2.4.0 -Dpackaging=jar
 ###### 1.2.5 在pom.xml中引用：
 ```
 <dependency>
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-common</artifactId>
-    <version>1.1.0</version>
+    <version>2.4.0</version>
 </dependency>
 
 <dependency>
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-ar-trace</artifactId>
-    <version>1.1.0</version>
+    <version>2.4.0</version>
 </dependency>
 
 <dependency>
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-ar-metrics</artifactId>
-    <version>1.1.0</version>
+    <version>2.4.0</version>
 </dependency>
 
 <dependency>
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-ar-log</artifactId>
-    <version>1.1.0</version>
+    <version>2.4.0</version>
 </dependency>
 ```
 
 #### 1.3  对于可以连外网拉第三方库的情况：【可以安装common小包和metrics小包，优点：体积小】
 ###### 1.3.1 把common大包安装到maven仓库：【注意：-Dfile指定jar包的地址填写正确。】
-- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-common-1.1.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-common -Dversion=1.1.0 -Dpackaging=jar
+- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-common-2.4.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-common -Dversion=2.4.0 -Dpackaging=jar
 ###### 1.3.2 把ar-metrics小包安装到maven仓库：
-- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-metrics-1.1.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-metrics -Dversion=1.1.0 -Dpackaging=jar
+- mvn install:install-file -Dfile=D:/jar/opentelemetry-exporter-ar-metrics-2.4.0.jar -DgroupId=cn.aishu -DartifactId=opentelemetry-exporter-ar-metrics -Dversion=2.4.0 -Dpackaging=jar
 ###### 1.3.3 在pom.xml中引用：
 
 ```
 <dependency>
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-common</artifactId>
-    <version>1.1.0</version>
+    <version>2.4.0</version>
 </dependency>
 
 <dependency>
     <groupId>cn.aishu</groupId>
     <artifactId>opentelemetry-exporter-ar-metrics</artifactId>
-    <version>1.1.0</version>
+    <version>2.4.0</version>
 </dependency>
 <dependency>
     <groupId>cn.hutool</groupId>
