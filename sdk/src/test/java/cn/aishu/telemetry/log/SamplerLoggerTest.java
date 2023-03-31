@@ -1,10 +1,13 @@
 package cn.aishu.telemetry.log;
 
 
+
+//import cn.aishu.exporter.common.utils.TimeUtil;
 import cn.aishu.telemetry.log.config.SamplerLogConfig;
 import cn.aishu.telemetry.log.output.BufferOut;
 
 
+import cn.aishu.telemetry.log.output.LogbackSender;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -186,6 +189,25 @@ public class SamplerLoggerTest {
         assertAndPrint(buffer, regLog);
 //        sleepSecond(1);
     }
+
+
+    //测试logbackSender
+    @Test
+    public void testLogbackSender() throws InterruptedException {
+        SamplerLogConfig.setSender(LogbackSender.create());
+        final Logger logger = LoggerFactory.getLogger(this.getClass());  //生成日志实例
+
+        SamplerLogConfig.setLevel(Level.TRACE);                           //（可选）配置系统日志等级，默认是INFO级别
+        logger.trace("test");
+        logger.debug("test");
+        logger.info("test");                                        //生成info级别的字符串日志：test
+        logger.warn("test");
+        logger.error("test");
+        logger.fatal("test");
+        Assert.assertNotNull(logger);
+//        TimeUtil.sleepSecond(1);
+    }
+
 
 
     //测试配置文件
