@@ -1,33 +1,20 @@
 package cn.aishu.exporter.ar_trace;
 
-//import cn.aishu.exporter.ar_trace.common.KeyValue;
-import cn.aishu.exporter.common.output.HttpSender;
-import cn.aishu.exporter.common.output.HttpsSender;
-import cn.aishu.exporter.common.output.Retry;
+
+import cn.aishu.exporter.common.output.StdSender;
 import cn.aishu.exporter.common.utils.TimeUtil;
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.AttributeType;
-import io.opentelemetry.api.internal.InternalAttributeKeyImpl;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
-import io.opentelemetry.sdk.internal.AttributesMap;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
-//import io.opentelemetry.api.common.ArrayBackedAttributes;
-import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-
 public class ArExporterTest {
-
 
     @Test
     public void testTraceExporterHttp(){
@@ -79,13 +66,6 @@ public class ArExporterTest {
         final SdkTracerProvider tracerProvider =
                 SdkTracerProvider.builder()
                         .addSpanProcessor(SimpleSpanProcessor.create(new ArExporter()))
-
-                        //发送到anyRobot：
-//                    .addSpanProcessor(SimpleSpanProcessor.create(ArExporter.create(
-//                                HttpSender.create("http://10.4.15.62/api/feed_ingester/v1/jobs/job-0988e01371fd21c9/events",
-//                                        Retry.create(true,5,15,30),
-//                                        true, 4096))))
-
                         .setResource(Resource.getDefault().merge(serviceNameResource))
                         .build();
         final OpenTelemetrySdk openTelemetry =
@@ -122,6 +102,24 @@ public class ArExporterTest {
         } finally {
             span.end();
         }
+    }
+
+    @Test
+    public void testCreate(){
+        ArExporter arExporter = ArExporter.create();
+        Assert.assertNotNull(arExporter);
+    }
+
+    @Test
+    public void testCreateWithSender(){
+        ArExporter arExporter = ArExporter.create(new StdSender());
+        Assert.assertNotNull(arExporter);
+    }
+
+    @Test
+    public void testCreateWithNull(){
+        ArExporter arExporter = ArExporter.create(null);
+        Assert.assertNotNull(arExporter);
     }
 
 }

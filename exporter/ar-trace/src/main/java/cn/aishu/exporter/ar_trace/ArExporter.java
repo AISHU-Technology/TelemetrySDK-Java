@@ -26,6 +26,9 @@ public final class ArExporter implements SpanExporter {
     }
 
     public ArExporter(Sender sender) {
+        if (sender == null){
+            return;
+        }
         this.sender = sender;
     }
 

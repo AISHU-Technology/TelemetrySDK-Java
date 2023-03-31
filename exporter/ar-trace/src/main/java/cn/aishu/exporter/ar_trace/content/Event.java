@@ -24,6 +24,9 @@ public class Event {
     private int droppedAttributesCount;
 
     public Event(EventData eventData) {
+        if (eventData == null){
+            return;
+        }
         this.name = eventData.getName();
         this.attributes = KeyValue.extractFromAttributes(eventData.getAttributes());
         this.time = eventData.getEpochNanos();
