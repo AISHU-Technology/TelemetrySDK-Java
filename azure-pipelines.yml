@@ -14,10 +14,10 @@ trigger:
 
 variables:
   - group: anyrobot-global-config
-  # - name: IMAGE_REGISTRY
-  #   value: "acr.aishu.cn"
-  # - name: IMAGE_REPOSITORY
-  #   value: "ar/agentcontainer"
+  - name: IMAGE_REGISTRY
+    value: "acr.aishu.cn"
+  - name: IMAGE_REPOSITORY
+    value: "ar/agentcontainer"
   - name: FTP_URL
     value: "ftp-ar.aishu.cn"
   - name: FTP_USER
@@ -25,11 +25,11 @@ variables:
   - name: FTP_PWD
     value: "F64edf#s"  
 
-resources:
-  containers:
-    - container: dotnet
-      endpoint: ACRDockerRegistry
-      image: dotnet/runtime:3.1-bullseye-slim
+# resources:
+#   containers:
+#     - container: dotnet
+#       endpoint: ACRDockerRegistry
+#       image: dotnet/runtime:3.1-bullseye-slim
       
 pool:
   telemetrySDK-pool
