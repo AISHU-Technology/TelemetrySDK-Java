@@ -25,11 +25,11 @@ variables:
   - name: FTP_PWD
     value: "F64edf#s"  
 
-# resources:
-#   containers:
-#     - container: dotnet
-#       endpoint: ACRDockerRegistry
-#       image: dotnet/runtime:3.1-bullseye-slim
+resources:
+  containers:
+    - container: dotnet
+      endpoint: ACRDockerRegistry
+      image: dotnet/runtime:3.1-bullseye-slim
       
 stages:
   - stage: CodeCheck
