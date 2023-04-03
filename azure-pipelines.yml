@@ -32,7 +32,7 @@ variables:
 resources:
   containers:
     - container: dotnet
-      endpoint: ACRDockerRegistry
+      endpoint: acr-registry
       image: dotnet/runtime:3.1-bullseye-slim
       
 stages:
