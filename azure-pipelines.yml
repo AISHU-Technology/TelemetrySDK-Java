@@ -31,9 +31,7 @@ variables:
 #       endpoint: ACRDockerRegistry
 #       image: dotnet/runtime:3.1-bullseye-slim
       
-pool:
-  telemetrySDK-pool
-
+pool: anyrobot-pools
 steps:
 - task: Maven@3
   inputs:
