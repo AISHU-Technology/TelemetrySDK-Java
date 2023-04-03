@@ -31,7 +31,8 @@ variables:
 #       endpoint: ACRDockerRegistry
 #       image: dotnet/runtime:3.1-bullseye-slim
       
-# pool: anyrobot-pools
+pool:
+  vmImage: 'ubuntu-latest'
 
 steps:
 - task: Maven@3
