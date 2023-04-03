@@ -18,7 +18,7 @@ trigger:
 variables:
   - group: anyrobot-global-config
   - name: BUILD_IMAGE
-    value: "docker pull acr.aishu.cn/public/maven:1.1"
+    value: "acr.aishu.cn/public/maven:1.1"
   - name: SONARQUBE_IMAGE
     value: "acr.aishu.cn/public/sonarsource/sonar-scanner-cli:4.8"
   - name: LintReportName # 此行保持一致
