@@ -1,40 +1,39 @@
 
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
+# 触发管道
 trigger:
   batch: true
   branches:
     include:
       - "feature-*"
+      - "feature/*"
       - "develop"
-      - "master"
+      - "release-*"
+      - "release/*"
 
 variables:
   - group: anyrobot-global-config
   - name: BUILD_IMAGE
-    value: "docker pull acr.aishu.cn/public/maven@sha256:a52afc2979dfe2c26b27da7c5f289385f79e00fe185e61aa29d8e3ea52a6a51c"
+    value: "docker pull acr.aishu.cn/public/maven:1.1"
   - name: SONARQUBE_IMAGE
     value: "acr.aishu.cn/public/sonarsource/sonar-scanner-cli:4.8"
-  - name: IMAGE_REGISTRY
-    value: "acr.aishu.cn"
-  - name: IMAGE_REPOSITORY
-    value: "ar/agentcontainer"
-  - name: FTP_URL
-    value: "ftp-ar.aishu.cn"
-  - name: FTP_USER
-    value: "ftp-ar"
-  - name: FTP_PWD
-    value: "F64edf#s"  
+  - name: LintReportName # 此行保持一致
+    value: jacoco.xml
+  - name: UTReportName # 此行保持一致
+    value: ut_report.xml
+  - name: CoverageReportName # 此行保持一致
+    value: coverage_report.xml
 
 resources:
   containers:
     - container: dotnet
       endpoint: acr-registry
       image: dotnet/runtime:3.1-bullseye-slim
-      
+
 stages:
   - stage: CodeCheck
     displayName: 代码检查
@@ -47,3 +46,23 @@ stages:
           name: telemetrySDK-pool
           demands:
             - docker
+        steps:
+          - checkout: self
+          - task: Bash@3
+            displayName: 单元测试
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+
+                docker run --rm \
+                      -v $(pwd):/TelemetrySDK-Java \
+                      $(BUILD_IMAGE) bash -c "
+                  set -ex
+
+                  cd /TelemetrySDK-Java/exporter/common
+                  mvn clean install assembly:assembly
+                  cd /TelemetrySDK-Java/sdk
+                  mvn clean install assembly:assembly
+                  "
