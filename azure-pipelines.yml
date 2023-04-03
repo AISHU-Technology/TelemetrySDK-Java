@@ -14,6 +14,10 @@ trigger:
 
 variables:
   - group: anyrobot-global-config
+  - name: BUILD_IMAGE
+    value: "docker pull acr.aishu.cn/public/maven@sha256:a52afc2979dfe2c26b27da7c5f289385f79e00fe185e61aa29d8e3ea52a6a51c"
+  - name: SONARQUBE_IMAGE
+    value: "acr.aishu.cn/public/sonarsource/sonar-scanner-cli:4.8"
   - name: IMAGE_REGISTRY
     value: "acr.aishu.cn"
   - name: IMAGE_REPOSITORY
