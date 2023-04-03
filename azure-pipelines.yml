@@ -59,8 +59,6 @@ stages:
                 docker run --rm \
                       -v $(pwd):/TelemetrySDK-Java \
                       $(BUILD_IMAGE) bash -c "
-                  set -ex
-
                   cd /TelemetrySDK-Java/exporter/common
                   mvn clean install assembly:assembly
                   cd /TelemetrySDK-Java/sdk
