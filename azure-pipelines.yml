@@ -31,7 +31,10 @@ variables:
 #       endpoint: ACRDockerRegistry
 #       image: dotnet/runtime:3.1-bullseye-slim
       
-pool: telemetrySDK-pool
+pool:
+  name: telemetrySDK-pool
+  demands:
+    - docker
 
 steps:
 - task: Maven@3
