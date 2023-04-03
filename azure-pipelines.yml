@@ -14,10 +14,10 @@ trigger:
 
 variables:
   - group: anyrobot-global-config
-  - name: IMAGE_REGISTRY
-    value: "acr.aishu.cn"
-  - name: IMAGE_REPOSITORY
-    value: "ar/agentcontainer"
+  # - name: IMAGE_REGISTRY
+  #   value: "acr.aishu.cn"
+  # - name: IMAGE_REPOSITORY
+  #   value: "ar/agentcontainer"
   - name: FTP_URL
     value: "ftp-ar.aishu.cn"
   - name: FTP_USER
