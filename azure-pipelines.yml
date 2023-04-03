@@ -31,19 +31,27 @@ variables:
 #       endpoint: ACRDockerRegistry
 #       image: dotnet/runtime:3.1-bullseye-slim
       
-pool:
-  name: telemetrySDK-pool
-  demands:
-    - docker
+stages:
+  - stage: CodeCheck
+    displayName: 代码检查
+    jobs:
+      - job: _1CodeCheck
+        displayName: 1.代码检查(UT/Lint)
+        workspace:
+          clean: all
+        pool:
+          name: telemetrySDK-pool
+          demands:
+            - docker
 
-steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'exporter/common/pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+        steps:
+        - task: Maven@3
+          inputs:
+            mavenPomFile: 'exporter/common/pom.xml'
+            mavenOptions: '-Xmx3072m'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.8'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: true
+            testResultsFiles: '**/surefire-reports/TEST-*.xml'
+            goals: 'package'
