@@ -14,7 +14,7 @@ trigger:
 
 
 pool:
-  anyrobot-pools
+  telemetrySDK-pool
 
 steps:
 - task: Maven@3
