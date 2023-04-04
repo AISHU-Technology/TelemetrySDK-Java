@@ -49,7 +49,7 @@ stages:
         workspace:
           clean: all
         pool:
-          name: anyrobot-pools
+          name: telemetrySDK-pool
           demands:
             - docker
         steps:
@@ -61,30 +61,20 @@ stages:
               script: |
                 #!/usr/bin/env bash
                 set -ex
-
-                docker run --rm \
-                      -v $(pwd):/TelemetrySDK-Java \
-                      $(BUILD_IMAGE) bash -c "
-                  set -ex
-
-                  cd /TelemetrySDK-Java/exporter/common
-                  mvn clean install assembly:assembly
-                  cd /TelemetrySDK-Java/sdk
-                  mvn clean install assembly:assembly
-                  mvn sonar:sonar -Dsonar.host.url=http://sonarqube.ar.aishu.cn:9000 -Dsonar.login=$(sonarqube.token)
-                  "
-                ls  
-                ftp -n<<EOF
-                    open $(FTP_URL)
-                    user $(FTP_USER) $(FTP_PWD)
-                    binary
-                    mkdir /data/ftp/telemetrySDK/java/$(Build.SourceBranchName)
-                    cd /data/ftp/telemetrySDK/java/$(Build.SourceBranchName)
-                    prompt
-                    put $(Build.SourcesDirectory)/sdk/target/opentelemetry-exporter-ar-log-2.4.0.jar hello.tar
-                    close
-                    bye
+                expect -re "Are you sure you want to continue connecting (yes/no)?" {
+                  send "yes\r"
+                } -re "password:" {
+                  send "F64edf#s\r"
+                }
+                expect "Connected*"
+                expect "sftp>"
+                send "cd /data\r"
+                expect "sftp>"
+                expect "sftp>"
+                send "bye\r"
                 EOF
+
+                ls
 
                   
       
