@@ -61,23 +61,21 @@ stages:
               script: |
                 #!/usr/bin/env bash
                 set -ex
-                /usr/bin/expect << EOF
-                spawn sftp -oPort=22 ftp-ar@ftp-ar.aishu.cn
-                set timeout 9
-                expect -re "Are you sure you want to continue connecting (yes/no)?" {
-                  send "yes\r"
-                } -re "password:" {
-                  send "F64edf#s\r"
-                }
-                expect "Connected*"
-                expect "sftp>"
-                send "cd /data\r"
-                expect "sftp>"
-                expect "sftp>"
-                send "bye\r"
-                EOF
-
-                ls
+                
+                touch hello.txt
+          - task: FtpUpload@2
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: 'ftp-ar.aishu.cn'
+              username: 'ftp-ar'
+              password: 'F64edf#s'
+              rootDirectory: './'
+              filePatterns: 'hello.txt'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
 
                   
       
