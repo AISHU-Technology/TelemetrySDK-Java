@@ -81,8 +81,8 @@ stages:
               username: $(FTP_USER)
               password: $(FTP_PWD)
               rootDirectory: './'
-              filePatterns: '*.jar'
-              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName);/data/ftp/telemetrySDK/java/release'
               clean: false
               cleanContents: false
               preservePaths: false
