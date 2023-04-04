@@ -61,7 +61,7 @@ stages:
               script: |
                 #!/usr/bin/env bash
                 set -ex
-                
+                ls -alh
                 touch hello.txt
           - task: FtpUpload@2
             inputs:
