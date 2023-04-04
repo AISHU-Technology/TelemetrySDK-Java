@@ -68,12 +68,20 @@ stages:
 
                   cd /TelemetrySDK-Java/exporter/common
                   mvn clean install assembly:assembly
+                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
+                  cd /TelemetrySDK-Java/exporter/ar-metric
+                  mvn clean install assembly:assembly
+                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
+                  cd /TelemetrySDK-Java/exporter/ar-trace
+                  mvn clean install assembly:assembly
+                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   cd /TelemetrySDK-Java/sdk
                   mvn clean install assembly:assembly
-                  mvn sonar:sonar -Dsonar.host.url=http://sonarqube.ar.aishu.cn:9000 -Dsonar.login=$(sonarqube.token)
+                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
 
           - task: FtpUpload@2
+            displayName: 上传log
             inputs:
               credentialsOption: 'inputs'
               serverUrl: $(FTP_URL)
@@ -88,15 +96,47 @@ stages:
               trustSSL: false
 
           - task: FtpUpload@2
+            displayName: 上传common
             inputs:
               credentialsOption: 'inputs'
               serverUrl: $(FTP_URL)
               username: $(FTP_USER)
               password: $(FTP_PWD)
-              rootDirectory: './**'
+              rootDirectory: './exporter/common/target/'
               filePatterns: '**.jar'
               remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
               clean: false
               cleanContents: false
               preservePaths: false
               trustSSL: false
+
+          - task: FtpUpload@2
+            displayName: 上传metric
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/ar-metric/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false              
+
+          - task: FtpUpload@2
+            displayName: 上传trace
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/ar-trace/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
