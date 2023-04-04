@@ -1,4 +1,3 @@
-
 # Starter pipeline
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
@@ -71,7 +70,7 @@ stages:
                   mvn clean install assembly:assembly
                   cd /TelemetrySDK-Java/sdk
                   mvn clean install assembly:assembly
-                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
+                  mvn sonar:sonar -Dsonar.host.url=http://sonarqube.ar.aishu.cn:9000 -Dsonar.login=$(sonarqube.token)
                   "
 
           - task: FtpUpload@2
@@ -82,11 +81,8 @@ stages:
               password: $(FTP_PWD)
               rootDirectory: './sdk/target/'
               filePatterns: '**.jar'
-              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName);/data/ftp/telemetrySDK/java/release'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
               clean: false
               cleanContents: false
               preservePaths: false
               trustSSL: false
-
-                  
-                
