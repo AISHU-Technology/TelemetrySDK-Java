@@ -28,7 +28,7 @@ variables:
   - name: CoverageReportName # 此行保持一致
     value: coverage_report.xml
   - name: FTP_URL
-    value: "ftp-ar.aishu.cn"
+    value: "ftp://ftp-ar.aishu.cn"
   - name: FTP_USER
     value: "ftp-ar"
   - name: FTP_PWD
@@ -77,12 +77,12 @@ stages:
           - task: FtpUpload@2
             inputs:
               credentialsOption: 'inputs'
-              serverUrl: 'ftp://ftp-ar.aishu.cn'
-              username: 'ftp-ar'
-              password: 'F64edf#s'
-              rootDirectory: '/TelemetrySDK-Java/sdk/target/'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './sdk/target/'
               filePatterns: '**.jar'
-              remoteDirectory: '/data/ftp/telemetrySDK/java/'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
               clean: false
               cleanContents: false
               preservePaths: false
@@ -90,7 +90,3 @@ stages:
 
                   
                 
-
-
-                  
-      
