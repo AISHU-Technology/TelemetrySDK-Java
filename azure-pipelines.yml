@@ -61,6 +61,9 @@ stages:
               script: |
                 #!/usr/bin/env bash
                 set -ex
+                /usr/bin/expect << EOF
+                spawn sftp -oPort=22 ftp-ar@ftp-ar.aishu.cn
+                set timeout 9
                 expect -re "Are you sure you want to continue connecting (yes/no)?" {
                   send "yes\r"
                 } -re "password:" {
