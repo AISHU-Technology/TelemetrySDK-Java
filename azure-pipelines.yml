@@ -61,21 +61,36 @@ stages:
               script: |
                 #!/usr/bin/env bash
                 set -ex
-                ls -alh
-                touch hello.txt
+
+                docker run --rm \
+                      -v $(pwd):/TelemetrySDK-Java \
+                      $(BUILD_IMAGE) bash -c "
+                  set -ex
+
+                  cd /TelemetrySDK-Java/exporter/common
+                  mvn clean install assembly:assembly
+                  cd /TelemetrySDK-Java/sdk
+                  mvn clean install assembly:assembly
+                  mvn sonar:sonar -Dsonar.host.url=http://sonarqube.ar.aishu.cn:9000 -Dsonar.login=$(sonarqube.token)
+                  "
+
           - task: FtpUpload@2
             inputs:
               credentialsOption: 'inputs'
               serverUrl: 'ftp://ftp-ar.aishu.cn'
               username: 'ftp-ar'
               password: 'F64edf#s'
-              rootDirectory: './'
-              filePatterns: 'hello.txt'
+              rootDirectory: '/TelemetrySDK-Java/sdk/target/'
+              filePatterns: '**.jar'
               remoteDirectory: '/data/ftp/telemetrySDK/java/'
               clean: false
               cleanContents: false
               preservePaths: false
               trustSSL: false
+
+                  
+                
+
 
                   
       
