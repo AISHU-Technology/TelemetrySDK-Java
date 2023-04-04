@@ -27,6 +27,12 @@ variables:
     value: ut_report.xml
   - name: CoverageReportName # 此行保持一致
     value: coverage_report.xml
+  - name: FTP_URL
+    value: "ftp-ar.aishu.cn"
+  - name: FTP_USER
+    value: "ftp-ar"
+  - name: FTP_PWD
+    value: "F64edf#s"
 
 resources:
   containers:
@@ -67,5 +73,18 @@ stages:
                   mvn clean install assembly:assembly
                   mvn sonar:sonar -Dsonar.host.url=http://sonarqube.ar.aishu.cn:9000 -Dsonar.login=$(sonarqube.token)
                   "
+                ls  
+                ftp -n<<EOF
+                    open $(FTP_URL)
+                    user $(FTP_USER) $(FTP_PWD)
+                    binary
+                    mkdir /data/ftp/telemetrySDK/java/$(Build.SourceBranchName)
+                    cd /data/ftp/telemetrySDK/java/$(Build.SourceBranchName)
+                    prompt
+                    put $(Build.SourcesDirectory)/sdk/target/opentelemetry-exporter-ar-log-2.4.0.jar hello.tar
+                    close
+                    bye
+                EOF
+
                   
-                
+      
