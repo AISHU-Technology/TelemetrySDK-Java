@@ -86,3 +86,17 @@ stages:
               cleanContents: false
               preservePaths: false
               trustSSL: false
+
+          - task: FtpUpload@2
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './**'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
