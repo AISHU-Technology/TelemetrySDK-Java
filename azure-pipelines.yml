@@ -65,6 +65,7 @@ stages:
                   mvn clean install assembly:assembly
                   cd /TelemetrySDK-Java/sdk
                   mvn clean install assembly:assembly
+                  mvn sonar:sonar -Dsonar.host.url=http://sonarqube.ar.aishu.cn:9000 -Dsonar.login=$(sonarqube.token)
                   "
                   
                 
