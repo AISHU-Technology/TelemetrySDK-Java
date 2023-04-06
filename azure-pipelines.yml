@@ -102,6 +102,8 @@ stages:
                       -D sonar.projectKey=${APP_NAME} \
                       -D sonar.branch.name=$(Build.SourceBranchName) \
                       -D sonar.sources=. \
+                      -D sonar.sonar.inclusions=src/main \
+                      -D sonar.coverage.inclusions=src/main \
                       -D sonar.language=java \
                       -D sonar.go.coverage.reportPaths=target/jacoco.exec \
                       -D sonar.login=$(sonarqube.token)
