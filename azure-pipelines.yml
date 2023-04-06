@@ -88,6 +88,9 @@ stages:
           #     failIfCoverageEmpty: true
           #   condition: always()  
 
+          - task: SonarQubePrepare@4
+            inputs:
+              scannerMode: MSBuild 
           - task: BuildQualityChecks@8           # 此行保持一致     # UT卡点
             displayName: Quality Gate UT         # 此行保持一致
             inputs:
@@ -98,7 +101,7 @@ stages:
               evaluateTaskWarnings: false
               evaluateFileWarnings: true
               warningFilesFolder: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco'
-              warningFiles: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco/jacoco.xml'    # 此行保持一致
+              warningFiles: '$(Build.BinariesDirectory)/exporter/common/target/jacoco.exec'    # 此行保持一致
               warningFileFilters: '/^.+<\/failure>.*?$/'
               warningFilesArtifact: 'CodeCheckReportFiles1'
           # - task: Bash@3
