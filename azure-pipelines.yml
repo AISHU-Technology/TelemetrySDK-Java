@@ -101,10 +101,11 @@ stages:
                     sonar-scanner \
                       -D sonar.host.url=$(sonarqube.server) \
                       -D sonar.projectKey=${APP_NAME} \
-                      -D sonar.branch.name=$(Build.SourceBranchName) \
-                      -D sonar.coverage.exclusions=**/test/** \
+                      -D sonar.projectName=${APP_NAME} \
+                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.sources=src/main/java/ \
                       -D sonar.language=java \
-                      -D sonar.coverage.reportPaths=target/site/jacoco \
+                      -D sonar.java.binaries=**/target/classes \
                       -D sonar.login=$(sonarqube.token)
                     "
 
