@@ -105,7 +105,7 @@ stages:
                       -D sonar.projectVersion=2.4.0 \
                       -D sonar.sources=src/main/java/ \
                       -D sonar.language=java \
-                      -D sonar.java.binaries=**/target/classes \
+                      -D sonar.java.binaries=target/classes \
                       -D sonar.login=$(sonarqube.token)
                     "
 
