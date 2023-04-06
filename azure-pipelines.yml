@@ -107,7 +107,7 @@ stages:
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
                       -D sonar.qualitygate.wait=true \
-                      -D sonar.coverage.thresholds=50 \
+                      -D sonar.coverage.thresholds=99 \
                       -D sonar.login=$(sonarqube.token)
                     "
 
