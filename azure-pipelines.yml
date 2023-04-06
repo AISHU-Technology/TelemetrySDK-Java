@@ -106,6 +106,8 @@ stages:
                       -D sonar.sources=src/main/java/ \
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
+                      -D sonar.qualitygate.wait=true \
+                      -D sonar.qualitygate.measure=Sonar way:Sonar way \
                       -D sonar.login=$(sonarqube.token)
                     "
 
