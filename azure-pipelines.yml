@@ -85,11 +85,11 @@ stages:
               codeCoverageTool: JaCoCo
               # summaryFileLocation: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco/jacoco.xml'
               summaryFileLocation: '$(Build.BinariesDirectory)/exporter/common/target/jacoco.exec'
-            #   reportDirectory: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco'
-            #   failIfCoverageEmpty: true
+              reportDirectory: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco'
+              failIfCoverageEmpty: true
               pathToSources: '$(Build.BinariesDirectory)/exporter/common/src/main/java'
               additionalCodeCoverageFiles: '$(Build.BinariesDirectory)/exporter/common/target/jacoco.exec'
-            # condition: always()  
+            condition: always()  
 
 
           - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
