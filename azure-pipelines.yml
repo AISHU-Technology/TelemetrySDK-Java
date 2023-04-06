@@ -79,6 +79,8 @@ stages:
                   # mvn clean install assembly:assembly
                   # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
+          - task: SonarQubeAnalyze@5
+            
 
           - task: Bash@3
             displayName: 上传SonarQube
@@ -101,11 +103,9 @@ stages:
                       -D sonar.host.url=$(sonarqube.server) \
                       -D sonar.projectKey=${APP_NAME} \
                       -D sonar.branch.name=$(Build.SourceBranchName) \
-                      -D sonar.sources=. \
-                      -D sonar.sonar.inclusions=src/main \
-                      -D sonar.coverage.inclusions=src/main \
+                      -D sonar.coverage.exclusions=**/test/** \
                       -D sonar.language=java \
-                      -D sonar.go.coverage.reportPaths=target/jacoco.exec \
+                      -D sonar.coverage.reportPaths=target/site/jacoco \
                       -D sonar.login=$(sonarqube.token)
                     "
 
