@@ -88,9 +88,9 @@ stages:
           #     failIfCoverageEmpty: true
           #   condition: always()  
 
-          - task: SonarQubePrepare@4
-            inputs:
-              scannerMode: MSBuild 
+          # - task: SonarQubePrepare@4
+          #   inputs:
+          #     scannerMode: MSBuild 
           - task: BuildQualityChecks@8           # 此行保持一致     # UT卡点
             displayName: Quality Gate UT         # 此行保持一致
             inputs:
