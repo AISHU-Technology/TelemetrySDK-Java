@@ -79,13 +79,15 @@ stages:
                   # mvn clean install assembly:assembly
                   # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
-          # - task: PublishCodeCoverageResults@1
-          #   displayName: 'fugailv'
-          #   inputs:
-          #     codeCoverageTool: JaCoCo
-          #     summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
-          #     reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco'
-          #     failIfCoverageEmpty: true
+          - task: PublishCodeCoverageResults@1
+            displayName: 'fugailv'
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/exporter/common/target/site/jacoco/jacoco.xml'
+              reportDirectory: '$(System.DefaultWorkingDirectory)/exporter/common/target/site/jacoco'
+              failIfCoverageEmpty: true
+              pathToSources: '$(System.DefaultWorkingDirectory)/exporter/common/src/main/java'
+              additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/**/jacoco.exec'
           #   condition: always()  
 
           # - task: SonarQubePrepare@4
