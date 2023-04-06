@@ -79,7 +79,6 @@ stages:
                   # mvn clean install assembly:assembly
                   # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
-          - task: SonarQubeAnalyze@5
             
 
           - task: Bash@3
