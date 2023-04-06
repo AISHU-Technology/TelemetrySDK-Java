@@ -97,8 +97,8 @@ stages:
               showStatistics: false
               evaluateTaskWarnings: false
               evaluateFileWarnings: true
-              warningFilesFolder: '$(System.DefaultWorkingDirectory)/target/site/jacoco'
-              warningFiles: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'    # 此行保持一致
+              warningFilesFolder: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco'
+              warningFiles: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco/jacoco.xml'    # 此行保持一致
               warningFileFilters: '/^.+<\/failure>.*?$/'
               warningFilesArtifact: 'CodeCheckReportFiles1'
           # - task: Bash@3
