@@ -80,6 +80,33 @@ stages:
                   mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
 
+          - task: Bash@3
+            displayName: 上传SonarQube
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+
+                APP_NAME="opentelemetry-exporter-common"
+
+                docker run --rm \
+                        -u root:root \
+                        -v $(pwd):/TelemetrySDK-Java \
+                        $(SONARQUBE_IMAGE) bash -c "
+                    set -ex
+
+                    cd /TelemetrySDK-Java/exporter/common
+                    sonar-scanner \
+                      -D sonar.host.url=$(sonarqube.server) \
+                      -D sonar.projectKey=${APP_NAME} \
+                      -D sonar.branch.name=$(Build.SourceBranchName) \
+                      -D sonar.sources=. \
+                      -D sonar.language=java \
+                      -D sonar.go.coverage.reportPaths=target/jacoco.exec \
+                      -D sonar.login=$(sonarqube.token)
+                    "
+
           - task: FtpUpload@2
             displayName: 上传log到$(Build.SourceBranchName)
             inputs:
