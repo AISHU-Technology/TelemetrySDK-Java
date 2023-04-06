@@ -90,10 +90,7 @@ stages:
             #   pathToSources: '$(Build.BinariesDirectory)/exporter/common/src/main/java'
             #   additionalCodeCoverageFiles: '$(Build.BinariesDirectory)/exporter/common/target/jacoco.exec'
             # condition: always()  
-          - task: reportgenerator@5
-            inputs:
-              reports: 'coverage.xml'
-              targetdir: 'coveragereport'
+
 
           - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
             displayName: Quality Gate Coverage # 此行保持一致
