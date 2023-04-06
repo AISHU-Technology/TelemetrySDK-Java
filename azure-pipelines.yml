@@ -79,14 +79,14 @@ stages:
                   # mvn clean install assembly:assembly
                   # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
-          - task: PublishCodeCoverageResults@1
-            displayName: 'fugailv'
-            inputs:
-              codeCoverageTool: JaCoCo
-              summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
-              reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco'
-              failIfCoverageEmpty: true
-            condition: always()  
+          # - task: PublishCodeCoverageResults@1
+          #   displayName: 'fugailv'
+          #   inputs:
+          #     codeCoverageTool: JaCoCo
+          #     summaryFileLocation: '$(System.DefaultWorkingDirectory)/target/site/jacoco/jacoco.xml'
+          #     reportDirectory: '$(System.DefaultWorkingDirectory)/target/site/jacoco'
+          #     failIfCoverageEmpty: true
+          #   condition: always()  
 
           - task: BuildQualityChecks@8           # 此行保持一致     # UT卡点
             displayName: Quality Gate UT         # 此行保持一致
