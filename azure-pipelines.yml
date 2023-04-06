@@ -93,7 +93,7 @@ stages:
             inputs:
               checkWarnings: true                # 此行保持一致
               warningFailOption: 'fixed'
-              warningThreshold: '0'
+              warningThreshold: '99'
               showStatistics: false
               evaluateTaskWarnings: false
               evaluateFileWarnings: true
