@@ -79,17 +79,24 @@ stages:
                   # mvn clean install assembly:assembly
                   # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
-          - task: PublishCodeCoverageResults@1
-            displayName: 'fugailv'
-            inputs:
-              codeCoverageTool: JaCoCo
-              summaryFileLocation: '$(System.DefaultWorkingDirectory)/exporter/common/target/site/jacoco/jacoco.xml'
-              reportDirectory: '$(System.DefaultWorkingDirectory)/exporter/common/target/site/jacoco'
-              failIfCoverageEmpty: true
-              pathToSources: '$(System.DefaultWorkingDirectory)/exporter/common/src/main/java'
-              additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/exporter/common/target/jacoco.exec'
+          # - task: PublishCodeCoverageResults@1
+          #   displayName: 'fugailv'
+          #   inputs:
+          #     codeCoverageTool: JaCoCo
+          #     summaryFileLocation: '$(System.DefaultWorkingDirectory)/exporter/common/target/site/jacoco/jacoco.xml'
+          #     reportDirectory: '$(System.DefaultWorkingDirectory)/exporter/common/target/site/jacoco'
+          #     failIfCoverageEmpty: true
+          #     pathToSources: '$(System.DefaultWorkingDirectory)/exporter/common/src/main/java'
+          #     additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/exporter/common/target/jacoco.exec'
           #   condition: always()  
 
+          - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+            displayName: Quality Gate Coverage # 此行保持一致
+            inputs:
+              coverageType: "lines" # 代表行覆盖率
+              coverageFailOption: "fixed"
+              checkCoverage: true # 此行保持一致
+              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
           # - task: SonarQubePrepare@4
           #   inputs:
           #     scannerMode: MSBuild 
