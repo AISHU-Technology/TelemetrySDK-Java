@@ -112,10 +112,10 @@ stages:
             displayName: 发布UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
-              pathToSources: "./sdk/src/main/java"
-              reportDirectory: "./sdk/target/site/jacoco/"
-              summaryFileLocation: "./sdk/target/site/jacoco/index.html"
-              additionalCodeCoverageFiles: "./sdk/target/jacoco.exec"
+              pathToSources: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/src/main/java"
+              reportDirectory: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/site/jacoco/"
+              summaryFileLocation: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/site/jacoco/index.html"
+              additionalCodeCoverageFiles: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/jacoco.exec"
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
           #   displayName: Quality Gate Coverage # 此行保持一致
