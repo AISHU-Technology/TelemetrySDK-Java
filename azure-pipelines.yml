@@ -114,7 +114,7 @@ stages:
               codeCoverageTool: JaCoCo
               pathToSources: "./exporter/common/src/main/java"
               reportDirectory: "./exporter/common/target/site/jacoco/"
-              summaryFileLocation: "jacoco.xml"
+              summaryFileLocation: "./exporter/common/target/jacoco.exec"
               additionalCodeCoverageFiles: "./exporter/common/target/jacoco.exec"
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
