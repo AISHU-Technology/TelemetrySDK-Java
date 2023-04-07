@@ -73,7 +73,7 @@ stages:
                   -Dsonar.login=$(sonarqube.token) \
                   -Dsonar.java.covergaePlugin=jacoco \
                   -Dsonar.coverage.thresholds=99 \
-                  -Dsonar.coverage.minimumProjectThreshhold=99 \
+                  -Dsonar.coverage.minimumProjectThreshold=99 \
                   -Dsonar.jacoco.reportPaths=target/jacoco.exec \
                   # cd /TelemetrySDK-Java/exporter/ar-metric
                   # mvn clean install assembly:assembly
@@ -118,7 +118,7 @@ stages:
               showStatistics: false
               evaluateTaskWarnings: false
               evaluateFileWarnings: true
-              warningFilesFolder: './TelemetrySDK-Java/exporter/common/target/site/jacoco'
+              # warningFilesFolder: './TelemetrySDK-Java/exporter/common/target/site/jacoco'
               warningFiles: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'    # 此行保持一致
               warningFileFilters: '/^.+<\/failure>.*?$/'
               warningFilesArtifact: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'
@@ -152,7 +152,7 @@ stages:
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-                      -Dsonar.coverage.minimumProjectThreshhold=99 \
+                      -Dsonar.coverage.minimumProjectThreshold=99 \
                     "
 
           # - task: sonar-buildbreaker@8
