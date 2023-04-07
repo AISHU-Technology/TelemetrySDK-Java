@@ -72,7 +72,7 @@ stages:
                   -Dsonar.host.url=$(sonarqube.server) \
                   -Dsonar.login=$(sonarqube.token) \
                   -Dsonar.java.covergaePlugin=jacoco \
-                  -Dsonar.jacoco.reportPaths=target/jacoco.exec 
+                  -Dsonar.jacoco.reportPaths=target/jacoco.exec \
                   # cd /TelemetrySDK-Java/exporter/ar-metric
                   # mvn clean install assembly:assembly
                   # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
@@ -149,7 +149,7 @@ stages:
                       -D sonar.coverage.thresholds=99 \
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
-                      -Dsonar.jacoco.reportPaths=target/jacoco.exec 
+                      -Dsonar.jacoco.reportPaths=target/jacoco.exec \
                     "
 
           # - task: FtpUpload@2
