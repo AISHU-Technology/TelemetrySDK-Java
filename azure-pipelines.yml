@@ -118,9 +118,11 @@ stages:
               showStatistics: false
               evaluateTaskWarnings: false
               evaluateFileWarnings: true
+              coverageThreshold: 99
+              coverageType: lines
               # warningFilesFolder: './TelemetrySDK-Java/exporter/common/target/site/jacoco'
-              warningFiles: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'    # 此行保持一致
-              warningFileFilters: '/^.+<\/failure>.*?$/'
+              # warningFiles: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'    # 此行保持一致
+              # warningFileFilters: '/^.+<\/failure>.*?$/'
               warningFilesArtifact: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'
           - task: Bash@3
             displayName: 上传SonarQube
