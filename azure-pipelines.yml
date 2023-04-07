@@ -72,7 +72,7 @@ stages:
                   -Dsonar.host.url=$(sonarqube.server) \
                   -Dsonar.login=$(sonarqube.token) \
                   -Dsonar.java.covergaePlugin=jacoco \
-                  -D sonar.coverage.thresholds=99 \
+                  -Dsonar.coverage.thresholds=99 \
                   -Dsonar.coverage.minimumProjectThreshhold=99 \
                   -Dsonar.jacoco.reportPaths=target/jacoco.exec \
                   # cd /TelemetrySDK-Java/exporter/ar-metric
