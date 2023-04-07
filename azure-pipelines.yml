@@ -116,7 +116,7 @@ stages:
               pathToSources: "/home/myagent/_work/3/s/sdk/src/main/java"
               reportDirectory: "/home/myagent/_work/3/s/sdk/target/site/jacoco/"
               summaryFileLocation: "/home/myagent/_work/3/s/sdk/target/site/jacoco/jacoco.xml"
-              additionalCodeCoverageFiles: "//home/myagent/_work/3/s/sdk/target/jacoco.exec"
+              additionalCodeCoverageFiles: "/home/myagent/_work/3/s/sdk/target/jacoco.exec"
             
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
