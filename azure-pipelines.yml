@@ -61,7 +61,7 @@ stages:
                 #!/usr/bin/env bash
                 set -ex
                 pwd
-                ls -alh
+                ls -alh /home/myagent/_work/3/s
                 docker run --rm \
                       -v $(pwd):/TelemetrySDK-Java \
                       $(BUILD_IMAGE) bash -c "
@@ -113,10 +113,10 @@ stages:
             displayName: 发布UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
-              pathToSources: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/src/main/java"
-              reportDirectory: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/site/jacoco/"
-              summaryFileLocation: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/site/jacoco/jacoco.xml"
-              additionalCodeCoverageFiles: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/jacoco.exec"
+              pathToSources: "/home/myagent/_work/3/s/sdk/src/main/java"
+              reportDirectory: "/home/myagent/_work/3/s/sdk/target/site/jacoco/"
+              summaryFileLocation: "/home/myagent/_work/3/s/sdk/target/site/jacoco/jacoco.xml"
+              additionalCodeCoverageFiles: "//home/myagent/_work/3/s/sdk/target/jacoco.exec"
             
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
