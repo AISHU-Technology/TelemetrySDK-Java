@@ -74,8 +74,9 @@ stages:
                   # -Dsonar.java.covergaePlugin=jacoco \
                   # -Dsonar.coverage.thresholds=99 \
                   # -Dsonar.coverage.minimumProjectThreshold=99 \
-                  # -Dsonar.jacoco.reportPaths=target/jacoco.exec 
+                  # -Dsonar.jacoco.reportPaths=target/jacoco.exec
                   mvn clean install assembly:assembly
+                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
 
                   # cd /TelemetrySDK-Java/exporter/ar-metric
                   # mvn clean install assembly:assembly
@@ -97,7 +98,7 @@ stages:
           #     failIfCoverageEmpty: true
           #     pathToSources: '$(Build.BinariesDirectory)/exporter/common/src/main/java'
           #     additionalCodeCoverageFiles: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco/jacoco.xml'
-          #   condition: always()  
+          #   condition: always()
 
           - task: Bash@3
             displayName: 查看单元测试
@@ -108,6 +109,8 @@ stages:
                 set -ex
                 ls -alh ./sdk/target
                 ls -alh ./sdk/target/site/jacoco/
+                ls -alh ./exporter/common/target
+                ls -alh ./exporter/common/target/site/jacoco/
 
           - task: PublishCodeCoverageResults@1
             displayName: 发布UT测试覆盖率报告
@@ -115,9 +118,9 @@ stages:
               codeCoverageTool: JaCoCo
               # pathToSources: "./sdk/src/main/java"
               # reportDirectory: "./sdk/target/site/jacoco/"
-              summaryFileLocation: "$(Build.BinariesDirectory)/sdk/target/site/jacoco/jacoco.xml"
+              summaryFileLocation: "./sdk/target/site/jacoco/jacoco.xml"
               # additionalCodeCoverageFiles: "./sdk/target/jacoco.exec"
-            
+
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
           #   displayName: Quality Gate Coverage # 此行保持一致
@@ -129,11 +132,10 @@ stages:
 
           # - task: SonarQubePrepare@4
           #   inputs:
-          #     scannerMode: MSBuild 
+          #     scannerMode: MSBuild
           - task: BuildQualityChecks@8           # 此行保持一致     # UT卡点
             displayName: Quality Gate UT         # 此行保持一致
             inputs:
-              
               # checkWarnings: true                # 此行保持一致
               # warningFailOption: 'fixed'
               # warningThreshold: '99'
@@ -148,6 +150,21 @@ stages:
               # warningFiles: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'    # 此行保持一致
               # warningFileFilters: '/^.+<\/failure>.*?$/'
               # warningFilesArtifact: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 发布UT测试覆盖率报告
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
+
+          - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+            displayName: Quality Gate Coverage # 此行保持一致
+            inputs:
+              coverageType: "lines" # 代表行覆盖率
+              coverageFailOption: "fixed"
+              checkCoverage: true # 此行保持一致
+              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+
           - task: Bash@3
             displayName: 上传SonarQube
             inputs:
@@ -181,12 +198,12 @@ stages:
                       -Dsonar.coverage.minimumProjectThreshold=99 \
                     "
 
-          # - task: sonar-buildbreaker@8
-          #   inputs:
-          #     SonarQube: '$(sonarqube.server)'
-              
-              
-              
+              # - task: sonar-buildbreaker@8
+              #   inputs:
+              #     SonarQube: '$(sonarqube.server)'
+
+
+
 
           # - task: FtpUpload@2
           #   displayName: 上传log到$(Build.SourceBranchName)
@@ -231,7 +248,7 @@ stages:
           #     clean: false
           #     cleanContents: false
           #     preservePaths: false
-          #     trustSSL: false              
+          #     trustSSL: false
 
           # - task: FtpUpload@2
           #   displayName: 上传trace到$(Build.SourceBranchName)
@@ -292,7 +309,7 @@ stages:
           #     clean: false
           #     cleanContents: false
           #     preservePaths: false
-          #     trustSSL: false              
+          #     trustSSL: false
 
           # - task: FtpUpload@2
           #   displayName: 上传trace到release
