@@ -61,7 +61,8 @@ stages:
                 #!/usr/bin/env bash
                 set -ex
 
-                ls -alh
+                ls -alh ./exporter/common
+
 
                 docker run --rm \
                       -v $(pwd):/TelemetrySDK-Java \
@@ -103,9 +104,9 @@ stages:
             displayName: 发布UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
-              pathToSources: "./TelemetrySDK-Java/exporter/common/src/main/java"
-              reportDirectory: "./TelemetrySDK-Java/exporter/common/target/jacoco.exec"
-              summaryFileLocation: "./TelemetrySDK-Java/exporter/common/target/jacoco.exec"
+              pathToSources: "./exporter/common/src/main/java"
+              reportDirectory: "./exporter/common/target/jacoco.exec"
+              summaryFileLocation: "./exporter/common/target/jacoco.exec"
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
           #   displayName: Quality Gate Coverage # 此行保持一致
