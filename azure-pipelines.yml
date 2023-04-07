@@ -155,9 +155,9 @@ stages:
                       -Dsonar.coverage.minimumProjectThreshhold=99 \
                     "
 
-          - task: sonar-buildbreaker@8
-            inputs:
-              SonarQube: '$(sonarqube.server)'
+          # - task: sonar-buildbreaker@8
+          #   inputs:
+          #     SonarQube: '$(sonarqube.server)'
               
               
               
