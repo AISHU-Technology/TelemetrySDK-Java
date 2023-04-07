@@ -139,7 +139,7 @@ stages:
                     cd /TelemetrySDK-Java/exporter/common
                     sonar-scanner \
                       -D sonar.host.url=$(sonarqube.server) \
-                      -D sonar.projectKey='cn.aishu:opentelemetry-exporter-ar-common' \
+                      -D sonar.projectKey='cn.aishu:opentelemetry-exporter-common' \
                       -D sonar.projectName=${APP_NAME} \
                       -D sonar.projectVersion=2.4.0 \
                       -D sonar.sources=src/main/java/ \
