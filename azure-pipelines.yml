@@ -8,11 +8,12 @@ trigger:
   batch: true
   branches:
     include:
-      - "feature-*"
-      - "feature/*"
-      - "develop"
-      - "release-*"
-      - "release/*"
+      - "azure-*"
+      # - "feature-*"
+      # - "feature/*"
+      # - "develop"
+      # - "release-*"
+      # - "release/*"
 
 variables:
   - group: anyrobot-global-config
