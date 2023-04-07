@@ -113,7 +113,7 @@ stages:
                 ls -alh ./exporter/common/target/site/jacoco/
 
           - task: PublishCodeCoverageResults@1
-            displayName: 发布UT测试覆盖率报告
+            displayName: 发布UT测试覆盖率报告log
             inputs:
               codeCoverageTool: JaCoCo
               # pathToSources: "./sdk/src/main/java"
@@ -134,7 +134,7 @@ stages:
           #   inputs:
           #     scannerMode: MSBuild
           - task: BuildQualityChecks@8           # 此行保持一致     # UT卡点
-            displayName: Quality Gate UT         # 此行保持一致
+            displayName: Quality Gate UT log        # 此行保持一致
             inputs:
               # checkWarnings: true                # 此行保持一致
               # warningFailOption: 'fixed'
@@ -152,10 +152,52 @@ stages:
               # warningFilesArtifact: './TelemetrySDK-Java/exporter/common/target/jacoco.exec'
 
           - task: PublishCodeCoverageResults@1
-            displayName: 发布UT测试覆盖率报告
+            displayName: 发布UT测试覆盖率报告common
             inputs:
               codeCoverageTool: JaCoCo
               summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
+
+          - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+            displayName: Quality Gate Coverage common # 此行保持一致
+            inputs:
+              coverageType: "lines" # 代表行覆盖率
+              coverageFailOption: "fixed"
+              checkCoverage: true # 此行保持一致
+              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 发布UT测试覆盖率报告metric
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: "./exporter/ar-metric/target/site/jacoco/jacoco.xml"
+
+          - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+            displayName: Quality Gate Coverage metric # 此行保持一致
+            inputs:
+              coverageType: "lines" # 代表行覆盖率
+              coverageFailOption: "fixed"
+              checkCoverage: true # 此行保持一致
+              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 发布UT测试覆盖率报告trace
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: "./exporter/ar-trace/target/site/jacoco/jacoco.xml"
+
+          # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+          #   displayName: Quality Gate Coverage # 此行保持一致
+          #   inputs:
+          #     coverageType: "lines" # 代表行覆盖率
+          #     coverageFailOption: "fixed"
+          #     checkCoverage: true # 此行保持一致
+          #     coverageThreshold: "80.0" # 代码覆盖率卡点阈值         
+
+          # - task: PublishCodeCoverageResults@1
+          #   displayName: 发布UT测试覆盖率报告
+          #   inputs:
+          #     codeCoverageTool: JaCoCo
+          #     summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
 
           - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
             displayName: Quality Gate Coverage # 此行保持一致
@@ -164,7 +206,6 @@ stages:
               coverageFailOption: "fixed"
               checkCoverage: true # 此行保持一致
               coverageThreshold: "80.0" # 代码覆盖率卡点阈值
-
           - task: Bash@3
             displayName: 上传SonarQube
             inputs:
