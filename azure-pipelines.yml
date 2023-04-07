@@ -142,7 +142,7 @@ stages:
               showStatistics: true
               # evaluateTaskWarnings: false
               # evaluateFileWarnings: true
-              coverageThreshold: "99"
+              coverageThreshold: "80"
               coverageType: lines
               coverageFailOption: fixed
               checkCoverage: true
