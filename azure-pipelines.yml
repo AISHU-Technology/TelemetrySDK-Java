@@ -104,15 +104,17 @@ stages:
               script: |
                 #!/usr/bin/env bash
                 set -ex
-                ls -alh ./exporter/common
+                ls -alh ./exporter/common/target
+                ls -alh ./exporter/common/target/site/jacoco/
 
           - task: PublishCodeCoverageResults@1
             displayName: 发布UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
               pathToSources: "./exporter/common/src/main/java"
-              reportDirectory: "./exporter/common/target/jacoco.exec"
-              summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
+              reportDirectory: "./exporter/common/target/site/jacoco/"
+              summaryFileLocation: "jacoco.xml"
+              additionalCodeCoverageFiles: "./exporter/common/target/jacoco.exec"
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
           #   displayName: Quality Gate Coverage # 此行保持一致
