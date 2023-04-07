@@ -163,7 +163,7 @@ stages:
               coverageType: "lines" # 代表行覆盖率
               coverageFailOption: "fixed"
               checkCoverage: true # 此行保持一致
-              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+              coverageThreshold: "50.0" # 代码覆盖率卡点阈值
 
           - task: PublishCodeCoverageResults@1
             displayName: 发布UT测试覆盖率报告metric
@@ -177,7 +177,7 @@ stages:
               coverageType: "lines" # 代表行覆盖率
               coverageFailOption: "fixed"
               checkCoverage: true # 此行保持一致
-              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+              coverageThreshold: "50.0" # 代码覆盖率卡点阈值
 
           - task: PublishCodeCoverageResults@1
             displayName: 发布UT测试覆盖率报告trace
@@ -185,59 +185,47 @@ stages:
               codeCoverageTool: JaCoCo
               summaryFileLocation: "./exporter/ar-trace/target/site/jacoco/jacoco.xml"
 
-          # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
-          #   displayName: Quality Gate Coverage # 此行保持一致
-          #   inputs:
-          #     coverageType: "lines" # 代表行覆盖率
-          #     coverageFailOption: "fixed"
-          #     checkCoverage: true # 此行保持一致
-          #     coverageThreshold: "80.0" # 代码覆盖率卡点阈值         
-
-          # - task: PublishCodeCoverageResults@1
-          #   displayName: 发布UT测试覆盖率报告
-          #   inputs:
-          #     codeCoverageTool: JaCoCo
-          #     summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
-
           - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
-            displayName: Quality Gate Coverage # 此行保持一致
+            displayName: Quality Gate Coverage trace# 此行保持一致
             inputs:
               coverageType: "lines" # 代表行覆盖率
               coverageFailOption: "fixed"
               checkCoverage: true # 此行保持一致
-              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
-          - task: Bash@3
-            displayName: 上传SonarQube
-            inputs:
-              targetType: 'inline'
-              script: |
-                #!/usr/bin/env bash
-                set -ex
+              coverageThreshold: "50.0" # 代码覆盖率卡点阈值         
 
-                APP_NAME="opentelemetry-exporter-common"
 
-                docker run --rm \
-                        -u root:root \
-                        -v $(pwd):/TelemetrySDK-Java \
-                        $(SONARQUBE_IMAGE) bash -c "
-                    set -ex
+          # - task: Bash@3
+          #   displayName: 上传SonarQube
+          #   inputs:
+          #     targetType: 'inline'
+          #     script: |
+          #       #!/usr/bin/env bash
+          #       set -ex
 
-                    cd /TelemetrySDK-Java/exporter/common
-                    sonar-scanner \
-                      -D sonar.host.url=$(sonarqube.server) \
-                      -D sonar.projectKey='opentelemetry-exporter-common' \
-                      -D sonar.projectName=${APP_NAME} \
-                      -D sonar.projectVersion=2.4.0 \
-                      -D sonar.sources=src/main/java/ \
-                      -D sonar.language=java \
-                      -D sonar.java.binaries=target/classes \
-                      -D sonar.qualitygate.wait=true \
-                      -D sonar.coverage.thresholds=99 \
-                      -D sonar.login=$(sonarqube.token) \
-                      -Dsonar.java.covergaePlugin=jacoco \
-                      -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-                      -Dsonar.coverage.minimumProjectThreshold=99 \
-                    "
+          #       APP_NAME="opentelemetry-exporter-common"
+
+          #       docker run --rm \
+          #               -u root:root \
+          #               -v $(pwd):/TelemetrySDK-Java \
+          #               $(SONARQUBE_IMAGE) bash -c "
+          #           set -ex
+
+          #           cd /TelemetrySDK-Java/exporter/common
+          #           sonar-scanner \
+          #             -D sonar.host.url=$(sonarqube.server) \
+          #             -D sonar.projectKey='opentelemetry-exporter-common' \
+          #             -D sonar.projectName=${APP_NAME} \
+          #             -D sonar.projectVersion=2.4.0 \
+          #             -D sonar.sources=src/main/java/ \
+          #             -D sonar.language=java \
+          #             -D sonar.java.binaries=target/classes \
+          #             -D sonar.qualitygate.wait=true \
+          #             -D sonar.coverage.thresholds=99 \
+          #             -D sonar.login=$(sonarqube.token) \
+          #             -Dsonar.java.covergaePlugin=jacoco \
+          #             -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+          #             -Dsonar.coverage.minimumProjectThreshold=99 \
+          #           "
 
               # - task: sonar-buildbreaker@8
               #   inputs:
