@@ -67,14 +67,15 @@ stages:
                   set -ex
 
                   cd /TelemetrySDK-Java/exporter/common
-                  mvn clean install assembly:assembly
                   mvn sonar:sonar -Dsonar.java.binaries=target/classes \
                   -Dsonar.host.url=$(sonarqube.server) \
                   -Dsonar.login=$(sonarqube.token) \
                   -Dsonar.java.covergaePlugin=jacoco \
                   -Dsonar.coverage.thresholds=99 \
                   -Dsonar.coverage.minimumProjectThreshold=99 \
-                  -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+                  -Dsonar.jacoco.reportPaths=target/jacoco.exec 
+                  mvn clean install assembly:assembly
+
                   # cd /TelemetrySDK-Java/exporter/ar-metric
                   # mvn clean install assembly:assembly
                   # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
