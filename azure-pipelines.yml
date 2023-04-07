@@ -114,7 +114,8 @@ stages:
               codeCoverageTool: JaCoCo
               # pathToSources: "./sdk/src/main/java"
               # reportDirectory: "./sdk/target/site/jacoco/"
-              summaryFileLocation: "./sdk/target/site/jacoco/jacoco.xml"
+              summaryFileLocation: "./sdk/target/jacoco.exec"
+              # summaryFileLocation: "./sdk/target/site/jacoco/jacoco.xml"
               # additionalCodeCoverageFiles: "./sdk/target/jacoco.exec"
             
 
