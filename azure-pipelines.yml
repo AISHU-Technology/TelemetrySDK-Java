@@ -115,8 +115,9 @@ stages:
               codeCoverageTool: JaCoCo
               pathToSources: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/src/main/java"
               reportDirectory: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/site/jacoco/"
-              summaryFileLocation: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/jacoco.exec"
+              summaryFileLocation: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/site/jacoco/jacoco.xml"
               additionalCodeCoverageFiles: "/home/myagent/_work/3/s/TelemetrySDK-Java/sdk/target/jacoco.exec"
+            
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
           #   displayName: Quality Gate Coverage # 此行保持一致
@@ -132,6 +133,7 @@ stages:
           - task: BuildQualityChecks@8           # 此行保持一致     # UT卡点
             displayName: Quality Gate UT         # 此行保持一致
             inputs:
+              
               # checkWarnings: true                # 此行保持一致
               # warningFailOption: 'fixed'
               # warningThreshold: '99'
