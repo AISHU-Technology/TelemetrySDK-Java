@@ -61,9 +61,6 @@ stages:
                 #!/usr/bin/env bash
                 set -ex
 
-                ls -alh ./exporter/common
-
-
                 docker run --rm \
                       -v $(pwd):/TelemetrySDK-Java \
                       $(BUILD_IMAGE) bash -c "
@@ -100,13 +97,22 @@ stages:
           #     additionalCodeCoverageFiles: '$(Build.BinariesDirectory)/exporter/common/target/site/jacoco/jacoco.xml'
           #   condition: always()  
 
+          - task: Bash@3
+            displayName: 查看单元测试
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+                ls -alh ./exporter/common
+
           - task: PublishCodeCoverageResults@1
             displayName: 发布UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
               pathToSources: "./exporter/common/src/main/java"
               reportDirectory: "./exporter/common/target/jacoco.exec"
-              summaryFileLocation: "./exporter/common/target/jacoco.exec"
+              summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
 
           # - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
           #   displayName: Quality Gate Coverage # 此行保持一致
