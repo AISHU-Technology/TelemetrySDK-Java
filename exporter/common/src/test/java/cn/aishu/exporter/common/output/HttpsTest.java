@@ -25,8 +25,9 @@ public class HttpsTest {
         Assert.assertNotNull(HttpsSender.create(httpsUrl, new Retry(), true, 1024));
     }
 
-    @Before
+//    @Before
     public void initServer() throws IOException, NoSuchAlgorithmException, KeyStoreException, CertificateException, UnrecoverableKeyException, KeyManagementException {
+        System.out.println("xxxxxxxxxxxxxxxxxxxxxxx");
         // 创建 http 服务器, 绑定本地 55556 端口
         HttpsServer httpsServer = HttpsServer.create(new InetSocketAddress(55556), 0);
         SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -88,7 +89,8 @@ public class HttpsTest {
 
 
     @Test
-    public void responseCodeTest() {
+    public void responseCodeTest() throws UnrecoverableKeyException, CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        initServer();
         HttpsSender hs = new HttpsSender("https://localhost:55556/204", new Retry(true, 1, 1, 2), false, 2);
         hs.httpsRequest("abc", 1, 1);
 
