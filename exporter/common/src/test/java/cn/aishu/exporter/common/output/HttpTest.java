@@ -25,10 +25,12 @@ public class HttpTest {
         Assert.assertNotNull(HttpSender.create(httpsUrl, new Retry(), true, 1024));
     }
 
-    @Before
+    HttpServer httpServer ;
+
+    //    @Before
     public void initServer() throws IOException {
         // 创建 http 服务器, 绑定本地 55555 端口
-        HttpServer httpServer = HttpServer.create(new InetSocketAddress(55555), 0);
+        httpServer = HttpServer.create(new InetSocketAddress(55555), 0);
 
         // 创建上下文监听, "/" 表示匹配所有 URI 请求
         httpServer.createContext("/", new HttpHandler() {
@@ -52,7 +54,10 @@ public class HttpTest {
 
 
     @Test
-    public void createTest() {
+    public void createTest() throws IOException {
+        initServer();
+        TimeUtil.sleepSecond(2);
+
         HttpSender hs = new HttpSender("http://localhost:55555/204", new Retry(true, 1,1,2),true, 2);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"a\":\"b\"}");
@@ -79,5 +84,6 @@ public class HttpTest {
 
         Assert.assertNotNull(hs503);
         TimeUtil.sleepSecond(2);
+        httpServer.stop(0);
     }
 }
