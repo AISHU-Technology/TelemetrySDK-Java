@@ -76,17 +76,17 @@ stages:
                   # -Dsonar.coverage.minimumProjectThreshold=99 \
                   # -Dsonar.jacoco.reportPaths=target/jacoco.exec
                   mvn clean install assembly:assembly
-                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
+                  # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
 
                   cd /TelemetrySDK-Java/exporter/ar-metric
                   mvn clean install assembly:assembly
-                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
+                  # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   cd /TelemetrySDK-Java/exporter/ar-trace
                   mvn clean install assembly:assembly
-                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
+                  # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   cd /TelemetrySDK-Java/sdk
                   mvn clean install assembly:assembly
-                  mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
+                  # mvn sonar:sonar -Dsonar.host.url=$(sonarqube.server) -Dsonar.login=$(sonarqube.token)
                   "
           # - task: PublishCodeCoverageResults@1
           #   displayName: 'fugailv'
