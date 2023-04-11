@@ -186,7 +186,7 @@ stages:
 
 
           - task: Bash@3
-            displayName: 上传SonarQube
+            displayName: common上传SonarQube
             inputs:
               targetType: 'inline'
               script: |
@@ -282,7 +282,7 @@ stages:
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
                       -Dsonar.coverage.minimumProjectThreshold=99 \
-
+                    "
 
           - task: Bash@3
             displayName: metric上传SonarQube
@@ -315,7 +315,7 @@ stages:
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
                       -Dsonar.coverage.minimumProjectThreshold=99 \
-
+                    "
 
           - task: FtpUpload@2
             displayName: 上传log到$(Build.SourceBranchName)
