@@ -4,6 +4,7 @@ import cn.aishu.exporter.common.utils.TimeUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,10 +26,11 @@ public class HttpTest {
         Assert.assertNotNull(HttpSender.create(httpsUrl, new Retry(), true, 1024));
     }
 
-    HttpServer httpServer ;
+    HttpServer httpServer;
 
-    //    @Before
+    @Before
     public void initServer() throws IOException {
+        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxz");
         // 创建 http 服务器, 绑定本地 55555 端口
         httpServer = HttpServer.create(new InetSocketAddress(55555), 0);
 
@@ -50,14 +52,18 @@ public class HttpTest {
 
         // 启动服务
         httpServer.start();
+        System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyz");
+    }
+
+    @After
+    public void stopServer(){
+        httpServer.stop(0);
+        System.out.println("zzzzzzzzzzzzzzzzz");
     }
 
 
     @Test
-    public void createTest() throws IOException {
-        initServer();
-        TimeUtil.sleepSecond(2);
-
+    public void createTest() {
         HttpSender hs = new HttpSender("http://localhost:55555/204", new Retry(true, 1,1,2),true, 2);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"a\":\"b\"}");
@@ -84,6 +90,5 @@ public class HttpTest {
 
         Assert.assertNotNull(hs503);
         TimeUtil.sleepSecond(2);
-        httpServer.stop(0);
     }
 }

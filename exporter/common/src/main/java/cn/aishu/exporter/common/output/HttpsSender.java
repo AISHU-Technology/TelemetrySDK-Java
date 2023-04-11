@@ -28,7 +28,7 @@ public class HttpsSender implements Sender {
     private String serverUrl;
     private boolean isShutDown = false;
     private Retry retry = new Retry();
-    private boolean isGzip;
+    private boolean isGzip = false;
     private final Log logger = LogFactory.getLog(getClass());
 
 

@@ -56,7 +56,8 @@ public class ResourceTest {
         attributesMap.put(keyDoubleArray, doubles);
 
         List<KeyValue> keyValues2 = KeyValue.extractFromAttributes(attributesMap);
-        System.out.println(keyValues2.size());
+        Assert.assertNotEquals(0, keyValues2.size());
+
 
 //        System.out.println(attributesMap);
 

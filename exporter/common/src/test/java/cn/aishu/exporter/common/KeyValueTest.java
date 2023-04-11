@@ -26,9 +26,9 @@ public class KeyValueTest {
         AttributeKey<Object> key = InternalAttributeKeyImpl.create("STRING", AttributeType.STRING);
         attributesMap.put(key,"str");
         List<KeyValue> keyValues = KeyValue.extractFromAttributes(attributesMap);
-        System.out.println(keyValues.size());
-        System.out.println(keyValues.get(0));
-        System.out.println(attributesMap);
+//        System.out.println(keyValues.size());
+//        System.out.println(keyValues.get(0));
+//        System.out.println(attributesMap);
 
         AttributeKey<Object> keyBoolean = InternalAttributeKeyImpl.create("BOOLEAN", AttributeType.BOOLEAN);
         attributesMap.put(keyBoolean, true);
@@ -56,7 +56,8 @@ public class KeyValueTest {
         attributesMap.put(keyDoubleArray, doubles);
 
         List<KeyValue> keyValues2 = KeyValue.extractFromAttributes(attributesMap);
-        System.out.println(keyValues2.size());
+        Assert.assertNotEquals(0, keyValues2.size());
+
 
 //        System.out.println(attributesMap);
 

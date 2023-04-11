@@ -25,7 +25,7 @@ public class HttpSender implements Sender {
     private String serverUrl;
     private boolean isShutDown = false;
     private Retry retry = new Retry();
-    private boolean isGzip;
+    private boolean isGzip = false;
     private final Log logger = LogFactory.getLog(getClass());
 
 
@@ -92,6 +92,11 @@ public class HttpSender implements Sender {
         try {
             URL creator = new URL(this.serverUrl);
             conn = (HttpURLConnection) creator.openConnection();
+            if(conn == null){
+                this.logger.info("http create connection error");
+                httpRequest(outputStr, retryInterval, retryElapsedTime);
+                return;
+            }
             if (this.isGzip){
                 conn.setRequestProperty("Content-Encoding", "gzip");
             } else {

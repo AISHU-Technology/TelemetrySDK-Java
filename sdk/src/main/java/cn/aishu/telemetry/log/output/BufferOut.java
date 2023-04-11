@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 
 public class BufferOut implements Sender {
-    private  final int CAPACITY = 1024;
+    private  static final int CAPACITY = 1024;
     private  final BlockingQueue<String> bufferQueue = new ArrayBlockingQueue<>(CAPACITY);
 
 
@@ -31,5 +31,6 @@ public class BufferOut implements Sender {
 
     @Override
     public void shutDown() {
+        Logger.getLogger(getClass().getName()).info("bufferOut is shutdown");
     }
 }
