@@ -3,6 +3,7 @@ package cn.aishu.exporter.ar_metric;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.opentelemetry.sdk.metrics.internal.aggregator.EmptyMetricData;
 import org.apache.commons.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,9 +25,12 @@ public class AnyrobotMetricsTest {
         Log mockLog = mock(Log.class);
 
         MetricData mockMetricData = mock(MetricData.class);
-        when(mockMetricData.getName()).thenReturn("NameTest");
-        when(mockMetricData.getDescription()).thenReturn("DescriptionTest");
-        when(mockMetricData.getUnit()).thenReturn("UnitTest");
+        String nameTest = "NameTest";
+        String descriptionTest = "DescriptionTest";
+        String unitTest = "UnitTest";
+        when(mockMetricData.getName()).thenReturn(nameTest);
+        when(mockMetricData.getDescription()).thenReturn(descriptionTest);
+        when(mockMetricData.getUnit()).thenReturn(unitTest);
         when(mockMetricData.getType()).thenReturn(MetricDataType.LONG_GAUGE);
 
         try {
@@ -37,5 +41,16 @@ public class AnyrobotMetricsTest {
 
         AnyrobotMetrics testMetrics = new AnyrobotMetrics(mockMetricData, mockLog);
         Assert.assertNotNull(testMetrics.gauge);
+
+        testMetrics.setName(nameTest);
+        testMetrics.setDescription(descriptionTest);
+        Assert.assertEquals(nameTest, testMetrics.getName());
+        Assert.assertEquals(descriptionTest, testMetrics.getDescription());
+        Assert.assertNotNull(testMetrics.getGauge());
+        Assert.assertNotNull(testMetrics.getUnit());
+        Assert.assertNull(testMetrics.getHistogram());
+        Assert.assertNull(testMetrics.getSum());
     }
+
+
 }

@@ -55,5 +55,12 @@ public class AnyrobotHistogramDatapointTest {
         Assert.assertEquals("2", testDatapoint.time);
         Assert.assertEquals(testBoundaries, testDatapoint.boundaries);
         Assert.assertEquals(testCounts, testDatapoint.bucketCounts);
+        Assert.assertNotNull(testDatapoint.getAttributes());
+        Assert.assertNotNull(testDatapoint.getSum());
+        Assert.assertNotNull(testDatapoint.getBoundaries());
+        Assert.assertNotNull(testDatapoint.getCount());
+        Assert.assertNotNull(testDatapoint.getBucketCounts());
+        Assert.assertNotNull(testDatapoint.getStartTime());
+        Assert.assertNotNull(testDatapoint.getTime());
     }
 }
