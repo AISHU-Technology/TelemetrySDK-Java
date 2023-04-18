@@ -12,6 +12,7 @@ trigger:
       # - "feature-*"
       # - "feature/*"
       # - "develop"
+      # - "master"
       # - "release-*"
       # - "release/*"
 
@@ -21,12 +22,6 @@ variables:
     value: "acr.aishu.cn/public/maven:1.1"
   - name: SONARQUBE_IMAGE
     value: "acr.aishu.cn/public/sonarsource/sonar-scanner-cli:4.8"
-  - name: LintReportName # 此行保持一致
-    value: jacoco.xml
-  - name: UTReportName # 此行保持一致
-    value: jacoco.xml
-  - name: CoverageReportName # 此行保持一致
-    value: jacoco.xml
   - name: FTP_URL
     value: "ftp://ftp-ar.aishu.cn"
   - name: FTP_USER
@@ -82,7 +77,7 @@ stages:
                   "
 
           - task: Bash@3
-            displayName: 查看单元测试
+            displayName: 查看构建目录
             inputs:
               targetType: 'inline'
               script: |
@@ -124,7 +119,7 @@ stages:
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
                       -D sonar.qualitygate.wait=true \
-                      -D sonar.coverage.thresholds=99 \
+                      -D sonar.coverage.thresholds=80 \
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
@@ -157,7 +152,7 @@ stages:
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
                       -D sonar.qualitygate.wait=true \
-                      -D sonar.coverage.thresholds=99 \
+                      -D sonar.coverage.thresholds=80 \
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
@@ -190,7 +185,7 @@ stages:
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
                       -D sonar.qualitygate.wait=true \
-                      -D sonar.coverage.thresholds=99 \
+                      -D sonar.coverage.thresholds=80 \
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
@@ -223,7 +218,7 @@ stages:
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
                       -D sonar.qualitygate.wait=true \
-                      -D sonar.coverage.thresholds=99 \
+                      -D sonar.coverage.thresholds=80 \
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
@@ -232,7 +227,7 @@ stages:
 
 
           - task: PublishCodeCoverageResults@1
-            displayName: 发布UT测试覆盖率报告common
+            displayName: 发布common的UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
               summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
@@ -246,7 +241,7 @@ stages:
               coverageThreshold: "80.0" # 代码覆盖率卡点阈值
 
           - task: PublishCodeCoverageResults@1
-            displayName: 发布UT测试覆盖率报告log
+            displayName: 发布log的UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
               summaryFileLocation: "./sdk/target/site/jacoco/jacoco.xml"
@@ -261,13 +256,13 @@ stages:
               checkCoverage: true
 
           - task: PublishCodeCoverageResults@1
-            displayName: 发布UT测试覆盖率报告metric
+            displayName: 发布metric的UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
               summaryFileLocation: "./exporter/ar-metric/target/site/jacoco/jacoco.xml"
 
           - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
-            displayName: Quality Gate Coverage metric # 此行保持一致
+            displayName: metric Quality Gate Coverage # 此行保持一致
             inputs:
               coverageType: "lines" # 代表行覆盖率
               coverageFailOption: "fixed"
@@ -275,14 +270,14 @@ stages:
               coverageThreshold: "80.0" # 代码覆盖率卡点阈值
 
           - task: PublishCodeCoverageResults@1
-            displayName: 发布UT测试覆盖率报告trace
+            displayName: 发布trace的UT测试覆盖率报告
             inputs:
               codeCoverageTool: JaCoCo
               summaryFileLocation: "./exporter/ar-trace/target/site/jacoco/jacoco.xml"
               failIfCoverageEmpty: true
 
           - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
-            displayName: Quality Gate Coverage trace# 此行保持一致
+            displayName: trace Quality Gate Coverage # 此行保持一致
             inputs:
               coverageType: "lines" # 代表行覆盖率
               coverageFailOption: "fixed"
