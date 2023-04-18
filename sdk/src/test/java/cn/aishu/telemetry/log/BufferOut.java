@@ -1,4 +1,4 @@
-package cn.aishu.telemetry.log.output;
+package cn.aishu.telemetry.log;
 
 import cn.aishu.exporter.common.output.Sender;
 import cn.aishu.exporter.common.output.Serializer;
