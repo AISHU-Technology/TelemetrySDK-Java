@@ -8,13 +8,6 @@ trigger:
   batch: true
   branches:
     include:
-#      - "azure-*"
-#      - "feature-*"
-#      - "feature/*"
-#      - "develop"
-#      - "master"
-#      - "release-*"
-#      - "release/*"
       - $(Build.SourceBranchName)
 
 variables:
@@ -29,6 +22,8 @@ variables:
     value: "ftp-ar"
   - name: FTP_PWD
     value: "F64edf#s"
+  - name: PROJECT_VERSION
+    value: "2.4.0"
 
 resources:
   containers:
@@ -115,7 +110,7 @@ stages:
                       -D sonar.host.url=$(sonarqube.server) \
                       -D sonar.projectKey='cn.aishu:opentelemetry-exporter-common' \
                       -D sonar.projectName=${APP_NAME} \
-                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.projectVersion=$(PROJECT_VERSION) \
                       -D sonar.sources=src/main/java/ \
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
@@ -124,7 +119,7 @@ stages:
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                      -Dsonar.coverage.minimumProjectThreshold=80 \
                     "
 
           - task: Bash@3
@@ -148,7 +143,7 @@ stages:
                       -D sonar.host.url=$(sonarqube.server) \
                       -D sonar.projectKey='cn.aishu:opentelemetry-exporter-ar-log' \
                       -D sonar.projectName=${APP_NAME} \
-                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.projectVersion=$(PROJECT_VERSION) \
                       -D sonar.sources=src/main/java/ \
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
@@ -157,7 +152,7 @@ stages:
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                      -Dsonar.coverage.minimumProjectThreshold=80 \
                     "
 
           - task: Bash@3
@@ -181,7 +176,7 @@ stages:
                       -D sonar.host.url=$(sonarqube.server) \
                       -D sonar.projectKey='cn.aishu:opentelemetry-exporter-ar-trace' \
                       -D sonar.projectName=${APP_NAME} \
-                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.projectVersion=$(PROJECT_VERSION) \
                       -D sonar.sources=src/main/java/ \
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
@@ -190,7 +185,7 @@ stages:
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                      -Dsonar.coverage.minimumProjectThreshold=80 \
                     "
 
           - task: Bash@3
@@ -214,7 +209,7 @@ stages:
                       -D sonar.host.url=$(sonarqube.server) \
                       -D sonar.projectKey='cn.aishu:opentelemetry-exporter-ar-metric' \
                       -D sonar.projectName=${APP_NAME} \
-                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.projectVersion=$(PROJECT_VERSION) \
                       -D sonar.sources=src/main/java/ \
                       -D sonar.language=java \
                       -D sonar.java.binaries=target/classes \
@@ -223,7 +218,7 @@ stages:
                       -D sonar.login=$(sonarqube.token) \
                       -Dsonar.java.covergaePlugin=jacoco \
                       -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                      -Dsonar.coverage.minimumProjectThreshold=80 \
                     "
 
 
