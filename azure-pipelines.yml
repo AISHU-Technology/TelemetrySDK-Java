@@ -9,12 +9,12 @@ trigger:
   branches:
     include:
       - "azure-*"
-       - "feature-*"
-       - "feature/*"
-       - "develop"
-       - "master"
-       - "release-*"
-       - "release/*"
+      - "feature-*"
+      - "feature/*"
+      - "develop"
+      - "master"
+      - "release-*"
+      - "release/*"
 
 variables:
   - group: anyrobot-global-config
