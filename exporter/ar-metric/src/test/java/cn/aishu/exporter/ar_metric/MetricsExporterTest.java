@@ -3,8 +3,12 @@ package cn.aishu.exporter.ar_metric;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import cn.aishu.exporter.common.output.HttpSender;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.impl.SimpleLog;
+import org.junit.Assert;
 import org.junit.Test;
 
 import cn.aishu.exporter.common.output.StdSender;
@@ -81,6 +85,9 @@ public class MetricsExporterTest {
                 io.opentelemetry.sdk.common.CompletableResultCode res = reader.shutdown();
                 System.out.println(res.isDone());
 
-                TimeUtil.sleepSecond(10);
+                Assert.assertNotNull(MetricsExporter.create());
+                Assert.assertNotNull(MetricsExporter.create().getPreferredTemporality());
+                Assert.assertNotNull(MetricsExporter.create(new StdSender(), new SimpleLog("test")));
+                TimeUtil.sleepSecond(5);
         }
 }

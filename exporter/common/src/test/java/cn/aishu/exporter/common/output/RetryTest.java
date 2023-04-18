@@ -3,6 +3,8 @@ package cn.aishu.exporter.common.output;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.net.HttpURLConnection;
+
 import static org.junit.Assert.*;
 
 public class RetryTest {
@@ -29,6 +31,6 @@ public class RetryTest {
     @Test
     public void isOK() {
         Retry retry = new Retry();
-        Retry.isOK(retry, 1, 204);
+        Assert.assertTrue(Retry.isOK(retry, 1, HttpURLConnection.HTTP_UNAVAILABLE));
     }
 }

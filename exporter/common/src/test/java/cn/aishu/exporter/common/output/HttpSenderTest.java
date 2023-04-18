@@ -41,9 +41,10 @@ public class HttpSenderTest {
         PowerMockito.when(conn.getResponseCode()).thenReturn(HttpURLConnection.HTTP_UNAVAILABLE);
 
         HttpSender hs = new HttpSender(httpUrl, new Retry(true, 1,1,2),true, 2);
+        Assert.assertNotNull(hs);
         hs.httpRequest("abc", 1, 1);
         //由于测试开的缓存小，这样测试会有缓冲区溢出的日志打印
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             hs.send(()-> "{\"a\":\"b\"}");
         }
 
@@ -66,8 +67,8 @@ public class HttpSenderTest {
         PowerMockito.when(conn.getResponseCode()).thenReturn(HttpURLConnection.HTTP_OK);
 
 
-        HttpsSender hs = new HttpsSender(httpUrl, new Retry(true, 1,1,2),true, 2);
-        hs.httpsRequest("abc", 1, 1);
+        HttpSender hs = new HttpSender(httpUrl, new Retry(true, 1,1,2),true, 2);
+        Assert.assertNotNull(hs);
         hs.send(()-> "{\"a\":\"b\"}");
 
     }

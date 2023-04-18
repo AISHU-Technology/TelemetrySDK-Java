@@ -56,6 +56,13 @@ public class AnyrobotDatapointTest {
         Assert.assertEquals((Long) 1L, testDatapoint.asInt);
         Assert.assertEquals("1", testDatapoint.startTime);
         Assert.assertEquals("2", testDatapoint.time);
+
+        testDatapoint.setAttributes(testDatapoint.getAttributes());
+
+        Assert.assertNull(testDatapoint.getFloat());
+        Assert.assertNotNull(testDatapoint.getTime());
+        Assert.assertNotNull(testDatapoint.getStartTime());
+        Assert.assertNotNull(testDatapoint.getInt());
     }
 
 }

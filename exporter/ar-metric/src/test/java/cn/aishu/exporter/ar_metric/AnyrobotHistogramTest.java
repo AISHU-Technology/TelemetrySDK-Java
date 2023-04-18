@@ -45,5 +45,8 @@ public class AnyrobotHistogramTest {
 
         AnyrobotHistogram testHistogram = new AnyrobotHistogram(mockMetricData);
         Assert.assertEquals(1, testHistogram.dataPoints.size());
+
+        Assert.assertNotNull(testHistogram.getDataPoints());
+        Assert.assertNotNull(testHistogram.getTemporality());
     }
 }
