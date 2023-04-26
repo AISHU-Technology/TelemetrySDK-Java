@@ -4,7 +4,6 @@ package cn.aishu.telemetry.log;
 
 //import cn.aishu.exporter.common.utils.TimeUtil;
 import cn.aishu.telemetry.log.config.SamplerLogConfig;
-import cn.aishu.telemetry.log.output.BufferOut;
 
 
 import cn.aishu.telemetry.log.output.LogbackSender;

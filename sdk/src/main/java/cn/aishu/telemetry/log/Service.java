@@ -2,16 +2,20 @@ package cn.aishu.telemetry.log;
 
 
 import cn.aishu.telemetry.log.constant.KeyConstant;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class Service {
     private  Instance instance = new Instance();
 
+    @SerializedName("name")
     private  String name = "UnknownServiceName";
 
+    @SerializedName("version")
     private  String version = "UnknownServiceVersion";
 
     private static final Service SERVICE = new Service();
@@ -43,7 +47,7 @@ public class Service {
                     setVersion(serviceVersion);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.getGlobal().warning("get service info error: " + e.getMessage());
             }
         }
     }

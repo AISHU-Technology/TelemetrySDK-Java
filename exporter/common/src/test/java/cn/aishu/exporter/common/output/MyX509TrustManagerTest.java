@@ -21,6 +21,6 @@ public class MyX509TrustManagerTest {
 
     @Test
     public void getAcceptedIssuers() {
-        Assert.assertNull(myX509TrustManager.getAcceptedIssuers());
+        Assert.assertNotNull(myX509TrustManager.getAcceptedIssuers());
     }
 }

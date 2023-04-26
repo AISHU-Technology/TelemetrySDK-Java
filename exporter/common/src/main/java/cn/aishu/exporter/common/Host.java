@@ -1,7 +1,6 @@
 package cn.aishu.exporter.common;
 
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
@@ -32,8 +31,7 @@ public class Host {
             this.name = inetAddress.getHostName();
             this.ip = inetAddress.getHostAddress();
         } catch (UnknownHostException e) {
-            Log logger = LogFactory.getLog(getClass());
-            logger.error(e.getMessage(), e);
+            LogFactory.getLog(getClass()).error(e.getMessage(), e);
         }
     }
 

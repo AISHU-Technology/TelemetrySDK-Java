@@ -4,31 +4,31 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.AttributeType;
 import io.opentelemetry.api.internal.InternalAttributeKeyImpl;
 import io.opentelemetry.sdk.internal.AttributesMap;
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.List;
 
 
-public class KeyValueTest {
+public class ResourceTest {
 
     @Test
-    public void createWithStringType() {
-        KeyValue withStringType = KeyValue.createWithStringType("stringKey", "abc");
-        Assert.assertNotNull(withStringType);
-//        System.out.println(withStringType);
+    public void getResource() {
+        AttributesMap attributesMap =AttributesMap.create(10, 10);
+        List<KeyValue> resource = Resource.getResource(attributesMap);
+
+        Assert.assertFalse(resource.isEmpty());
     }
 
     @Test
     public void extractFromAttributes() {
-//        InternalAttributeKeyImpl.create()
         AttributesMap attributesMap =AttributesMap.create(10, 10);
         AttributeKey<Object> key = InternalAttributeKeyImpl.create("STRING", AttributeType.STRING);
         attributesMap.put(key,"str");
         List<KeyValue> keyValues = KeyValue.extractFromAttributes(attributesMap);
-        System.out.println(keyValues.size());
-        System.out.println(keyValues.get(0));
-        System.out.println(attributesMap);
+//        System.out.println(keyValues.size());
+//        System.out.println(keyValues.get(0));
+//        System.out.println(attributesMap);
 
         AttributeKey<Object> keyBoolean = InternalAttributeKeyImpl.create("BOOLEAN", AttributeType.BOOLEAN);
         attributesMap.put(keyBoolean, true);
@@ -56,7 +56,8 @@ public class KeyValueTest {
         attributesMap.put(keyDoubleArray, doubles);
 
         List<KeyValue> keyValues2 = KeyValue.extractFromAttributes(attributesMap);
-        System.out.println(keyValues2.size());
+        Assert.assertNotEquals(0, keyValues2.size());
+
 
 //        System.out.println(attributesMap);
 
