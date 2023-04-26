@@ -1,0 +1,401 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+# 触发管道
+trigger:
+  batch: true
+  branches:
+    include:
+      - $(Build.SourceBranchName)
+
+variables:
+  - group: anyrobot-global-config
+  - name: BUILD_IMAGE
+    value: "acr.aishu.cn/public/maven:1.1"
+  - name: SONARQUBE_IMAGE
+    value: "acr.aishu.cn/public/sonarsource/sonar-scanner-cli:4.8"
+  - name: FTP_URL
+    value: "ftp://ftp-ar.aishu.cn"
+  - name: FTP_USER
+    value: "ftp-ar"
+  - name: FTP_PWD
+    value: "F64edf#s"
+
+resources:
+  containers:
+    - container: dotnet
+      endpoint: acr-registry
+      image: dotnet/runtime:3.1-bullseye-slim
+
+stages:
+  - stage: CodeCheck
+    displayName: 代码检查
+    jobs:
+      - job: _1CodeCheck
+        displayName: 1.代码检查(UT/Lint)
+        workspace:
+          clean: all
+        pool:
+          name: telemetrySDK-pool
+          demands:
+            - docker
+        steps:
+          - checkout: self
+          - task: Bash@3
+            displayName: 单元测试
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+
+                docker run --rm \
+                      -v $(pwd):/TelemetrySDK-Java \
+                      $(BUILD_IMAGE) bash -c "
+                  set -ex
+
+                  cd /TelemetrySDK-Java/exporter/common
+                  mvn clean install assembly:assembly
+
+                  cd /TelemetrySDK-Java/exporter/ar-metric
+                  mvn clean install assembly:assembly
+
+                  cd /TelemetrySDK-Java/exporter/ar-trace
+                  mvn clean install assembly:assembly
+
+                  cd /TelemetrySDK-Java/sdk
+                  mvn clean install assembly:assembly
+
+                  "
+
+          - task: Bash@3
+            displayName: 查看构建目录
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+                ls -alh ./sdk/target
+                ls -alh ./sdk/target/site/jacoco/
+                ls -alh ./exporter/common/target
+                ls -alh ./exporter/common/target/site/jacoco/
+                ls -alh ./exporter/ar-trace/target
+                ls -alh ./exporter/ar-trace/target/site/jacoco/
+                ls -alh ./exporter/ar-metric/target
+                ls -alh ./exporter/ar-metric/target/site/jacoco/
+
+
+          - task: Bash@3
+            displayName: common上传SonarQube
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+
+                APP_NAME="opentelemetry-exporter-common"
+
+                docker run --rm \
+                        -u root:root \
+                        -v $(pwd):/TelemetrySDK-Java \
+                        $(SONARQUBE_IMAGE) bash -c "
+                    set -ex
+
+                    cd /TelemetrySDK-Java/exporter/common
+                    sonar-scanner \
+                      -D sonar.host.url=$(sonarqube.server) \
+                      -D sonar.projectKey='cn.aishu:opentelemetry-exporter-common' \
+                      -D sonar.projectName=${APP_NAME} \
+                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.sources=src/main/java/ \
+                      -D sonar.language=java \
+                      -D sonar.java.binaries=target/classes \
+                      -D sonar.qualitygate.wait=true \
+                      -D sonar.coverage.thresholds=80 \
+                      -D sonar.login=$(sonarqube.token) \
+                      -Dsonar.java.covergaePlugin=jacoco \
+                      -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                    "
+
+          - task: Bash@3
+            displayName: log上传SonarQube
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+
+                APP_NAME="opentelemetry-exporter-ar-log"
+
+                docker run --rm \
+                        -u root:root \
+                        -v $(pwd):/TelemetrySDK-Java \
+                        $(SONARQUBE_IMAGE) bash -c "
+                    set -ex
+
+                    cd /TelemetrySDK-Java/sdk
+                    sonar-scanner \
+                      -D sonar.host.url=$(sonarqube.server) \
+                      -D sonar.projectKey='cn.aishu:opentelemetry-exporter-ar-log' \
+                      -D sonar.projectName=${APP_NAME} \
+                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.sources=src/main/java/ \
+                      -D sonar.language=java \
+                      -D sonar.java.binaries=target/classes \
+                      -D sonar.qualitygate.wait=true \
+                      -D sonar.coverage.thresholds=80 \
+                      -D sonar.login=$(sonarqube.token) \
+                      -Dsonar.java.covergaePlugin=jacoco \
+                      -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                    "
+
+          - task: Bash@3
+            displayName: trace上传SonarQube
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+
+                APP_NAME="opentelemetry-exporter-ar-trace"
+
+                docker run --rm \
+                        -u root:root \
+                        -v $(pwd):/TelemetrySDK-Java \
+                        $(SONARQUBE_IMAGE) bash -c "
+                    set -ex
+
+                    cd /TelemetrySDK-Java/exporter/ar-trace
+                    sonar-scanner \
+                      -D sonar.host.url=$(sonarqube.server) \
+                      -D sonar.projectKey='cn.aishu:opentelemetry-exporter-ar-trace' \
+                      -D sonar.projectName=${APP_NAME} \
+                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.sources=src/main/java/ \
+                      -D sonar.language=java \
+                      -D sonar.java.binaries=target/classes \
+                      -D sonar.qualitygate.wait=true \
+                      -D sonar.coverage.thresholds=80 \
+                      -D sonar.login=$(sonarqube.token) \
+                      -Dsonar.java.covergaePlugin=jacoco \
+                      -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                    "
+
+          - task: Bash@3
+            displayName: metric上传SonarQube
+            inputs:
+              targetType: 'inline'
+              script: |
+                #!/usr/bin/env bash
+                set -ex
+
+                APP_NAME="opentelemetry-exporter-ar-metric"
+
+                docker run --rm \
+                        -u root:root \
+                        -v $(pwd):/TelemetrySDK-Java \
+                        $(SONARQUBE_IMAGE) bash -c "
+                    set -ex
+
+                    cd /TelemetrySDK-Java/exporter/ar-metric
+                    sonar-scanner \
+                      -D sonar.host.url=$(sonarqube.server) \
+                      -D sonar.projectKey='cn.aishu:opentelemetry-exporter-ar-metric' \
+                      -D sonar.projectName=${APP_NAME} \
+                      -D sonar.projectVersion=2.4.0 \
+                      -D sonar.sources=src/main/java/ \
+                      -D sonar.language=java \
+                      -D sonar.java.binaries=target/classes \
+                      -D sonar.qualitygate.wait=true \
+                      -D sonar.coverage.thresholds=80 \
+                      -D sonar.login=$(sonarqube.token) \
+                      -Dsonar.java.covergaePlugin=jacoco \
+                      -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+                      -Dsonar.coverage.minimumProjectThreshold=99 \
+                    "
+
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 发布common的UT测试覆盖率报告
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: "./exporter/common/target/site/jacoco/jacoco.xml"
+
+          - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+            displayName: common Quality Gate Coverage # 此行保持一致
+            inputs:
+              coverageType: "lines" # 代表行覆盖率
+              coverageFailOption: "fixed"
+              checkCoverage: true # 此行保持一致
+              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 发布log的UT测试覆盖率报告
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: "./sdk/target/site/jacoco/jacoco.xml"
+
+          - task: BuildQualityChecks@8           # 此行保持一致     # UT卡点
+            displayName: log Quality Gate Coverage        # 此行保持一致
+            inputs:
+              showStatistics: true
+              coverageThreshold: "80"
+              coverageType: lines
+              coverageFailOption: fixed
+              checkCoverage: true
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 发布metric的UT测试覆盖率报告
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: "./exporter/ar-metric/target/site/jacoco/jacoco.xml"
+
+          - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+            displayName: metric Quality Gate Coverage # 此行保持一致
+            inputs:
+              coverageType: "lines" # 代表行覆盖率
+              coverageFailOption: "fixed"
+              checkCoverage: true # 此行保持一致
+              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 发布trace的UT测试覆盖率报告
+            inputs:
+              codeCoverageTool: JaCoCo
+              summaryFileLocation: "./exporter/ar-trace/target/site/jacoco/jacoco.xml"
+              failIfCoverageEmpty: true
+
+          - task: BuildQualityChecks@8 # 此行保持一致 代码覆盖率卡点
+            displayName: trace Quality Gate Coverage # 此行保持一致
+            inputs:
+              coverageType: "lines" # 代表行覆盖率
+              coverageFailOption: "fixed"
+              checkCoverage: true # 此行保持一致
+              coverageThreshold: "80.0" # 代码覆盖率卡点阈值
+
+
+          - task: FtpUpload@2
+            displayName: 上传log到$(Build.SourceBranchName)
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './sdk/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
+          - task: FtpUpload@2
+            displayName: 上传common到$(Build.SourceBranchName)
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/common/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
+          - task: FtpUpload@2
+            displayName: 上传metric到$(Build.SourceBranchName)
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/ar-metric/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
+          - task: FtpUpload@2
+            displayName: 上传trace到$(Build.SourceBranchName)
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/ar-trace/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/$(Build.SourceBranchName)'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
+
+          - task: FtpUpload@2
+            displayName: 上传log到release
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './sdk/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/release'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
+          - task: FtpUpload@2
+            displayName: 上传common到release
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/common/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/release'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
+          - task: FtpUpload@2
+            displayName: 上传metric到release
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/ar-metric/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/release'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false
+
+          - task: FtpUpload@2
+            displayName: 上传trace到release
+            inputs:
+              credentialsOption: 'inputs'
+              serverUrl: $(FTP_URL)
+              username: $(FTP_USER)
+              password: $(FTP_PWD)
+              rootDirectory: './exporter/ar-trace/target/'
+              filePatterns: '**.jar'
+              remoteDirectory: '/data/ftp/telemetrySDK/java/release'
+              clean: false
+              cleanContents: false
+              preservePaths: false
+              trustSSL: false

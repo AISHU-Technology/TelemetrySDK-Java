@@ -49,6 +49,7 @@ public class AnyrobotGaugeTest {
 
         AnyrobotGauge testGauge = new AnyrobotGauge(mockMetricData, mockLog);
         Assert.assertEquals(1, testGauge.dataPoints.size());
+        Assert.assertNotNull(testGauge.getDataPoints());
     }
 
     @Test

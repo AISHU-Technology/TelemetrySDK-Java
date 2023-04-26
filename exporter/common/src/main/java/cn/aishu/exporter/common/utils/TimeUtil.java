@@ -1,7 +1,6 @@
 package cn.aishu.exporter.common.utils;
 
 import cn.hutool.core.date.DateUtil;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Date;
@@ -15,8 +14,7 @@ public class TimeUtil {
         try {
             Thread.sleep(1000 * sec);
         } catch (InterruptedException e) {
-            final Log logger = LogFactory.getLog(TimeUtil.class);
-            logger.error(e);
+            LogFactory.getLog(TimeUtil.class).error(e);
             Thread.currentThread().interrupt();
         }
     }

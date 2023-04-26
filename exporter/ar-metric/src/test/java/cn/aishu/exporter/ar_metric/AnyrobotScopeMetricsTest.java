@@ -42,6 +42,9 @@ public class AnyrobotScopeMetricsTest {
 
         AnyrobotScopeMetrics testScopeMetrics = new AnyrobotScopeMetrics(mockMetricData, mockLog);
         Assert.assertEquals(1, testScopeMetrics.metrics.size());
+        testScopeMetrics.setScope(testScopeMetrics.getScope());
+        Assert.assertNotNull(testScopeMetrics.getScope());
+        Assert.assertNotNull(testScopeMetrics.getMetrics());
     }
 
 }

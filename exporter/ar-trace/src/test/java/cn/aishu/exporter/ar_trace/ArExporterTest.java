@@ -53,6 +53,7 @@ public class ArExporterTest {
         span.addEvent("Event 02");
 
         span.end();
+        Assert.assertNotNull(tracer);
         TimeUtil.sleepSecond(5);
     }
 
@@ -80,6 +81,8 @@ public class ArExporterTest {
         } finally {
             span.end();
         }
+        Assert.assertNotNull(tracer);
+
         Runtime.getRuntime().addShutdownHook(new Thread(tracerProvider::close));
         TimeUtil.sleepSecond(1);
     }
